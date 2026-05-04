@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+
+// ─── USERS (login accounts) ───────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  settings    Settings?
+
+  paylaws   Paylaw[]
+  overtimes Overtime[]
+  employees Employee[]
+}
+
+// ─── EMPLOYEES (workers on site) ──────────────────────
+model Employee {
+  id        String   @id @default(cuid())
+  name      String
+  jobTitle  String
+  site      String
+  dayRate   Float    // normal shift — paid per day
+  otRate    Float    // overtime — paid per hour
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  paylawRows  PaylawRow[]
+  overtimeRows OvertimeRow[]
+}
+
+// ─── PAYLAWS (normal shift sheets) ────────────────────
+model Paylaw {
+  id          String   @id @default(cuid())
+  site        String
+  month       Int      // e.g. 4 for April
+  year        Int      // e.g. 2026
+  preparedBy  String
+  foodExpense Float    @default(0)
+  otherDeduct Float    @default(0)
+  status      String   @default("draft") // "draft" or "done"
+  createdAt   DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  rows        PaylawRow[]
+}
+
+// ─── PAYLAW ROWS (one row per worker per paylaw) ───────
+model PaylawRow {
+  id         String  @id @default(cuid())
+  daysWorked Int     // total days present that month
+  dayRate    Float   // snapshot of rate at time of paylaw
+  amount     Float   // daysWorked × dayRate
+  signature  String? // worker's signature text
+
+  // which paylaw this row belongs to
+  paylawId   String
+  paylaw     Paylaw   @relation(fields: [paylawId], references: [id])
+
+  // which employee this row is for
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  // attendance: stored as JSON  e.g. {"1":true,"2":false,"3":true ...}
+  attendance Json
+}
+
+// ─── OVERTIME SHEETS ───────────────────────────────────
+model Overtime {
+  id         String   @id @default(cuid())
+  site       String
+  month      Int
+  year       Int
+  preparedBy String
+  status     String   @default("draft")
+  createdAt  DateTime @default(now())
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+
+  rows       OvertimeRow[]
+}
+
+// ─── OVERTIME ROWS (one row per worker per OT sheet) ───
+model OvertimeRow {
+  id         String  @id @default(cuid())
+  totalHours Float   // sum of all hours that month
+  otRate     Float   // snapshot of rate at time of OT sheet
+  amount     Float   // totalHours × otRate
+  signature  String?
+
+  overtimeId String
+  overtime   Overtime @relation(fields: [overtimeId], references: [id])
+
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  // hours per day e.g. {"1":2,"2":0,"3":3 ...}
+  hours      Json
+}
+
+
+model Settings {
+  id          String  @id @default(cuid())
+  companyName String  @default("")
+  siteName    String  @default("")
+  phone       String  @default("")
+  email       String  @default("")
+  address     String  @default("")
+
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id])
+}

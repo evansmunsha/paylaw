@@ -24,3 +24,17 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+
+/* Safe area for notched phones */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Smaller padding on mobile everywhere */
+@media (max-width: 768px) {
+  .page-pad {
+    padding: 1rem;
+  }
+}
