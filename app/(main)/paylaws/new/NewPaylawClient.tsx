@@ -25,6 +25,7 @@ interface WorkerRow {
   jobTitle: string
   dayRate: number
   attendance: Record<string, boolean>
+  deduction: number
   signature: string
 }
 
@@ -69,11 +70,10 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
   }
 
   function isWeekend(day: number) {
-    const dow = getDayOfWeek(day)
-    return dow === 0 || dow === 6
+    const d = getDayOfWeek(day)
+    return d === 0 || d === 6
   }
 
-  // ── Copy workers from a previous paylaw ─────────────
   async function copyFromPaylaw(paylawId: string) {
     if (!paylawId) return
     setCopying(true)
@@ -86,10 +86,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
         setError('Could not load workers from that paylaw')
         return
       }
-
       const data = await res.json()
-
-      // Add workers that are not already in the grid
       const newWorkers: WorkerRow[] = []
       for (const w of data.workers) {
         if (!rows.find(r => r.employeeId === w.employeeId)) {
@@ -98,19 +95,14 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
             name: w.name,
             jobTitle: w.jobTitle,
             dayRate: w.dayRate,
-            attendance: {},    // fresh attendance — no marks from last month
+            attendance: {},
+            deduction: 0,
             signature: '',
           })
         }
       }
-
       setRows(prev => [...prev, ...newWorkers])
-
-      // Auto-fill site name if empty
-      if (!site && data.site) {
-        setSite(data.site)
-      }
-
+      if (!site && data.site) setSite(data.site)
       setCopySuccess(
         `Copied ${newWorkers.length} worker${newWorkers.length !== 1 ? 's' : ''} from ${data.site}`
       )
@@ -136,6 +128,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
       jobTitle: emp.jobTitle,
       dayRate: emp.dayRate,
       attendance: {},
+      deduction: 0,
       signature: '',
     }])
     setSelectedEmpId('')
@@ -164,16 +157,30 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
     ))
   }
 
+  function updateDeduction(employeeId: string, val: string) {
+    setRows(prev => prev.map(row =>
+      row.employeeId === employeeId
+        ? { ...row, deduction: parseFloat(val) || 0 }
+        : row
+    ))
+  }
+
   function daysWorked(row: WorkerRow) {
     return Object.values(row.attendance).filter(Boolean).length
   }
 
-  function rowAmount(row: WorkerRow) {
+  function grossAmount(row: WorkerRow) {
     return daysWorked(row) * row.dayRate
   }
 
-  const totalDays   = rows.reduce((t, r) => t + daysWorked(r), 0)
-  const totalNormal = rows.reduce((t, r) => t + rowAmount(r), 0)
+  function netAmount(row: WorkerRow) {
+    return Math.max(grossAmount(row) - row.deduction, 0)
+  }
+
+  const totalGross    = rows.reduce((t, r) => t + grossAmount(r), 0)
+  const totalDeduct   = rows.reduce((t, r) => t + r.deduction, 0)
+  const totalNet      = rows.reduce((t, r) => t + netAmount(r), 0)
+  const totalDaysAll  = rows.reduce((t, r) => t + daysWorked(r), 0)
 
   async function handleSave(status: 'draft' | 'done') {
     if (!site || !preparedBy) {
@@ -196,11 +203,13 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           foodExpense, otherDeduct, status,
           rows: rows.map(row => ({
             employeeId: row.employeeId,
-            dayRate: row.dayRate,
+            dayRate:    row.dayRate,
             daysWorked: daysWorked(row),
-            amount: rowAmount(row),
+            amount:     grossAmount(row),
+            deduction:  row.deduction,
+            netAmount:  netAmount(row),
             attendance: row.attendance,
-            signature: row.signature,
+            signature:  row.signature,
           })),
         }),
       })
@@ -232,28 +241,27 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                       border-green-100 rounded-lg px-4 py-2 text-sm
                       text-gray-600 flex-wrap">
         <span className="text-gray-400">Formula:</span>
-        <span className="font-medium text-gray-800">Worker salary</span>
+        <span className="font-medium text-gray-800">Net pay</span>
         <span className="text-gray-400">=</span>
         <span className="bg-green-100 text-green-800 font-medium
                          px-2 py-0.5 rounded">
-          days worked
+          days worked × rate
         </span>
-        <span className="text-gray-400">×</span>
-        <span className="bg-green-100 text-green-800 font-medium
+        <span className="text-gray-400">−</span>
+        <span className="bg-red-100 text-red-700 font-medium
                          px-2 py-0.5 rounded">
-          rate per day (K)
+          deduction
         </span>
       </div>
 
-      {/* ── COPY FROM PREVIOUS PAYLAW ── */}
-      {previousPaylaws?.length > 0 && (
+      {/* Copy from previous */}
+      {previousPaylaws.length > 0 && (
         <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
           <p className="text-sm font-medium text-blue-900 mb-1">
             Copy workers from a previous paylaw
           </p>
           <p className="text-xs text-blue-600 mb-3">
-            This adds all workers from that sheet instantly.
-            Attendance starts fresh — you mark days from zero.
+            Adds all workers instantly. Attendance and deductions start fresh.
           </p>
           <div className="flex gap-2 flex-wrap">
             <select
@@ -277,15 +285,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
             )}
           </div>
           {copySuccess && (
-            <p className="text-xs text-green-700 mt-2 flex items-center gap-1">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <circle cx="6" cy="6" r="5.5" fill="#16a34a"/>
-                <path d="M3.5 6l2 2 3-3" stroke="white"
-                      strokeWidth="1.3" strokeLinecap="round"
-                      strokeLinejoin="round"/>
-              </svg>
-              {copySuccess}
-            </p>
+            <p className="text-xs text-green-700 mt-2">✓ {copySuccess}</p>
           )}
         </div>
       )}
@@ -363,7 +363,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                       tracking-wider mb-1 flex items-center gap-3
                       after:flex-1 after:h-px after:bg-gray-100
                       after:content-['']">
-          Monthly attendance &amp; rates
+          Monthly attendance, rates &amp; deductions
         </p>
 
         <div className="flex items-center justify-between flex-wrap
@@ -376,17 +376,19 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
             <span className="flex items-center gap-1.5">
               <span className="w-5 h-5 rounded bg-green-100 border
                                border-green-300 flex items-center
-                               justify-center text-green-700
-                               font-bold text-xs">✓</span>
+                               justify-center text-green-700 font-bold">
+                ✓
+              </span>
               Present
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded bg-amber-50
-                               border border-amber-200 inline-block"/>
-              Weekend
-            </span>
-            <span className="text-gray-400 hidden sm:inline">
-              · Click any day to toggle
+              <span className="w-5 h-5 rounded bg-red-50 border
+                               border-red-200 flex items-center
+                               justify-center text-red-500 text-xs
+                               font-bold">
+                −
+              </span>
+              Deduction
             </span>
           </div>
         </div>
@@ -411,7 +413,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           </span>
         </div>
 
-        {/* Add worker row */}
+        {/* Add worker */}
         <div className="flex gap-2 mb-4">
           <select
             className="flex-1 min-w-0 border border-gray-200 rounded-lg
@@ -442,8 +444,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
               <line x1="1" y1="6" x2="11" y2="6" stroke="currentColor"
                     strokeWidth="1.6" strokeLinecap="round"/>
             </svg>
-            <span className="hidden sm:inline">Add worker</span>
-            <span className="sm:hidden">Add</span>
+            Add
           </button>
         </div>
 
@@ -451,10 +452,6 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           <div className="border border-dashed border-gray-200 rounded-xl
                           py-12 text-center text-sm text-gray-400">
             No workers added yet.
-            <br/>
-            <span className="text-xs text-gray-300 mt-1 block">
-              Copy from a previous paylaw above or add individually
-            </span>
           </div>
         ) : (
           <div
@@ -490,27 +487,20 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                     K / day
                   </th>
                   {allDays.map(day => {
-                    const dow     = getDayOfWeek(day)
                     const weekend = isWeekend(day)
                     return (
                       <th key={day}
                           className={`border-b border-gray-200 text-center
                                       px-0 py-2 min-w-9
-                                      ${weekend
-                                        ? 'bg-amber-50'
-                                        : 'bg-gray-50'}`}>
+                                      ${weekend ? 'bg-amber-50' : 'bg-gray-50'}`}>
                         <div className="flex flex-col items-center gap-0.5">
                           <span className={`text-xs font-semibold
-                            ${weekend
-                              ? 'text-amber-600'
-                              : 'text-gray-600'}`}>
+                            ${weekend ? 'text-amber-600' : 'text-gray-600'}`}>
                             {day}
                           </span>
                           <span className={`text-xs
-                            ${weekend
-                              ? 'text-amber-400'
-                              : 'text-gray-300'}`}>
-                            {DAY_LABELS[dow]}
+                            ${weekend ? 'text-amber-400' : 'text-gray-300'}`}>
+                            {DAY_LABELS[getDayOfWeek(day)]}
                           </span>
                         </div>
                       </th>
@@ -523,8 +513,19 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                   </th>
                   <th className="border-b border-gray-200 bg-gray-50
                                  text-right text-xs font-medium text-gray-400
-                                 uppercase tracking-wide px-3 py-3 min-w-24">
-                    Amount
+                                 uppercase tracking-wide px-3 py-3 min-w-20">
+                    Gross
+                  </th>
+                  {/* Deduction column */}
+                  <th className="border-b border-gray-200 bg-red-50
+                                 text-center text-xs font-medium text-red-400
+                                 uppercase tracking-wide px-3 py-3 min-w-20">
+                    Deduct (K)
+                  </th>
+                  <th className="border-b border-gray-200 bg-green-50
+                                 text-right text-xs font-medium text-green-600
+                                 uppercase tracking-wide px-3 py-3 min-w-20">
+                    Net pay
                   </th>
                   <th className="border-b border-gray-200 bg-gray-50
                                  text-left text-xs font-medium text-gray-400
@@ -539,7 +540,8 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
               <tbody>
                 {rows.map(row => {
                   const worked = daysWorked(row)
-                  const amount = rowAmount(row)
+                  const gross  = grossAmount(row)
+                  const net    = netAmount(row)
                   return (
                     <tr key={row.employeeId}
                         className="border-b border-gray-100
@@ -569,8 +571,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                         />
                       </td>
                       {allDays.map(day => {
-                        const key     = String(day)
-                        const present = !!row.attendance[key]
+                        const present = !!row.attendance[String(day)]
                         const weekend = isWeekend(day)
                         return (
                           <td key={day}
@@ -578,9 +579,6 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                                 ${weekend ? 'bg-amber-50/40' : ''}`}>
                             <button
                               onClick={() => toggleDay(row.employeeId, day)}
-                              title={present
-                                ? 'Mark absent'
-                                : 'Mark present'}
                               className={`w-7 h-7 rounded text-xs font-bold
                                           transition-all mx-auto block
                                 ${present
@@ -595,18 +593,47 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                           </td>
                         )
                       })}
+
+                      {/* Days */}
                       <td className="border-l border-gray-100 px-3 py-2.5
                                      text-center text-sm font-semibold
                                      text-gray-800">
                         {worked > 0 ? worked : '—'}
                       </td>
+
+                      {/* Gross */}
+                      <td className="px-3 py-2.5 text-right text-sm
+                                     font-medium text-gray-600 whitespace-nowrap">
+                        {gross > 0 ? `K ${gross.toLocaleString()}` : '—'}
+                      </td>
+
+                      {/* Deduction input */}
+                      <td className="px-2 py-2.5 text-center bg-red-50/30">
+                        <input
+                          type="number"
+                          min="0"
+                          value={row.deduction || ''}
+                          placeholder="0"
+                          onChange={e => updateDeduction(
+                            row.employeeId, e.target.value
+                          )}
+                          className="w-16 text-center text-xs font-semibold
+                                     text-red-600 bg-white border
+                                     border-red-200 rounded px-1 py-1
+                                     outline-none focus:border-red-400
+                                     [appearance:textfield]
+                                     [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      </td>
+
+                      {/* Net pay */}
                       <td className="px-3 py-2.5 text-right text-sm
                                      font-semibold text-green-700
-                                     whitespace-nowrap">
-                        {amount > 0
-                          ? `K ${amount.toLocaleString()}`
-                          : '—'}
+                                     whitespace-nowrap bg-green-50/20">
+                        {net > 0 ? `K ${net.toLocaleString()}` : '—'}
                       </td>
+
+                      {/* Signature */}
                       <td className="px-2 py-2.5">
                         <input
                           type="text"
@@ -626,6 +653,8 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                                      placeholder:text-gray-300"
                         />
                       </td>
+
+                      {/* Remove */}
                       <td className="px-2 py-2.5">
                         <button
                           onClick={() => removeWorker(row.employeeId)}
@@ -647,19 +676,16 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                   <td colSpan={3}
                       className="sticky left-0 z-10 bg-gray-50 px-4 py-2
                                  text-xs font-semibold text-gray-500">
-                    Daily total
+                    Totals
                   </td>
                   {allDays.map(day => {
                     const count = rows.filter(
                       r => !!r.attendance[String(day)]
                     ).length
                     return (
-                      <td key={day}
-                          className="text-center px-0.5 py-2">
+                      <td key={day} className="text-center px-0.5 py-2">
                         <span className={`text-xs font-semibold
-                          ${count > 0
-                            ? 'text-green-700'
-                            : 'text-gray-300'}`}>
+                          ${count > 0 ? 'text-green-700' : 'text-gray-300'}`}>
                           {count > 0 ? count : '—'}
                         </span>
                       </td>
@@ -667,11 +693,22 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                   })}
                   <td className="border-l border-gray-200 px-3 py-2
                                  text-center text-xs font-bold text-gray-700">
-                    {totalDays}
+                    {totalDaysAll}
                   </td>
                   <td className="px-3 py-2 text-right text-xs font-bold
-                                 text-green-700 whitespace-nowrap">
-                    K {totalNormal.toLocaleString()}
+                                 text-gray-600 whitespace-nowrap">
+                    K {totalGross.toLocaleString()}
+                  </td>
+                  <td className="px-3 py-2 text-center text-xs font-bold
+                                 text-red-600 whitespace-nowrap bg-red-50/30">
+                    {totalDeduct > 0
+                      ? `− K ${totalDeduct.toLocaleString()}`
+                      : '—'}
+                  </td>
+                  <td className="px-3 py-2 text-right text-xs font-bold
+                                 text-green-700 whitespace-nowrap
+                                 bg-green-50/20">
+                    K {totalNet.toLocaleString()}
                   </td>
                   <td colSpan={2}/>
                 </tr>
@@ -690,17 +727,40 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                       after:content-['']">
           Description &amp; expenses
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4
-                        gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500
                                uppercase tracking-wide">
-              Salaries total (K)
+              Gross salaries (K)
             </label>
             <input readOnly
-              value={`K ${totalNormal.toLocaleString()}`}
+              value={`K ${totalGross.toLocaleString()}`}
               className="border border-gray-200 rounded-lg px-3 py-2
-                         text-sm text-green-700 font-medium
+                         text-sm text-gray-600 bg-gray-50 outline-none"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-gray-500
+                               uppercase tracking-wide">
+              Total deductions (K)
+            </label>
+            <input readOnly
+              value={totalDeduct > 0
+                ? `− K ${totalDeduct.toLocaleString()}`
+                : 'K 0'}
+              className="border border-red-100 rounded-lg px-3 py-2
+                         text-sm text-red-600 bg-red-50 outline-none"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-gray-500
+                               uppercase tracking-wide">
+              Net salaries (K)
+            </label>
+            <input readOnly
+              value={`K ${totalNet.toLocaleString()}`}
+              className="border border-green-100 rounded-lg px-3 py-2
+                         text-sm text-green-700 font-semibold
                          bg-green-50 outline-none"
             />
           </div>
@@ -716,34 +776,6 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                          text-sm outline-none focus:border-gray-400"
             />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-gray-500
-                               uppercase tracking-wide">
-              Other deductions (K)
-            </label>
-            <input type="number" placeholder="0"
-              value={otherDeduct}
-              onChange={e => setOtherDeduct(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-2
-                         text-sm outline-none focus:border-gray-400"
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-gray-500
-                               uppercase tracking-wide">
-              Total amount spent (K)
-            </label>
-            <input readOnly
-              value={`K ${(
-                totalNormal +
-                parseFloat(foodExpense || '0') +
-                parseFloat(otherDeduct || '0')
-              ).toLocaleString()}`}
-              className="border border-gray-200 rounded-lg px-3 py-2
-                         text-sm font-semibold text-gray-900
-                         bg-gray-50 outline-none"
-            />
-          </div>
         </div>
       </div>
 
@@ -751,7 +783,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
       <div className="bg-white border border-gray-100 rounded-xl
                       p-4 md:p-5 flex items-center justify-between
                       gap-4 flex-wrap">
-        <div className="flex gap-6 md:gap-8">
+        <div className="flex gap-4 md:gap-8 flex-wrap">
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">
               Workers
@@ -762,26 +794,36 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">
-              Total days
+              Gross pay
             </p>
-            <p className="text-xl font-semibold text-amber-700">
-              {totalDays}
+            <p className="text-xl font-semibold text-gray-600">
+              K {totalGross.toLocaleString()}
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">
-              Total pay
+              Deductions
+            </p>
+            <p className="text-xl font-semibold text-red-600">
+              − K {totalDeduct.toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">
+              Net pay
             </p>
             <p className="text-xl font-semibold text-green-700">
-              K {totalNormal.toLocaleString()}
+              K {totalNet.toLocaleString()}
             </p>
           </div>
         </div>
 
-        <div className="flex gap-3 flex-wrap items-center w-full sm:w-auto">
+        <div className="flex gap-3 flex-wrap items-center
+                        w-full sm:w-auto">
           {error && (
             <p className="text-xs text-red-600 bg-red-50 border
-                          border-red-100 rounded-lg px-3 py-2 w-full sm:w-auto">
+                          border-red-100 rounded-lg px-3 py-2
+                          w-full sm:w-auto">
               {error}
             </p>
           )}

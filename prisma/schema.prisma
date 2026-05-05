@@ -53,6 +53,8 @@ model Paylaw {
   month       Int      // e.g. 4 for April
   year        Int      // e.g. 2026
   preparedBy  String
+  deduction  Float   @default(0)   // ← added this line
+  netAmount  Float   @default(0)   // ← anded this line
   foodExpense Float    @default(0)
   otherDeduct Float    @default(0)
   status      String   @default("draft") // "draft" or "done"

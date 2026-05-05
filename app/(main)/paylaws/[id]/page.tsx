@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import Topbar from '@/components/Topbar'
 import Link from 'next/link'
 import DownloadPaylawPDF from './DownloadPaylawPDF'
+import PayslipButton from './PayslipButton'
 
 const MONTH_NAMES = [
   'January','February','March','April','May','June',
@@ -268,6 +269,11 @@ export default async function ViewPaylawPage({
                                  tracking-wide px-3 py-3 min-w-24">
                     Signature
                   </th>
+                  <th className="border-b border-gray-200 bg-gray-50 text-left
+                                 text-xs font-medium text-gray-400 uppercase
+                                 tracking-wide px-3 py-3 min-w-24">
+                    Pay slip
+                  </th>
                 </tr>
               </thead>
 
@@ -340,6 +346,14 @@ export default async function ViewPaylawPage({
 
                       <td className="px-3 py-2.5 text-xs text-gray-500 italic">
                         {row.signature || '—'}
+                      </td>
+                      
+                      <td className="px-3 py-2.5 text-xs text-gray-500 italic">
+                        <PayslipButton
+                          paylawId={paylaw.id}
+                          employeeId={row.employee.id}
+                          workerName={row.employee.name}
+                        />
                       </td>
                     </tr>
                   )

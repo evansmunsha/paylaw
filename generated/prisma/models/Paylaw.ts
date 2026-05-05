@@ -29,6 +29,8 @@ export type AggregatePaylaw = {
 export type PaylawAvgAggregateOutputType = {
   month: number | null
   year: number | null
+  deduction: number | null
+  netAmount: number | null
   foodExpense: number | null
   otherDeduct: number | null
 }
@@ -36,6 +38,8 @@ export type PaylawAvgAggregateOutputType = {
 export type PaylawSumAggregateOutputType = {
   month: number | null
   year: number | null
+  deduction: number | null
+  netAmount: number | null
   foodExpense: number | null
   otherDeduct: number | null
 }
@@ -46,6 +50,8 @@ export type PaylawMinAggregateOutputType = {
   month: number | null
   year: number | null
   preparedBy: string | null
+  deduction: number | null
+  netAmount: number | null
   foodExpense: number | null
   otherDeduct: number | null
   status: string | null
@@ -59,6 +65,8 @@ export type PaylawMaxAggregateOutputType = {
   month: number | null
   year: number | null
   preparedBy: string | null
+  deduction: number | null
+  netAmount: number | null
   foodExpense: number | null
   otherDeduct: number | null
   status: string | null
@@ -72,6 +80,8 @@ export type PaylawCountAggregateOutputType = {
   month: number
   year: number
   preparedBy: number
+  deduction: number
+  netAmount: number
   foodExpense: number
   otherDeduct: number
   status: number
@@ -84,6 +94,8 @@ export type PaylawCountAggregateOutputType = {
 export type PaylawAvgAggregateInputType = {
   month?: true
   year?: true
+  deduction?: true
+  netAmount?: true
   foodExpense?: true
   otherDeduct?: true
 }
@@ -91,6 +103,8 @@ export type PaylawAvgAggregateInputType = {
 export type PaylawSumAggregateInputType = {
   month?: true
   year?: true
+  deduction?: true
+  netAmount?: true
   foodExpense?: true
   otherDeduct?: true
 }
@@ -101,6 +115,8 @@ export type PaylawMinAggregateInputType = {
   month?: true
   year?: true
   preparedBy?: true
+  deduction?: true
+  netAmount?: true
   foodExpense?: true
   otherDeduct?: true
   status?: true
@@ -114,6 +130,8 @@ export type PaylawMaxAggregateInputType = {
   month?: true
   year?: true
   preparedBy?: true
+  deduction?: true
+  netAmount?: true
   foodExpense?: true
   otherDeduct?: true
   status?: true
@@ -127,6 +145,8 @@ export type PaylawCountAggregateInputType = {
   month?: true
   year?: true
   preparedBy?: true
+  deduction?: true
+  netAmount?: true
   foodExpense?: true
   otherDeduct?: true
   status?: true
@@ -227,6 +247,8 @@ export type PaylawGroupByOutputType = {
   month: number
   year: number
   preparedBy: string
+  deduction: number
+  netAmount: number
   foodExpense: number
   otherDeduct: number
   status: string
@@ -263,6 +285,8 @@ export type PaylawWhereInput = {
   month?: Prisma.IntFilter<"Paylaw"> | number
   year?: Prisma.IntFilter<"Paylaw"> | number
   preparedBy?: Prisma.StringFilter<"Paylaw"> | string
+  deduction?: Prisma.FloatFilter<"Paylaw"> | number
+  netAmount?: Prisma.FloatFilter<"Paylaw"> | number
   foodExpense?: Prisma.FloatFilter<"Paylaw"> | number
   otherDeduct?: Prisma.FloatFilter<"Paylaw"> | number
   status?: Prisma.StringFilter<"Paylaw"> | string
@@ -278,6 +302,8 @@ export type PaylawOrderByWithRelationInput = {
   month?: Prisma.SortOrder
   year?: Prisma.SortOrder
   preparedBy?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -296,6 +322,8 @@ export type PaylawWhereUniqueInput = Prisma.AtLeast<{
   month?: Prisma.IntFilter<"Paylaw"> | number
   year?: Prisma.IntFilter<"Paylaw"> | number
   preparedBy?: Prisma.StringFilter<"Paylaw"> | string
+  deduction?: Prisma.FloatFilter<"Paylaw"> | number
+  netAmount?: Prisma.FloatFilter<"Paylaw"> | number
   foodExpense?: Prisma.FloatFilter<"Paylaw"> | number
   otherDeduct?: Prisma.FloatFilter<"Paylaw"> | number
   status?: Prisma.StringFilter<"Paylaw"> | string
@@ -311,6 +339,8 @@ export type PaylawOrderByWithAggregationInput = {
   month?: Prisma.SortOrder
   year?: Prisma.SortOrder
   preparedBy?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -332,6 +362,8 @@ export type PaylawScalarWhereWithAggregatesInput = {
   month?: Prisma.IntWithAggregatesFilter<"Paylaw"> | number
   year?: Prisma.IntWithAggregatesFilter<"Paylaw"> | number
   preparedBy?: Prisma.StringWithAggregatesFilter<"Paylaw"> | string
+  deduction?: Prisma.FloatWithAggregatesFilter<"Paylaw"> | number
+  netAmount?: Prisma.FloatWithAggregatesFilter<"Paylaw"> | number
   foodExpense?: Prisma.FloatWithAggregatesFilter<"Paylaw"> | number
   otherDeduct?: Prisma.FloatWithAggregatesFilter<"Paylaw"> | number
   status?: Prisma.StringWithAggregatesFilter<"Paylaw"> | string
@@ -345,6 +377,8 @@ export type PaylawCreateInput = {
   month: number
   year: number
   preparedBy: string
+  deduction?: number
+  netAmount?: number
   foodExpense?: number
   otherDeduct?: number
   status?: string
@@ -359,6 +393,8 @@ export type PaylawUncheckedCreateInput = {
   month: number
   year: number
   preparedBy: string
+  deduction?: number
+  netAmount?: number
   foodExpense?: number
   otherDeduct?: number
   status?: string
@@ -373,6 +409,8 @@ export type PaylawUpdateInput = {
   month?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.IntFieldUpdateOperationsInput | number
   preparedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -387,6 +425,8 @@ export type PaylawUncheckedUpdateInput = {
   month?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.IntFieldUpdateOperationsInput | number
   preparedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -401,6 +441,8 @@ export type PaylawCreateManyInput = {
   month: number
   year: number
   preparedBy: string
+  deduction?: number
+  netAmount?: number
   foodExpense?: number
   otherDeduct?: number
   status?: string
@@ -414,6 +456,8 @@ export type PaylawUpdateManyMutationInput = {
   month?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.IntFieldUpdateOperationsInput | number
   preparedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -426,6 +470,8 @@ export type PaylawUncheckedUpdateManyInput = {
   month?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.IntFieldUpdateOperationsInput | number
   preparedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -449,6 +495,8 @@ export type PaylawCountOrderByAggregateInput = {
   month?: Prisma.SortOrder
   year?: Prisma.SortOrder
   preparedBy?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -459,6 +507,8 @@ export type PaylawCountOrderByAggregateInput = {
 export type PaylawAvgOrderByAggregateInput = {
   month?: Prisma.SortOrder
   year?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
 }
@@ -469,6 +519,8 @@ export type PaylawMaxOrderByAggregateInput = {
   month?: Prisma.SortOrder
   year?: Prisma.SortOrder
   preparedBy?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -482,6 +534,8 @@ export type PaylawMinOrderByAggregateInput = {
   month?: Prisma.SortOrder
   year?: Prisma.SortOrder
   preparedBy?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -492,6 +546,8 @@ export type PaylawMinOrderByAggregateInput = {
 export type PaylawSumOrderByAggregateInput = {
   month?: Prisma.SortOrder
   year?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
 }
@@ -571,6 +627,8 @@ export type PaylawCreateWithoutUserInput = {
   month: number
   year: number
   preparedBy: string
+  deduction?: number
+  netAmount?: number
   foodExpense?: number
   otherDeduct?: number
   status?: string
@@ -584,6 +642,8 @@ export type PaylawUncheckedCreateWithoutUserInput = {
   month: number
   year: number
   preparedBy: string
+  deduction?: number
+  netAmount?: number
   foodExpense?: number
   otherDeduct?: number
   status?: string
@@ -626,6 +686,8 @@ export type PaylawScalarWhereInput = {
   month?: Prisma.IntFilter<"Paylaw"> | number
   year?: Prisma.IntFilter<"Paylaw"> | number
   preparedBy?: Prisma.StringFilter<"Paylaw"> | string
+  deduction?: Prisma.FloatFilter<"Paylaw"> | number
+  netAmount?: Prisma.FloatFilter<"Paylaw"> | number
   foodExpense?: Prisma.FloatFilter<"Paylaw"> | number
   otherDeduct?: Prisma.FloatFilter<"Paylaw"> | number
   status?: Prisma.StringFilter<"Paylaw"> | string
@@ -639,6 +701,8 @@ export type PaylawCreateWithoutRowsInput = {
   month: number
   year: number
   preparedBy: string
+  deduction?: number
+  netAmount?: number
   foodExpense?: number
   otherDeduct?: number
   status?: string
@@ -652,6 +716,8 @@ export type PaylawUncheckedCreateWithoutRowsInput = {
   month: number
   year: number
   preparedBy: string
+  deduction?: number
+  netAmount?: number
   foodExpense?: number
   otherDeduct?: number
   status?: string
@@ -681,6 +747,8 @@ export type PaylawUpdateWithoutRowsInput = {
   month?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.IntFieldUpdateOperationsInput | number
   preparedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -694,6 +762,8 @@ export type PaylawUncheckedUpdateWithoutRowsInput = {
   month?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.IntFieldUpdateOperationsInput | number
   preparedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -707,6 +777,8 @@ export type PaylawCreateManyUserInput = {
   month: number
   year: number
   preparedBy: string
+  deduction?: number
+  netAmount?: number
   foodExpense?: number
   otherDeduct?: number
   status?: string
@@ -719,6 +791,8 @@ export type PaylawUpdateWithoutUserInput = {
   month?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.IntFieldUpdateOperationsInput | number
   preparedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -732,6 +806,8 @@ export type PaylawUncheckedUpdateWithoutUserInput = {
   month?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.IntFieldUpdateOperationsInput | number
   preparedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -745,6 +821,8 @@ export type PaylawUncheckedUpdateManyWithoutUserInput = {
   month?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.IntFieldUpdateOperationsInput | number
   preparedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -788,6 +866,8 @@ export type PaylawSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   month?: boolean
   year?: boolean
   preparedBy?: boolean
+  deduction?: boolean
+  netAmount?: boolean
   foodExpense?: boolean
   otherDeduct?: boolean
   status?: boolean
@@ -804,6 +884,8 @@ export type PaylawSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   month?: boolean
   year?: boolean
   preparedBy?: boolean
+  deduction?: boolean
+  netAmount?: boolean
   foodExpense?: boolean
   otherDeduct?: boolean
   status?: boolean
@@ -818,6 +900,8 @@ export type PaylawSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   month?: boolean
   year?: boolean
   preparedBy?: boolean
+  deduction?: boolean
+  netAmount?: boolean
   foodExpense?: boolean
   otherDeduct?: boolean
   status?: boolean
@@ -832,6 +916,8 @@ export type PaylawSelectScalar = {
   month?: boolean
   year?: boolean
   preparedBy?: boolean
+  deduction?: boolean
+  netAmount?: boolean
   foodExpense?: boolean
   otherDeduct?: boolean
   status?: boolean
@@ -839,7 +925,7 @@ export type PaylawSelectScalar = {
   userId?: boolean
 }
 
-export type PaylawOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "site" | "month" | "year" | "preparedBy" | "foodExpense" | "otherDeduct" | "status" | "createdAt" | "userId", ExtArgs["result"]["paylaw"]>
+export type PaylawOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "site" | "month" | "year" | "preparedBy" | "deduction" | "netAmount" | "foodExpense" | "otherDeduct" | "status" | "createdAt" | "userId", ExtArgs["result"]["paylaw"]>
 export type PaylawInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   rows?: boolean | Prisma.Paylaw$rowsArgs<ExtArgs>
@@ -864,6 +950,8 @@ export type $PaylawPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     month: number
     year: number
     preparedBy: string
+    deduction: number
+    netAmount: number
     foodExpense: number
     otherDeduct: number
     status: string
@@ -1299,6 +1387,8 @@ export interface PaylawFieldRefs {
   readonly month: Prisma.FieldRef<"Paylaw", 'Int'>
   readonly year: Prisma.FieldRef<"Paylaw", 'Int'>
   readonly preparedBy: Prisma.FieldRef<"Paylaw", 'String'>
+  readonly deduction: Prisma.FieldRef<"Paylaw", 'Float'>
+  readonly netAmount: Prisma.FieldRef<"Paylaw", 'Float'>
   readonly foodExpense: Prisma.FieldRef<"Paylaw", 'Float'>
   readonly otherDeduct: Prisma.FieldRef<"Paylaw", 'Float'>
   readonly status: Prisma.FieldRef<"Paylaw", 'String'>

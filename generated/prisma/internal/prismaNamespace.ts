@@ -999,6 +999,8 @@ export const PaylawScalarFieldEnum = {
   month: 'month',
   year: 'year',
   preparedBy: 'preparedBy',
+  deduction: 'deduction',
+  netAmount: 'netAmount',
   foodExpense: 'foodExpense',
   otherDeduct: 'otherDeduct',
   status: 'status',

@@ -13,6 +13,7 @@ interface Employee {
 }
 
 interface ExistingRow {
+  deduction: number
   id: string
   employeeId: string
   dayRate: number
@@ -41,6 +42,7 @@ interface WorkerRow {
   jobTitle: string
   dayRate: number
   attendance: Record<string, boolean>
+  deduction: number      // ← added this
   signature: string
 }
 
@@ -76,9 +78,29 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
       dayRate: row.dayRate,
       // Cast the JSON attendance back to the shape we use
       attendance: (row.attendance as Record<string, boolean>) || {},
+      deduction: row.deduction || 0,
       signature: row.signature || '',
     }))
   )
+
+
+  function grossAmount(row: WorkerRow) {
+    return daysWorked(row) * row.dayRate
+  }
+
+  function netAmount(row: WorkerRow) {
+    return Math.max(grossAmount(row) - row.deduction, 0)
+  }
+
+  function updateDeduction(employeeId: string, val: string) {
+    setRows(prev => prev.map(row =>
+      row.employeeId === employeeId
+        ? { ...row, deduction: parseFloat(val) || 0 }
+        : row
+    ))
+  }
+
+
 
   const [selectedEmpId, setSelectedEmpId] = useState('')
   const [saving, setSaving]               = useState(false)
@@ -115,6 +137,7 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
       jobTitle: emp.jobTitle,
       dayRate: emp.dayRate,
       attendance: {},
+      deduction: 0,
       signature: '',
     }])
     setSelectedEmpId('')
@@ -174,13 +197,15 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
           site, month, year, preparedBy,
           foodExpense, otherDeduct, status,
           rows: rows.map(row => ({
-            employeeId: row.employeeId,
-            dayRate: row.dayRate,
-            daysWorked: daysWorked(row),
-            amount: rowAmount(row),
-            attendance: row.attendance,
-            signature: row.signature,
-          })),
+          employeeId: row.employeeId,
+          dayRate:    row.dayRate,
+          daysWorked: daysWorked(row),
+          amount:     grossAmount(row),
+          deduction:  row.deduction,
+          netAmount:  netAmount(row),
+          attendance: row.attendance,
+          signature:  row.signature,
+        })),
         }),
       })
 

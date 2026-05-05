@@ -11,7 +11,9 @@ export async function GET() {
 
   const paylaws = await prisma.paylaw.findMany({
     where: { userId: session.user.id },
-    include: { rows: { include: { employee: true } } },
+    include: {
+      rows: { include: { employee: true } },
+    },
     orderBy: { createdAt: 'desc' },
   })
 
@@ -36,7 +38,6 @@ export async function POST(req: Request) {
     )
   }
 
-  // Step 1 — create the paylaw header first
   const paylaw = await prisma.paylaw.create({
     data: {
       site,
@@ -50,9 +51,6 @@ export async function POST(req: Request) {
     },
   })
 
-  // Step 2 — create each worker row linked to that paylaw
-  // We do this separately because the adapter does not
-  // support interactive transactions
   if (rows && rows.length > 0) {
     await prisma.paylawRow.createMany({
       data: rows.map((row: {
@@ -60,16 +58,20 @@ export async function POST(req: Request) {
         dayRate: number
         daysWorked: number
         amount: number
+        deduction: number
+        netAmount: number
         attendance: Record<string, boolean>
         signature?: string
       }) => ({
-        paylawId: paylaw.id,
+        paylawId:   paylaw.id,
         employeeId: row.employeeId,
-        dayRate: row.dayRate,
+        dayRate:    row.dayRate,
         daysWorked: row.daysWorked,
-        amount: row.amount,
+        amount:     row.amount,
+        deduction:  row.deduction  || 0,
+        netAmount:  row.netAmount  || row.amount,
         attendance: row.attendance,
-        signature: row.signature || '',
+        signature:  row.signature  || '',
       })),
     })
   }

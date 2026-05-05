@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
+
 // ── PATCH — update existing paylaw ───────────────────
 export async function PATCH(
   req: Request,
@@ -15,7 +16,7 @@ export async function PATCH(
 
   const { id } = await params
 
-  // Security — make sure this paylaw belongs to this user
+// Security — make sure this paylaw belongs to this user
   const existing = await prisma.paylaw.findFirst({
     where: { id, userId: session.user.id },
   })
@@ -29,7 +30,7 @@ export async function PATCH(
     foodExpense, otherDeduct, status, rows,
   } = await req.json()
 
-  // Step 1 — update the paylaw header
+// Step 1 — update the paylaw header
   await prisma.paylaw.update({
     where: { id },
     data: {
@@ -43,12 +44,11 @@ export async function PATCH(
     },
   })
 
-  // Step 2 — delete all old rows then recreate them
+
+// Step 2 — delete all old rows then recreate them
   // This is the simplest way to handle attendance changes
   // without tracking which rows changed
-  await prisma.paylawRow.deleteMany({
-    where: { paylawId: id },
-  })
+  await prisma.paylawRow.deleteMany({ where: { paylawId: id } })
 
   if (rows && rows.length > 0) {
     await prisma.paylawRow.createMany({
@@ -57,16 +57,20 @@ export async function PATCH(
         dayRate: number
         daysWorked: number
         amount: number
+        deduction: number
+        netAmount: number
         attendance: Record<string, boolean>
         signature?: string
       }) => ({
-        paylawId: id,
+        paylawId:   id,
         employeeId: row.employeeId,
-        dayRate: row.dayRate,
+        dayRate:    row.dayRate,
         daysWorked: row.daysWorked,
-        amount: row.amount,
+        amount:     row.amount,
+        deduction:  row.deduction  || 0,
+        netAmount:  row.netAmount  || row.amount,
         attendance: row.attendance,
-        signature: row.signature || '',
+        signature:  row.signature  || '',
       })),
     })
   }
@@ -94,7 +98,7 @@ export async function DELETE(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  // Delete rows first then the paylaw
+// Delete rows first then the paylaw
   await prisma.paylawRow.deleteMany({ where: { paylawId: id } })
   await prisma.paylaw.delete({ where: { id } })
 

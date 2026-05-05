@@ -111,9 +111,7 @@ export default function LandingPage() {
               <p className="text-white/60 text-sm">
                 Demo video coming soon
               </p>
-              <p className="text-white/30 text-xs mt-1">
-                Replace this with your screen recording
-              </p>
+              
             </div>
           </div>
         </div>

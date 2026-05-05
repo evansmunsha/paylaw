@@ -67,6 +67,13 @@ export default async function PrintOvertimePage({
   return (
     <>
       <style>{`
+        /* ── Force ALL backgrounds & colors to print ── */
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
+
         body { margin: 0 !important; padding: 0 !important; background: #f9fafb; }
 
         .print-toolbar {
@@ -84,7 +91,7 @@ export default async function PrintOvertimePage({
         }
         .print-back { font-size: 13px; color: #6b7280; text-decoration: none; }
         .print-back:hover { color: #111; }
-        .print-mid { font-size: 13px; font-weight: 500; color: #374151; }
+        .print-mid  { font-size: 13px; font-weight: 500; color: #374151; }
 
         .print-wrap {
           background: white;
@@ -105,9 +112,10 @@ export default async function PrintOvertimePage({
 
         .att-table-wrap { overflow-x: auto; }
         .att-table { border-collapse: collapse; font-size: 10px; width: 100%; }
+
         .att-table th {
-          background: #78350f;
-          color: white;
+          background: #78350f !important;
+          color: white !important;
           padding: 3px 5px;
           font-weight: 600;
           text-align: center;
@@ -115,6 +123,7 @@ export default async function PrintOvertimePage({
           white-space: nowrap;
         }
         .att-table th.l { text-align: left; }
+
         .att-table td {
           border: 1px solid #d1d5db;
           padding: 3px 5px;
@@ -123,12 +132,17 @@ export default async function PrintOvertimePage({
           white-space: nowrap;
         }
         .att-table td.l { text-align: left; }
-        .td-has     { background: #fffbeb; color: #92400e; font-weight: 700; }
-        .th-weekend { background: #451a03 !important; }
-        .td-weekend { background: #fffbeb; }
-        .tr-even    { background: #fff; }
-        .tr-odd     { background: #f9fafb; }
-        .tr-total   { background: #f3f4f6; font-weight: 700; }
+
+        /* OT hours cell */
+        .td-has     { background: #fffbeb !important; color: #92400e !important; font-weight: 700; }
+        /* Weekend header */
+        .th-weekend { background: #451a03 !important; color: white !important; }
+        /* Weekend body cell */
+        .td-weekend { background: #fffbeb !important; }
+        /* Alternating rows */
+        .tr-odd     { background: #f9fafb !important; }
+        /* Totals row */
+        .tr-total   { background: #f3f4f6 !important; font-weight: 700; }
 
         .section-title {
           font-size: 11px; font-weight: 700;
@@ -142,6 +156,8 @@ export default async function PrintOvertimePage({
         }
         .desc-table { width: 100%; border-collapse: collapse; }
         .desc-table td { border: 1px solid #e5e7eb; padding: 4px 8px; text-align: left; font-size: 10px; }
+        .desc-total { background: #f3f4f6 !important; font-weight: 700; }
+
         .sign-line  { display: block; border-bottom: 1px solid #9ca3af; width: 180px; margin-top: 20px; }
         .sign-label { font-size: 10px; color: #6b7280; margin-top: 8px; font-family: 'Segoe UI', Arial, sans-serif; }
 
@@ -150,35 +166,21 @@ export default async function PrintOvertimePage({
           body { background: white !important; }
           .print-wrap { padding: 0; }
           .att-table-wrap { overflow: visible !important; }
-          .att-table {
-            font-size: 7px !important;
-            width: 100% !important;
-          }
-          .att-table th,
-          .att-table td {
-            padding: 2px 3px !important;
-            font-size: 7px !important;
-          }
-          .att-table th.l,
-          .att-table td.l { min-width: 60px !important; }
+          .att-table { font-size: 7px !important; width: 100% !important; }
+          .att-table th, .att-table td { padding: 2px 3px !important; font-size: 7px !important; }
+          .att-table th.l, .att-table td.l { min-width: 60px !important; }
         }
         @page { size: A4 landscape; margin: 8mm; }
       `}</style>
 
-      {/* Toolbar */}
       <div className="print-toolbar">
-        <a href={`/overtime/${overtime.id}`} className="print-back">
-          ← Back
-        </a>
-        <span className="print-mid">
-          {overtime.site} — {monthName} {overtime.year}
-        </span>
+        <a href={`/overtime/${overtime.id}`} className="print-back">← Back</a>
+        <span className="print-mid">{overtime.site} — {monthName} {overtime.year}</span>
         <PrintButton />
       </div>
 
       <div className="print-wrap">
 
-        {/* Header */}
         <div className="doc-header">
           {settings?.companyName && (
             <p className="company-name">{settings.companyName}</p>
@@ -186,8 +188,7 @@ export default async function PrintOvertimePage({
           <p className="doc-title">OVERTIME SHEET</p>
           {(settings?.phone || settings?.email || settings?.address) && (
             <p className="contact-line">
-              {[settings.phone, settings.email, settings.address]
-                .filter(Boolean).join('  |  ')}
+              {[settings.phone, settings.email, settings.address].filter(Boolean).join('  |  ')}
             </p>
           )}
           <p className="period-line">
@@ -197,7 +198,6 @@ export default async function PrintOvertimePage({
           </p>
         </div>
 
-        {/* Hours table */}
         <div className="att-table-wrap">
           <table className="att-table" style={{ minWidth: 'max-content' }}>
             <thead>
@@ -227,47 +227,30 @@ export default async function PrintOvertimePage({
                 const hours = row.hours as Record<string, number>
                 return (
                   <tr key={row.id} className={i % 2 === 0 ? 'tr-even' : 'tr-odd'}>
-                    <td className="l" style={{ fontWeight: 500 }}>
-                      {row.employee.name}
-                    </td>
-                    <td className="l" style={{ color: '#6b7280' }}>
-                      {row.employee.jobTitle}
-                    </td>
-                    <td style={{ fontWeight: 600, color: '#92400e' }}>
-                      {row.otRate}
-                    </td>
+                    <td className="l" style={{ fontWeight: 500 }}>{row.employee.name}</td>
+                    <td className="l" style={{ color: '#6b7280' }}>{row.employee.jobTitle}</td>
+                    <td style={{ fontWeight: 600, color: '#92400e' }}>{row.otRate}</td>
                     {allDays.map(day => {
                       const val = hours[String(day)] || 0
                       return (
                         <td
                           key={day}
-                          className={
-                            val > 0 ? 'td-has'
-                            : isWeekend(day) ? 'td-weekend'
-                            : ''
-                          }
+                          className={val > 0 ? 'td-has' : isWeekend(day) ? 'td-weekend' : ''}
                           style={{ padding: '2px', fontSize: '8px' }}
                         >
                           {val > 0 ? val : ''}
                         </td>
                       )
                     })}
-                    <td style={{ fontWeight: 700, color: '#92400e' }}>
-                      {row.totalHours}h
-                    </td>
-                    <td style={{ fontWeight: 700, color: '#92400e' }}>
-                      K {row.amount.toLocaleString()}
-                    </td>
-                    <td style={{ color: '#9ca3af', fontStyle: 'italic' }}>
-                      {row.signature || ''}
-                    </td>
+                    <td style={{ fontWeight: 700, color: '#92400e' }}>{row.totalHours}h</td>
+                    <td style={{ fontWeight: 700, color: '#92400e' }}>K {row.amount.toLocaleString()}</td>
+                    <td style={{ color: '#9ca3af', fontStyle: 'italic' }}>{row.signature || ''}</td>
                   </tr>
                 )
               })}
 
               <tr className="tr-total">
-                <td className="l" colSpan={3}
-                    style={{ fontWeight: 700, color: '#374151' }}>
+                <td className="l" colSpan={3} style={{ fontWeight: 700, color: '#374151' }}>
                   Daily total
                 </td>
                 {allDays.map(day => {
@@ -284,45 +267,30 @@ export default async function PrintOvertimePage({
                     </td>
                   )
                 })}
-                <td style={{ fontWeight: 700, color: '#92400e' }}>
-                  {grandHours}h
-                </td>
-                <td style={{ fontWeight: 700, color: '#92400e' }}>
-                  K {grandAmount.toLocaleString()}
-                </td>
+                <td style={{ fontWeight: 700, color: '#92400e' }}>{grandHours}h</td>
+                <td style={{ fontWeight: 700, color: '#92400e' }}>K {grandAmount.toLocaleString()}</td>
                 <td/>
               </tr>
             </tbody>
           </table>
         </div>
 
-        {/* Summary + Prepared by */}
         <div className="two-col">
           <div>
             <p className="section-title">Summary</p>
             <table className="desc-table">
               <tbody>
-                <tr>
-                  <td>Total OT Hours</td>
-                  <td><strong>{grandHours} hrs</strong></td>
-                </tr>
-                <tr style={{ background: '#f3f4f6' }}>
+                <tr><td>Total OT Hours</td><td><strong>{grandHours} hrs</strong></td></tr>
+                <tr className="desc-total">
                   <td><strong>Total OT Payout</strong></td>
-                  <td>
-                    <strong style={{ color: '#92400e' }}>
-                      K {grandAmount.toLocaleString()}
-                    </strong>
-                  </td>
+                  <td><strong style={{ color: '#92400e' }}>K {grandAmount.toLocaleString()}</strong></td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div>
             <p className="section-title">Prepared By</p>
-            <p style={{
-              fontSize: '11px', fontWeight: 600, color: '#111',
-              fontFamily: 'Segoe UI, Arial, sans-serif',
-            }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#111', fontFamily: 'Segoe UI, Arial, sans-serif' }}>
               {overtime.preparedBy}
             </p>
             <p className="sign-label">Signature:</p>
@@ -336,6 +304,3 @@ export default async function PrintOvertimePage({
     </>
   )
 }
-
-
-
