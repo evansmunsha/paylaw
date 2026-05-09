@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
+// Pages foremen are NOT allowed to visit
+const ADMIN_ONLY_PATHS = [
+  '/employees',
+  '/summary',
+  '/settings',
+]
+
 export async function proxy(req: NextRequest) {
   const token = await getToken({
     req,
@@ -10,22 +17,35 @@ export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   const protectedPaths = [
-    '/dashboard',
-    '/paylaws',
-    '/overtime',
-    '/employees',
-    '/summary',
+    '/dashboard', '/paylaws', '/overtime',
+    '/employees', '/summary', '/settings',
   ]
+
+  
 
   const isProtected = protectedPaths.some(p => pathname.startsWith(p))
 
-  // Not logged in + protected page → send to landing page
+  // Not logged in + protected page → landing
   if (isProtected && !token) {
     return NextResponse.redirect(new URL('/home', req.url))
   }
 
-  // Logged in + going to login or landing → send to dashboard
+  // Logged in + login or home → dashboard
   if ((pathname === '/login' || pathname === '/home') && token) {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
+  }
+
+  
+  if (pathname === '/register' && token) {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
+  }
+
+  // Foreman trying to access admin-only page → dashboard
+  if (
+    token &&
+    (token as any).role === 'foreman' &&
+    ADMIN_ONLY_PATHS.some(p => pathname.startsWith(p))
+  ) {
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
@@ -38,9 +58,10 @@ export const config = {
     '/paylaws/:path*',
     '/overtime/:path*',
     '/employees/:path*',
-    '/settings/:path*',
     '/summary/:path*',
+    '/settings/:path*',
     '/login',
     '/home',
+    '/register',
   ],
 }

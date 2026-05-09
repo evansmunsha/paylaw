@@ -9,11 +9,18 @@ export async function GET() {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
   }
 
+  // Foremen see only their site's paylaws
+  // Admins see all their paylaws
+  const where = session.user.role === 'foreman'
+    ? {
+        userId: session.user.adminId!, // foreman's data lives under admin
+        site:   session.user.site!,
+      }
+    : { userId: session.user.id }
+
   const paylaws = await prisma.paylaw.findMany({
-    where: { userId: session.user.id },
-    include: {
-      rows: { include: { employee: true } },
-    },
+    where,
+    include: { rows: { include: { employee: true } } },
     orderBy: { createdAt: 'desc' },
   })
 
@@ -38,6 +45,24 @@ export async function POST(req: Request) {
     )
   }
 
+  // Foremen create under the admin's userId
+  // so the admin can see everything
+  const ownerId = session.user.role === 'foreman'
+    ? session.user.adminId!
+    : session.user.id
+
+  // Foremen can only create paylaws for their assigned site
+  if (
+    session.user.role === 'foreman' &&
+    session.user.site &&
+    site !== session.user.site
+  ) {
+    return NextResponse.json(
+      { error: 'You can only create paylaws for your assigned site' },
+      { status: 403 }
+    )
+  }
+
   const paylaw = await prisma.paylaw.create({
     data: {
       site,
@@ -47,7 +72,7 @@ export async function POST(req: Request) {
       foodExpense: parseFloat(foodExpense) || 0,
       otherDeduct: parseFloat(otherDeduct) || 0,
       status: status || 'draft',
-      userId: session.user.id,
+      userId: ownerId,
     },
   })
 

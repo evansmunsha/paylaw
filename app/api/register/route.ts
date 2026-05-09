@@ -4,51 +4,66 @@ import bcrypt from 'bcryptjs'
 
 export async function POST(req: Request) {
   try {
-    // 1. Get the data sent from the form
-    const { email, password, name } = await req.json()
+    const { email, password, name, companyName } = await req.json()
 
-    // 2. Make sure nothing is empty
-    if (!email || !password) {
+    if (!email || !password || !name) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Name, email and password are required' },
         { status: 400 }
       )
     }
 
-    // 3. Check if that email is already registered
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    })
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: 'Password must be at least 8 characters' },
+        { status: 400 }
+      )
+    }
 
-    if (existingUser) {
+    // Check no account already exists with this email
+    const existing = await prisma.user.findUnique({ where: { email } })
+    if (existing) {
       return NextResponse.json(
         { error: 'An account with that email already exists' },
         { status: 400 }
       )
     }
 
-    // 4. Hash the password — NEVER save a plain text password
-    // The number 12 is the "salt rounds" — higher = more secure but slower
-    const hashedPassword = await bcrypt.hash(password, 12)
+    const hashed = await bcrypt.hash(password, 12)
 
-    // 5. Save the new user to the database
+    // Every person who signs up becomes an admin
+    // of their own separate company account
     const user = await prisma.user.create({
       data: {
-        email,
         name,
-        password: hashedPassword,
+        email,
+        password: hashed,
+        role: 'admin',
       },
     })
 
-    // 6. Return success (don't send the password back!)
+    // If they provided a company name during signup
+    // save it to their settings automatically
+    if (companyName) {
+      await prisma.settings.create({
+        data: {
+          companyName,
+          userId: user.id,
+          siteName: '',
+          phone: '',
+          email: '',
+          address: '',
+        },
+      })
+    }
+
     return NextResponse.json(
-      { message: 'Account created', userId: user.id },
+      { id: user.id, email: user.email },
       { status: 201 }
     )
-
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: 'Something went wrong' },
+      { error: 'Something went wrong. Please try again.' },
       { status: 500 }
     )
   }

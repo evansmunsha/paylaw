@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma'
 import Topbar from '@/components/Topbar'
 import Link from 'next/link'
 import MonthSelector from './MonthSelector'
+import ExportExcelButton from '@/components/ExportExcelButton'
+import MonthlyReportButton from '@/components/MonthlyReportButton'
 
 const MONTH_NAMES = [
   'January','February','March','April','May','June',
@@ -186,6 +188,16 @@ export default async function SummaryPage({
 
       <div className="p-6 flex flex-col gap-5">
 
+        <div className="flex items-center gap-3 flex-wrap">
+          <MonthlyReportButton month={safeMonth} year={safeYear} />
+          <ExportExcelButton
+            type="monthly"
+            month={safeMonth}
+            year={safeYear}
+            label="Export Excel"
+          />
+        </div>
+
         {/* Month selector */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2 flex-wrap">
@@ -201,6 +213,23 @@ export default async function SummaryPage({
               · All sites combined
             </span>
           </div>
+        </div>
+
+        {/* YTD link */}
+        <div className="flex justify-end">
+          <Link
+            href={`/summary/ytd?year=${new Date().getFullYear()}`}
+            className="flex items-center gap-2 text-sm border border-gray-200
+                      px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50
+                      transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="1" y="8" width="3" height="5" rx="1" fill="currentColor"/>
+              <rect x="5.5" y="5" width="3" height="8" rx="1" fill="currentColor"/>
+              <rect x="10" y="2" width="3" height="11" rx="1" fill="currentColor"/>
+            </svg>
+            View year-to-date →
+          </Link>
         </div>
 
         {/* 3 stat cards */}

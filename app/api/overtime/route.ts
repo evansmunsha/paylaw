@@ -9,8 +9,17 @@ export async function GET() {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
   }
 
+  // Foremen see only their site's overtime sheets
+  // Admins see all their overtime sheets
+  const where = session.user.role === 'foreman'
+    ? {
+        userId: session.user.adminId!,
+        site:   session.user.site!,
+      }
+    : { userId: session.user.id }
+
   const overtimes = await prisma.overtime.findMany({
-    where: { userId: session.user.id },
+    where,
     include: {
       rows: { include: { employee: true } },
     },
@@ -37,19 +46,35 @@ export async function POST(req: Request) {
     )
   }
 
-  // Step 1 — create the overtime sheet header
+  // Foremen create under the admin's userId
+  // so the admin can see everything they create
+  const ownerId = session.user.role === 'foreman'
+    ? session.user.adminId!
+    : session.user.id
+
+  // Foremen can only create OT sheets for their assigned site
+  if (
+    session.user.role === 'foreman' &&
+    session.user.site &&
+    site !== session.user.site
+  ) {
+    return NextResponse.json(
+      { error: 'You can only create overtime sheets for your assigned site' },
+      { status: 403 }
+    )
+  }
+
   const overtime = await prisma.overtime.create({
     data: {
       site,
       month: parseInt(month),
-      year: parseInt(year),
+      year:  parseInt(year),
       preparedBy,
       status: status || 'draft',
-      userId: session.user.id,
+      userId: ownerId,
     },
   })
 
-  // Step 2 — create each worker row
   if (rows && rows.length > 0) {
     await prisma.overtimeRow.createMany({
       data: rows.map((row: {
@@ -62,11 +87,11 @@ export async function POST(req: Request) {
       }) => ({
         overtimeId: overtime.id,
         employeeId: row.employeeId,
-        otRate: row.otRate,
+        otRate:     row.otRate,
         totalHours: row.totalHours,
-        amount: row.amount,
-        hours: row.hours,
-        signature: row.signature || '',
+        amount:     row.amount,
+        hours:      row.hours,
+        signature:  row.signature || '',
       })),
     })
   }

@@ -49,23 +49,31 @@ export default function LandingPage() {
         </p>
 
         <div className="flex gap-3 flex-wrap justify-center">
-  <Link
-    href="/login"
-    className="bg-black text-white text-sm font-medium px-6 py-3
-               rounded-lg hover:bg-gray-800 transition-colors"
-  >
-    Get started →
-  </Link>
+          <Link
+            href="/login"
+            className="bg-black text-white text-sm font-medium px-6 py-3
+                      rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            Get started →
+          </Link>
 
-  <a
-    href="#how-it-works"
-    className="border border-gray-200 text-gray-700 text-sm
-               font-medium px-6 py-3 rounded-lg hover:bg-gray-50
-                transition-colors"
-    >
-        See how it works
-    </a>
-</div>
+            <Link
+              href="/register"
+              className="bg-black text-white text-sm font-medium px-6 py-3
+                        rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              Get started free →
+            </Link>
+
+          <a
+            href="#how-it-works"
+            className="border border-gray-200 text-gray-700 text-sm
+                      font-medium px-6 py-3 rounded-lg hover:bg-gray-50
+                        transition-colors"
+            >
+                See how it works
+            </a>
+        </div>
       </section>
 
       {/* ── VIDEO SECTION ── */}
@@ -570,6 +578,15 @@ export default function LandingPage() {
                        transition-colors inline-block"
           >
             Sign in to PayLaw →
+          </Link>
+
+          <Link
+            href="/register"
+            className="bg-white text-gray-900 text-sm font-semibold
+                      px-8 py-3.5 rounded-lg hover:bg-gray-100
+                      transition-colors inline-block"
+          >
+            Create your free account →
           </Link>
         </div>
       </section>

@@ -4,75 +4,71 @@ import { prisma } from './prisma'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
-  // Where NextAuth stores the session
-  session: {
-    strategy: 'jwt', // JWT = a token saved in the browser, no extra DB table needed
-  },
+  session: { strategy: 'jwt' },
 
   providers: [
     CredentialsProvider({
       name: 'credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
+        email:    { label: 'Email',    type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
 
       async authorize(credentials) {
-        // 1. Check that email and password were actually sent
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Email and password are required')
         }
 
-        // 2. Look for the user in the database by email
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         })
 
-        // 3. If no user found, stop here
         if (!user) {
           throw new Error('No account found with that email')
         }
 
-        // 4. Compare the password they typed with the hashed one in the DB
-        const passwordMatch = await bcrypt.compare(
+        const match = await bcrypt.compare(
           credentials.password,
           user.password
         )
 
-        // 5. If password is wrong, stop here
-        if (!passwordMatch) {
+        if (!match) {
           throw new Error('Incorrect password')
         }
 
-        // 6. Everything is correct — return the user
         return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
+          id:      user.id,
+          email:   user.email,
+          name:    user.name,
+          role:    user.role,    // admin or foreman
+          site:    user.site,    // foreman's assigned site
+          adminId: user.adminId, // which admin they belong to
         }
       },
     }),
   ],
 
   callbacks: {
-    // This runs when the JWT token is created or updated
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id // save the user id inside the token
+        token.id      = user.id
+        token.role    = (user as any).role
+        token.site    = (user as any).site
+        token.adminId = (user as any).adminId
       }
       return token
     },
 
-    // This runs when a page asks "who is logged in?"
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as string // put the user id on the session
+        session.user.id      = token.id      as string
+        session.user.role    = token.role    as string
+        session.user.site    = token.site    as string | null
+        session.user.adminId = token.adminId as string | null
       }
       return session
     },
   },
 
-  pages: {
-    signIn: '/login', // when someone is not logged in, send them here
-  },
+  pages: { signIn: '/login' },
 }

@@ -3,12 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 
-// Each nav item has a label, a link, and an icon
-const navItems = [
+const allNavItems = [
   {
     label: 'Dashboard',
     href: '/dashboard',
+    roles: ['admin', 'foreman'],
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/>
@@ -21,6 +22,7 @@ const navItems = [
   {
     label: 'Paylaws',
     href: '/paylaws',
+    roles: ['admin', 'foreman'],
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <rect x="2" y="1" width="12" height="14" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
@@ -33,6 +35,7 @@ const navItems = [
   {
     label: 'Overtime',
     href: '/overtime',
+    roles: ['admin', 'foreman'],
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.3"/>
@@ -40,9 +43,11 @@ const navItems = [
       </svg>
     ),
   },
+  // Admin only below
   {
     label: 'Employees',
     href: '/employees',
+    roles: ['admin'],
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.3"/>
@@ -53,6 +58,7 @@ const navItems = [
   {
     label: 'Summary',
     href: '/summary',
+    roles: ['admin'],
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <rect x="1" y="9" width="3" height="6" rx="1" fill="currentColor"/>
@@ -62,22 +68,42 @@ const navItems = [
     ),
   },
   {
-  label: 'Settings',
-  href: '/settings',
-  icon: (
+    label: 'Settings',
+    href: '/settings',
+    roles: ['admin'],
+    icon: (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <circle cx="8" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.3"/>
       <path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M3.4 12.6l.7-.7M11.9 4.1l.7-.7"
             stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
     </svg>
   ),
-},
+  },
+  {
+    label: 'Team',
+    href: '/settings/team',
+    roles: ['admin'],
+    icon: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.3"/>
+      <path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M3.4 12.6l.7-.7M11.9 4.1l.7-.7"
+            stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+    </svg>
+  ),
+  },
 ]
+
 
 export default function Sidebar() {
   // usePathname tells us which page we are on
   // so we can highlight the active nav item
   const pathname = usePathname()
+
+  const { data: session } = useSession()
+  const role = session?.user?.role || 'admin'
+
+  // Filter items by role
+  const navItems = allNavItems.filter(item => item.roles.includes(role))
 
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-56 bg-white border-r
@@ -132,6 +158,7 @@ export default function Sidebar() {
           )
         })}
       </nav>
+ 
 
       <div className="px-3 py-4 border-t border-gray-100 flex flex-col gap-1">
         <Link
@@ -141,15 +168,7 @@ export default function Sidebar() {
         >
           Privacy Policy
         </Link>
-        <button
-          onClick={() => signOut({ callbackUrl: '/login' })}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
-                    text-gray-500 hover:bg-red-50 hover:text-red-600
-                    transition-colors w-full"
-        >
-          {/* sign out icon */}
-          Sign out
-        </button>
+        
       </div>
 
       {/* Sign out at the bottom */}

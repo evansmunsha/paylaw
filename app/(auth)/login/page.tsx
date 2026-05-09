@@ -5,7 +5,7 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 export default function LoginPage() {
@@ -20,6 +20,10 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
 
   const router = useRouter()
+
+
+  const searchParams = useSearchParams()
+  const justRegistered = searchParams.get('registered') === 'true'
 
   async function handleLogin(e: React.FormEvent) {
     // Stop the page from refreshing on form submit
@@ -69,6 +73,14 @@ export default function LoginPage() {
           <p className="text-sm text-gray-500 mb-6">
             Enter your email and password to continue
           </p>
+
+
+          {justRegistered && (
+            <div className="bg-green-50 border border-green-100 rounded-lg
+                            px-4 py-3 text-sm text-green-700 mb-4">
+              ✓ Account created successfully. Sign in to get started.
+            </div>
+          )}
 
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
 
@@ -122,6 +134,20 @@ export default function LoginPage() {
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
+
+            import Link from 'next/link'
+
+            // Replace the bottom paragraph with this:
+            <p className="text-center text-xs text-gray-400 mt-4">
+              Don't have an account?{' '}
+              <Link
+                href="/register"
+                className="text-gray-700 underline underline-offset-2
+                          hover:text-gray-900"
+              >
+                Create one free
+              </Link>
+            </p>
 
           </form>
         </div>

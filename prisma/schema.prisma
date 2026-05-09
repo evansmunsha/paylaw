@@ -20,12 +20,19 @@ model User {
   email     String   @unique
   password  String
   name      String?
+  role      String   @default("admin")  // "admin" or "foreman"
+  site      String?  // foremen only — which site they manage
+  adminId   String?  // foremen are linked to the admin who created them
   createdAt DateTime @default(now())
-  settings    Settings?
+
+  // Self relation — admin has many foremen
+  admin   User?  @relation("AdminForemen", fields: [adminId], references: [id])
+  foremen User[] @relation("AdminForemen")
 
   paylaws   Paylaw[]
   overtimes Overtime[]
   employees Employee[]
+  settings  Settings?
 }
 
 // ─── EMPLOYEES (workers on site) ──────────────────────

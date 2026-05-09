@@ -79,6 +79,10 @@ export default async function DashboardPage() {
 
   const sites = Object.entries(siteMap)
 
+  // After the session check add this
+  const isForeman = session.user.role === 'foreman'
+  const foremanSite = session.user.site
+
   return (
     <div className="flex flex-col min-h-screen">
       <Topbar
@@ -89,6 +93,21 @@ export default async function DashboardPage() {
       <div className="p-6 flex flex-col gap-6">
 
         {/* ── Greeting ── */}
+
+          {isForeman && foremanSite && (
+            <div className="inline-flex items-center gap-2 bg-blue-50 border
+                            border-blue-100 rounded-lg px-3 py-1.5 text-xs
+                            text-blue-700 mt-2">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <circle cx="6" cy="4.5" r="2" stroke="currentColor" strokeWidth="1.1"/>
+                <path d="M1.5 10.5C1.5 8.015 3.515 6 6 6s4.5 2.015 4.5 4.5"
+                      stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+              </svg>
+              Your site: <strong>{foremanSite}</strong>
+            </div>
+          )}
+
+
         <div>
           <h2 className="text-xl font-semibold text-gray-900">
             {greeting} {session.user.name?.split(' ')[0] ?? ''} 👷
