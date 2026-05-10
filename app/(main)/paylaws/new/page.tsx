@@ -9,23 +9,32 @@ export default async function NewPaylawPage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
+  const isForeman = session.user.role === 'foreman'
+
+  // Foremen see only employees at their site
+  // owned by their admin — same fix as employees page
+  const employeeWhere = isForeman
+    ? {
+        userId: session.user.adminId!,
+        site:   session.user.site!,
+        active: true, // only show active workers
+      }
+    : {
+        userId: session.user.id,
+        active: true, // only show active workers
+      }
+
   const [employees, previousPaylaws] = await Promise.all([
     prisma.employee.findMany({
-      where: { userId: session.user.id, active: true },
+      where: employeeWhere,
       orderBy: { name: 'asc' },
     }),
-    // Fetch previous paylaws so user can copy workers from them
     prisma.paylaw.findMany({
-      where: { userId: session.user.id },
+      where: isForeman
+        ? { userId: session.user.adminId!, site: session.user.site! }
+        : { userId: session.user.id },
       orderBy: { createdAt: 'desc' },
-      // Only need basic info for the dropdown
-      select: {
-        id: true,
-        site: true,
-        month: true,
-        year: true,
-      },
-      // Limit to last 10 so the dropdown is not too long
+      select: { id: true, site: true, month: true, year: true },
       take: 10,
     }),
   ])

@@ -3,7 +3,7 @@ import { getToken } from 'next-auth/jwt'
 
 // Pages foremen are NOT allowed to visit
 const ADMIN_ONLY_PATHS = [
-  '/employees',
+  //'/employees',
   '/summary',
   '/settings',
 ]

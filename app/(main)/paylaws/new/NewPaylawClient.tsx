@@ -2,8 +2,10 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 interface Employee {
+  active: boolean
   id: string
   name: string
   jobTitle: string
@@ -27,6 +29,7 @@ interface WorkerRow {
   attendance: Record<string, boolean>
   deduction: number
   signature: string
+  active: boolean
 }
 
 interface Props {
@@ -43,12 +46,19 @@ const DAY_LABELS = ['Su','Mo','Tu','We','Th','Fr','Sa']
 
 export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
   const router = useRouter()
+  const { data: session } = useSession()
+  const isForeman   = session?.user?.role === 'foreman'
+  const foremanSite = session?.user?.site || ''
 
   const now = new Date()
-  const [site, setSite]               = useState('')
+  const [site, setSite]               = useState(
+    isForeman ? foremanSite : ''
+  )
   const [month, setMonth]             = useState(now.getMonth() + 1)
   const [year, setYear]               = useState(now.getFullYear())
-  const [preparedBy, setPreparedBy]   = useState('')
+  const [preparedBy, setPreparedBy]   = useState(
+    session?.user?.name || ''
+  )
   const [foodExpense, setFoodExpense] = useState('0')
   const [otherDeduct, setOtherDeduct] = useState('0')
   const [rows, setRows]               = useState<WorkerRow[]>([])
@@ -74,6 +84,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
     return d === 0 || d === 6
   }
 
+  // ── Copy workers from a previous paylaw ──────────────
   async function copyFromPaylaw(paylawId: string) {
     if (!paylawId) return
     setCopying(true)
@@ -92,12 +103,13 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
         if (!rows.find(r => r.employeeId === w.employeeId)) {
           newWorkers.push({
             employeeId: w.employeeId,
-            name: w.name,
-            jobTitle: w.jobTitle,
-            dayRate: w.dayRate,
+            name:       w.name,
+            jobTitle:   w.jobTitle,
+            dayRate:    w.dayRate,
             attendance: {},
-            deduction: 0,
-            signature: '',
+            deduction:  0,
+            signature:  '',
+            active:     true,
           })
         }
       }
@@ -113,6 +125,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
     }
   }
 
+  // ── Add individual worker ─────────────────────────────
   function addWorker() {
     if (!selectedEmpId) return
     if (rows.find(r => r.employeeId === selectedEmpId)) {
@@ -124,12 +137,13 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
     setError('')
     setRows(prev => [...prev, {
       employeeId: emp.id,
-      name: emp.name,
-      jobTitle: emp.jobTitle,
-      dayRate: emp.dayRate,
+      name:       emp.name,
+      jobTitle:   emp.jobTitle,
+      dayRate:    emp.dayRate,
       attendance: {},
-      deduction: 0,
-      signature: '',
+      deduction:  0,
+      signature:  '',
+      active:     emp.active,
     }])
     setSelectedEmpId('')
   }
@@ -138,9 +152,11 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
     setRows(prev => prev.filter(r => r.employeeId !== employeeId))
   }
 
+  // ── Toggle day — blocked for inactive workers ─────────
   function toggleDay(employeeId: string, day: number) {
     setRows(prev => prev.map(row => {
       if (row.employeeId !== employeeId) return row
+      if (!row.active) return row // safety block
       const key = String(day)
       return {
         ...row,
@@ -177,12 +193,13 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
     return Math.max(grossAmount(row) - row.deduction, 0)
   }
 
-  const totalGross    = rows.reduce((t, r) => t + grossAmount(r), 0)
-  const totalDeduct   = rows.reduce((t, r) => t + r.deduction, 0)
-  const totalNet      = rows.reduce((t, r) => t + netAmount(r), 0)
-  const totalDaysAll  = rows.reduce((t, r) => t + daysWorked(r), 0)
+  const totalGross   = rows.reduce((t, r) => t + grossAmount(r), 0)
+  const totalDeduct  = rows.reduce((t, r) => t + r.deduction, 0)
+  const totalNet     = rows.reduce((t, r) => t + netAmount(r), 0)
+  const totalDaysAll = rows.reduce((t, r) => t + daysWorked(r), 0)
 
-  async function handleSave(status: 'draft' | 'done') {
+  // ── Save ─────────────────────────────────────────────
+  async function handleSave(status: 'draft' | 'done' | 'submitted' | 'approved') {
     if (!site || !preparedBy) {
       setError('Site name and Prepared by are required')
       return
@@ -191,6 +208,30 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
       setError('Add at least one worker')
       return
     }
+
+    // Check same worker in different site same month
+    try {
+      const checkRes = await fetch('/api/paylaws/check-duplicates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employeeIds: rows.map(r => r.employeeId),
+          month,
+          year,
+          site,
+        }),
+      })
+      const checkData = await checkRes.json()
+      if (checkData.duplicates && checkData.duplicates.length > 0) {
+        setError(
+          `These workers already have a paylaw this month at a different site: ${checkData.duplicates.join(', ')}. Remove them or use the same site.`
+        )
+        return
+      }
+    } catch {
+      // If check fails just continue
+    }
+
     setSaving(true)
     setError('')
 
@@ -291,26 +332,40 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
       )}
 
       {/* Sheet Info */}
-      <div className="bg-white border border-gray-100 rounded-xl p-4 md:p-5">
+      <div className="bg-white border border-gray-100 rounded-xl
+                      p-4 md:p-5">
         <p className="text-xs font-semibold text-gray-400 uppercase
                       tracking-wider mb-4 flex items-center gap-3
                       after:flex-1 after:h-px after:bg-gray-100
                       after:content-['']">
           Sheet info
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4
+                        gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500
                                uppercase tracking-wide">
               Site name
             </label>
-            <input
-              className="border border-gray-200 rounded-lg px-3 py-2
-                         text-sm outline-none focus:border-gray-400"
-              placeholder="e.g. Lusaka Central"
-              value={site}
-              onChange={e => setSite(e.target.value)}
-            />
+            {isForeman ? (
+              <div className="border border-gray-200 rounded-lg px-3
+                              py-2 text-sm bg-gray-50 text-gray-600
+                              flex items-center justify-between">
+                <span>{foremanSite}</span>
+                <span className="text-xs text-gray-300 bg-gray-100
+                                 px-2 py-0.5 rounded">
+                  Your site
+                </span>
+              </div>
+            ) : (
+              <input
+                className="border border-gray-200 rounded-lg px-3 py-2
+                           text-sm outline-none focus:border-gray-400"
+                placeholder="e.g. Lusaka Central"
+                value={site}
+                onChange={e => setSite(e.target.value)}
+              />
+            )}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500
@@ -358,7 +413,8 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
       </div>
 
       {/* Attendance Grid */}
-      <div className="bg-white border border-gray-100 rounded-xl p-4 md:p-5">
+      <div className="bg-white border border-gray-100 rounded-xl
+                      p-4 md:p-5">
         <p className="text-xs font-semibold text-gray-400 uppercase
                       tracking-wider mb-1 flex items-center gap-3
                       after:flex-1 after:h-px after:bg-gray-100
@@ -382,13 +438,9 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
               Present
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded bg-red-50 border
-                               border-red-200 flex items-center
-                               justify-center text-red-500 text-xs
-                               font-bold">
-                −
-              </span>
-              Deduction
+              <span className="w-5 h-5 rounded bg-gray-100 border
+                               border-gray-200 inline-block"/>
+              Inactive worker
             </span>
           </div>
         </div>
@@ -413,7 +465,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           </span>
         </div>
 
-        {/* Add worker */}
+        {/* Add worker dropdown */}
         <div className="flex gap-2 mb-4">
           <select
             className="flex-1 min-w-0 border border-gray-200 rounded-lg
@@ -426,6 +478,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
             {availableEmployees.map(e => (
               <option key={e.id} value={e.id}>
                 {e.name} — {e.jobTitle} (K {e.dayRate}/day)
+                {!e.active ? ' — INACTIVE' : ''}
               </option>
             ))}
           </select>
@@ -471,16 +524,16 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                   <th className="sticky left-0 z-20 bg-gray-50 border-b
                                  border-r border-gray-200 text-left text-xs
                                  font-medium text-gray-400 uppercase
-                                 tracking-wide px-4 py-3 min-w-36">
+                                 tracking-wide px-4 py-3 min-w-40">
                     Name
                   </th>
-                  <th className="sticky left-36 z-20 bg-gray-50 border-b
+                  <th className="sticky left-40 z-20 bg-gray-50 border-b
                                  border-r border-gray-200 text-left text-xs
                                  font-medium text-gray-400 uppercase
                                  tracking-wide px-3 py-3 min-w-28">
                     Job title
                   </th>
-                  <th className="sticky left-64 z-20 bg-gray-50 border-b
+                  <th className="sticky left-68 z-20 bg-gray-50 border-b
                                  border-r border-gray-200 text-center
                                  text-xs font-medium text-gray-400 uppercase
                                  tracking-wide px-3 py-3 min-w-20">
@@ -489,17 +542,25 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                   {allDays.map(day => {
                     const weekend = isWeekend(day)
                     return (
-                      <th key={day}
-                          className={`border-b border-gray-200 text-center
-                                      px-0 py-2 min-w-9
-                                      ${weekend ? 'bg-amber-50' : 'bg-gray-50'}`}>
+                      <th
+                        key={day}
+                        className={`border-b border-gray-200 text-center
+                                    px-0 py-2 min-w-9
+                                    ${weekend
+                                      ? 'bg-amber-50'
+                                      : 'bg-gray-50'}`}
+                      >
                         <div className="flex flex-col items-center gap-0.5">
                           <span className={`text-xs font-semibold
-                            ${weekend ? 'text-amber-600' : 'text-gray-600'}`}>
+                            ${weekend
+                              ? 'text-amber-600'
+                              : 'text-gray-600'}`}>
                             {day}
                           </span>
                           <span className={`text-xs
-                            ${weekend ? 'text-amber-400' : 'text-gray-300'}`}>
+                            ${weekend
+                              ? 'text-amber-400'
+                              : 'text-gray-300'}`}>
                             {DAY_LABELS[getDayOfWeek(day)]}
                           </span>
                         </div>
@@ -516,7 +577,6 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                                  uppercase tracking-wide px-3 py-3 min-w-20">
                     Gross
                   </th>
-                  {/* Deduction column */}
                   <th className="border-b border-gray-200 bg-red-50
                                  text-center text-xs font-medium text-red-400
                                  uppercase tracking-wide px-3 py-3 min-w-20">
@@ -542,59 +602,102 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                   const worked = daysWorked(row)
                   const gross  = grossAmount(row)
                   const net    = netAmount(row)
+
                   return (
-                    <tr key={row.employeeId}
-                        className="border-b border-gray-100
-                                   hover:bg-gray-50/50">
+                    <tr
+                      key={row.employeeId}
+                      className={`border-b border-gray-100
+                        ${row.active
+                          ? 'hover:bg-gray-50/50'
+                          : 'bg-gray-50/50 opacity-70'}`}
+                    >
+                      {/* Name — with inactive badge */}
                       <td className="sticky left-0 z-10 bg-white border-r
-                                     border-gray-100 px-4 py-2.5 text-sm
-                                     font-medium text-gray-900 min-w-36">
-                        {row.name}
+                                     border-gray-100 px-4 py-2.5 min-w-40">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`text-sm font-medium
+                            ${row.active
+                              ? 'text-gray-900'
+                              : 'text-gray-400'}`}>
+                            {row.name}
+                          </span>
+                          {!row.active && (
+                            <span className="text-xs bg-gray-100
+                                             text-gray-400 px-1.5 py-0.5
+                                             rounded-full leading-none
+                                             flex-shrink-0">
+                              inactive
+                            </span>
+                          )}
+                        </div>
                       </td>
-                      <td className="sticky left-36 z-10 bg-white border-r
+
+                      {/* Job title */}
+                      <td className="sticky left-40 z-10 bg-white border-r
                                      border-gray-100 px-3 py-2.5 text-xs
                                      text-gray-500 min-w-28">
                         {row.jobTitle}
                       </td>
-                      <td className="sticky left-64 z-10 bg-white border-r
+
+                      {/* Day rate */}
+                      <td className="sticky left-68 z-10 bg-white border-r
                                      border-gray-200 px-2 py-2.5 min-w-20">
                         <input
                           type="number"
                           value={row.dayRate}
+                          disabled={!row.active}
                           onChange={e => updateRate(
                             row.employeeId, e.target.value
                           )}
-                          className="w-16 text-center text-xs font-semibold
-                                     text-green-700 bg-green-50 border
-                                     border-green-200 rounded px-1 py-1
-                                     outline-none focus:border-green-400"
+                          className={`w-16 text-center text-xs font-semibold
+                                      border rounded px-1 py-1 outline-none
+                            ${row.active
+                              ? 'text-green-700 bg-green-50 border-green-200 focus:border-green-400'
+                              : 'text-gray-300 bg-gray-50 border-gray-100 cursor-not-allowed'}`}
                         />
                       </td>
+
+                      {/* Day cells */}
                       {allDays.map(day => {
                         const present = !!row.attendance[String(day)]
                         const weekend = isWeekend(day)
                         return (
-                          <td key={day}
-                              className={`px-0.5 py-2 text-center
-                                ${weekend ? 'bg-amber-50/40' : ''}`}>
+                          <td
+                            key={day}
+                            className={`px-0.5 py-2 text-center
+                              ${weekend ? 'bg-amber-50/40' : ''}`}
+                          >
                             <button
-                              onClick={() => toggleDay(row.employeeId, day)}
+                              onClick={() => {
+                                if (!row.active) return
+                                toggleDay(row.employeeId, day)
+                              }}
+                              disabled={!row.active}
+                              title={
+                                !row.active
+                                  ? 'Worker is inactive — cannot mark days'
+                                  : present
+                                  ? 'Mark absent'
+                                  : 'Mark present'
+                              }
                               className={`w-7 h-7 rounded text-xs font-bold
                                           transition-all mx-auto block
-                                ${present
-                                  ? 'bg-green-100 border border-green-300 text-green-700'
+                                ${!row.active
+                                  ? 'bg-gray-50 border border-gray-100 text-gray-200 cursor-not-allowed'
+                                  : present
+                                  ? 'bg-green-100 border border-green-300 text-green-700 hover:bg-green-200'
                                   : weekend
-                                  ? 'bg-amber-50 border border-amber-100 text-amber-200'
-                                  : 'bg-gray-100 border border-gray-200 text-gray-200'
+                                  ? 'bg-amber-50 border border-amber-100 text-amber-200 hover:bg-amber-100'
+                                  : 'bg-gray-100 border border-gray-200 text-gray-300 hover:bg-gray-200'
                                 }`}
                             >
-                              {present ? '✓' : ''}
+                              {present && row.active ? '✓' : ''}
                             </button>
                           </td>
                         )
                       })}
 
-                      {/* Days */}
+                      {/* Days worked */}
                       <td className="border-l border-gray-100 px-3 py-2.5
                                      text-center text-sm font-semibold
                                      text-gray-800">
@@ -603,26 +706,29 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
 
                       {/* Gross */}
                       <td className="px-3 py-2.5 text-right text-sm
-                                     font-medium text-gray-600 whitespace-nowrap">
+                                     font-medium text-gray-600
+                                     whitespace-nowrap">
                         {gross > 0 ? `K ${gross.toLocaleString()}` : '—'}
                       </td>
 
-                      {/* Deduction input */}
+                      {/* Deduction */}
                       <td className="px-2 py-2.5 text-center bg-red-50/30">
                         <input
                           type="number"
                           min="0"
                           value={row.deduction || ''}
                           placeholder="0"
+                          disabled={!row.active}
                           onChange={e => updateDeduction(
                             row.employeeId, e.target.value
                           )}
-                          className="w-16 text-center text-xs font-semibold
-                                     text-red-600 bg-white border
-                                     border-red-200 rounded px-1 py-1
-                                     outline-none focus:border-red-400
-                                     [appearance:textfield]
-                                     [&::-webkit-inner-spin-button]:appearance-none"
+                          className={`w-16 text-center text-xs font-semibold
+                                      border rounded px-1 py-1 outline-none
+                                      [appearance:textfield]
+                                      [&::-webkit-inner-spin-button]:appearance-none
+                            ${row.active
+                              ? 'text-red-600 bg-white border-red-200 focus:border-red-400'
+                              : 'text-gray-300 bg-gray-50 border-gray-100 cursor-not-allowed'}`}
                         />
                       </td>
 
@@ -639,6 +745,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                           type="text"
                           placeholder="sign…"
                           value={row.signature}
+                          disabled={!row.active}
                           onChange={e => {
                             const sig = e.target.value
                             setRows(prev => prev.map(r =>
@@ -654,7 +761,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                         />
                       </td>
 
-                      {/* Remove */}
+                      {/* Remove button */}
                       <td className="px-2 py-2.5">
                         <button
                           onClick={() => removeWorker(row.employeeId)}
@@ -671,21 +778,25 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                   )
                 })}
 
-                {/* Daily total row */}
+                {/* Totals row */}
                 <tr className="bg-gray-50 border-t border-gray-200">
-                  <td colSpan={3}
-                      className="sticky left-0 z-10 bg-gray-50 px-4 py-2
-                                 text-xs font-semibold text-gray-500">
+                  <td
+                    colSpan={3}
+                    className="sticky left-0 z-10 bg-gray-50 px-4 py-2
+                               text-xs font-semibold text-gray-500"
+                  >
                     Totals
                   </td>
                   {allDays.map(day => {
                     const count = rows.filter(
-                      r => !!r.attendance[String(day)]
+                      r => r.active && !!r.attendance[String(day)]
                     ).length
                     return (
                       <td key={day} className="text-center px-0.5 py-2">
                         <span className={`text-xs font-semibold
-                          ${count > 0 ? 'text-green-700' : 'text-gray-300'}`}>
+                          ${count > 0
+                            ? 'text-green-700'
+                            : 'text-gray-300'}`}>
                           {count > 0 ? count : '—'}
                         </span>
                       </td>
@@ -700,7 +811,8 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                     K {totalGross.toLocaleString()}
                   </td>
                   <td className="px-3 py-2 text-center text-xs font-bold
-                                 text-red-600 whitespace-nowrap bg-red-50/30">
+                                 text-red-600 whitespace-nowrap
+                                 bg-red-50/30">
                     {totalDeduct > 0
                       ? `− K ${totalDeduct.toLocaleString()}`
                       : '—'}
@@ -727,13 +839,15 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                       after:content-['']">
           Description &amp; expenses
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4
+                        gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500
                                uppercase tracking-wide">
               Gross salaries (K)
             </label>
-            <input readOnly
+            <input
+              readOnly
               value={`K ${totalGross.toLocaleString()}`}
               className="border border-gray-200 rounded-lg px-3 py-2
                          text-sm text-gray-600 bg-gray-50 outline-none"
@@ -744,7 +858,8 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                                uppercase tracking-wide">
               Total deductions (K)
             </label>
-            <input readOnly
+            <input
+              readOnly
               value={totalDeduct > 0
                 ? `− K ${totalDeduct.toLocaleString()}`
                 : 'K 0'}
@@ -757,7 +872,8 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                                uppercase tracking-wide">
               Net salaries (K)
             </label>
-            <input readOnly
+            <input
+              readOnly
               value={`K ${totalNet.toLocaleString()}`}
               className="border border-green-100 rounded-lg px-3 py-2
                          text-sm text-green-700 font-semibold
@@ -769,7 +885,9 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                                uppercase tracking-wide">
               Food expense (K)
             </label>
-            <input type="number" placeholder="0"
+            <input
+              type="number"
+              placeholder="0"
               value={foodExpense}
               onChange={e => setFoodExpense(e.target.value)}
               className="border border-gray-200 rounded-lg px-3 py-2
@@ -779,7 +897,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
         </div>
       </div>
 
-      {/* Summary bar */}
+      {/* Summary + save buttons */}
       <div className="bg-white border border-gray-100 rounded-xl
                       p-4 md:p-5 flex items-center justify-between
                       gap-4 flex-wrap">
@@ -829,28 +947,56 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           )}
           <button
             onClick={() => router.back()}
-            className="px-4 py-2 text-sm border border-gray-200 rounded-lg
-                       text-gray-600 hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-sm border border-gray-200
+                       rounded-lg text-gray-600 hover:bg-gray-50
+                       transition-colors"
           >
             Cancel
           </button>
-          <button
-            onClick={() => handleSave('draft')}
-            disabled={saving}
-            className="px-4 py-2 text-sm border border-gray-200 rounded-lg
-                       text-gray-700 hover:bg-gray-50 transition-colors
-                       disabled:opacity-50"
-          >
-            Save draft
-          </button>
-          <button
-            onClick={() => handleSave('done')}
-            disabled={saving}
-            className="px-4 py-2 text-sm bg-black text-white rounded-lg
-                       hover:bg-gray-800 transition-colors disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save & generate PDF ↗'}
-          </button>
+
+          {isForeman ? (
+            <>
+              <button
+                onClick={() => handleSave('draft')}
+                disabled={saving}
+                className="px-4 py-2 text-sm border border-gray-200
+                           rounded-lg text-gray-700 hover:bg-gray-50
+                           transition-colors disabled:opacity-50"
+              >
+                Save draft
+              </button>
+              <button
+                onClick={() => handleSave('submitted')}
+                disabled={saving}
+                className="px-4 py-2 text-sm bg-blue-600 text-white
+                           rounded-lg hover:bg-blue-700 transition-colors
+                           disabled:opacity-50"
+              >
+                {saving ? 'Submitting...' : 'Submit for approval ↗'}
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => handleSave('draft')}
+                disabled={saving}
+                className="px-4 py-2 text-sm border border-gray-200
+                           rounded-lg text-gray-700 hover:bg-gray-50
+                           transition-colors disabled:opacity-50"
+              >
+                Save draft
+              </button>
+              <button
+                onClick={() => handleSave('approved')}
+                disabled={saving}
+                className="px-4 py-2 text-sm bg-black text-white
+                           rounded-lg hover:bg-gray-800 transition-colors
+                           disabled:opacity-50"
+              >
+                {saving ? 'Saving...' : 'Save & approve ✓'}
+              </button>
+            </>
+          )}
         </div>
       </div>
 

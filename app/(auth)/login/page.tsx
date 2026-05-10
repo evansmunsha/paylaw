@@ -135,9 +135,7 @@ export default function LoginPage() {
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
 
-            import Link from 'next/link'
-
-            // Replace the bottom paragraph with this:
+            
             <p className="text-center text-xs text-gray-400 mt-4">
               Don't have an account?{' '}
               <Link

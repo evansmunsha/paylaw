@@ -13,7 +13,7 @@ interface Employee {
 }
 
 interface ExistingRow {
-  deduction: number
+  deduction?: number
   id: string
   employeeId: string
   dayRate: number

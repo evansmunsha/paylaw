@@ -4,10 +4,13 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
-// GET — fetch all foremen created by this admin
 export async function GET() {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'admin') {
+  if (!session) {
+    return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
+  }
+
+  if (session.user.role !== 'admin') {
     return NextResponse.json({ error: 'Not allowed' }, { status: 403 })
   }
 
@@ -23,10 +26,13 @@ export async function GET() {
   return NextResponse.json(foremen)
 }
 
-// POST — create a new foreman account
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'admin') {
+  if (!session) {
+    return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
+  }
+
+  if (session.user.role !== 'admin') {
     return NextResponse.json({ error: 'Not allowed' }, { status: 403 })
   }
 
@@ -39,15 +45,44 @@ export async function POST(req: Request) {
     )
   }
 
-  // Check email not already used
-  const existing = await prisma.user.findUnique({ where: { email } })
-  if (existing) {
+  if (password.length < 6) {
     return NextResponse.json(
-      { error: 'That email is already registered' },
+      { error: 'Password must be at least 6 characters' },
       { status: 400 }
     )
   }
 
+  // Check if email already exists
+  const existing = await prisma.user.findUnique({ where: { email } })
+
+  if (existing) {
+    // If this foreman already belongs to this admin — just update them
+    if (existing.adminId === session.user.id && existing.role === 'foreman') {
+      const hashed = await bcrypt.hash(password, 12)
+      const updated = await prisma.user.update({
+        where: { id: existing.id },
+        data: { name, site, password: hashed },
+      })
+      return NextResponse.json({
+        id:    updated.id,
+        name:  updated.name,
+        email: updated.email,
+        site:  updated.site,
+      }, { status: 200 })
+    }
+
+    // Email belongs to a completely different account — block it
+    return NextResponse.json(
+      {
+        error: email === session.user.email
+          ? 'That is your own admin email. Use a different email for the foreman.'
+          : 'That email is already used by another account. Use a different email for this foreman.',
+      },
+      { status: 400 }
+    )
+  }
+
+  // Create brand new foreman account
   const hashed = await bcrypt.hash(password, 12)
 
   const foreman = await prisma.user.create({

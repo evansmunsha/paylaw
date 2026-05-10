@@ -9,8 +9,19 @@ export default async function NewOvertimePage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
+  const isForeman = session.user.role === 'foreman'
+
   const employees = await prisma.employee.findMany({
-    where: { userId: session.user.id, active: true },
+    where: isForeman
+      ? {
+          userId: session.user.adminId!,
+          site:   session.user.site!,
+          active: true,
+        }
+      : {
+          userId: session.user.id,
+          active: true,
+        },
     orderBy: { name: 'asc' },
   })
 

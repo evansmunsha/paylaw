@@ -14,23 +14,35 @@ export default async function EditPaylawPage({
   if (!session) redirect('/login')
 
   const { id } = await params
+  const isForeman = session.user.role === 'foreman'
 
-  // Load the existing paylaw with all its rows
+  const ownerId = isForeman
+    ? session.user.adminId!
+    : session.user.id
+
   const paylaw = await prisma.paylaw.findFirst({
-    where: { id, userId: session.user.id },
+    where: { id, userId: ownerId },
     include: {
-      rows: {
-        include: { employee: true },
-      },
+      rows: { include: { employee: true } },
     },
   })
 
   if (!paylaw) notFound()
 
-  // Load all active employees for this user
-  // so they can add more workers if needed
+  // Same fix — foremen see their site's active employees
+  const employeeWhere = isForeman
+    ? {
+        userId: session.user.adminId!,
+        site:   session.user.site!,
+        active: true,
+      }
+    : {
+        userId: session.user.id,
+        active: true,
+      }
+
   const employees = await prisma.employee.findMany({
-    where: { userId: session.user.id, active: true },
+    where: employeeWhere,
     orderBy: { name: 'asc' },
   })
 
@@ -38,12 +50,9 @@ export default async function EditPaylawPage({
     <div className="flex flex-col min-h-screen">
       <Topbar
         title={`Edit Paylaw — ${paylaw.site}`}
-        subtitle="Continue marking attendance · changes are saved when you click save"
+        subtitle="Continue marking attendance"
       />
-      <EditPaylawClient
-        paylaw={paylaw}
-        employees={employees}
-      />
+      <EditPaylawClient paylaw={paylaw} employees={employees} />
     </div>
   )
 }

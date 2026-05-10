@@ -14,20 +14,27 @@ export default async function EditOvertimePage({
   if (!session) redirect('/login')
 
   const { id } = await params
+  const isForeman = session.user.role === 'foreman'
+  const ownerId   = isForeman ? session.user.adminId! : session.user.id
 
   const overtime = await prisma.overtime.findFirst({
-    where: { id, userId: session.user.id },
-    include: {
-      rows: {
-        include: { employee: true },
-      },
-    },
+    where: { id, userId: ownerId },
+    include: { rows: { include: { employee: true } } },
   })
 
   if (!overtime) notFound()
 
   const employees = await prisma.employee.findMany({
-    where: { userId: session.user.id, active: true },
+    where: isForeman
+      ? {
+          userId: session.user.adminId!,
+          site:   session.user.site!,
+          active: true,
+        }
+      : {
+          userId: session.user.id,
+          active: true,
+        },
     orderBy: { name: 'asc' },
   })
 
@@ -35,7 +42,7 @@ export default async function EditOvertimePage({
     <div className="flex flex-col min-h-screen">
       <Topbar
         title={`Edit Overtime — ${overtime.site}`}
-        subtitle="Continue entering hours · save draft to come back later"
+        subtitle="Continue entering hours"
       />
       <EditOvertimeClient overtime={overtime} employees={employees} />
     </div>

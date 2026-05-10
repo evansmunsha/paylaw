@@ -76,7 +76,7 @@ export default function RegisterPage() {
               <input
                 type="text"
                 required
-                placeholder="e.g. Evans Mwansa"
+                placeholder="e.g. Evans Munsha"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 className="border border-gray-200 rounded-lg px-4 py-2.5
@@ -96,7 +96,7 @@ export default function RegisterPage() {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Mwansa Construction Ltd"
+                placeholder="e.g. Munsha Construction Ltd"
                 value={companyName}
                 onChange={e => setCompanyName(e.target.value)}
                 className="border border-gray-200 rounded-lg px-4 py-2.5
