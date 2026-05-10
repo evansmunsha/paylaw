@@ -128,6 +128,8 @@ export const PaylawRowScalarFieldEnum = {
   daysWorked: 'daysWorked',
   dayRate: 'dayRate',
   amount: 'amount',
+  deduction: 'deduction',
+  netAmount: 'netAmount',
   signature: 'signature',
   paylawId: 'paylawId',
   employeeId: 'employeeId',

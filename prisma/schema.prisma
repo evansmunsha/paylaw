@@ -79,6 +79,8 @@ model PaylawRow {
   daysWorked Int     // total days present that month
   dayRate    Float   // snapshot of rate at time of paylaw
   amount     Float   // daysWorked × dayRate
+  deduction  Float   @default(0) // per-row deductions
+  netAmount  Float   @default(0) // amount after deductions
   signature  String? // worker's signature text
 
   // which paylaw this row belongs to

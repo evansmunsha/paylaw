@@ -30,12 +30,16 @@ export type PaylawRowAvgAggregateOutputType = {
   daysWorked: number | null
   dayRate: number | null
   amount: number | null
+  deduction: number | null
+  netAmount: number | null
 }
 
 export type PaylawRowSumAggregateOutputType = {
   daysWorked: number | null
   dayRate: number | null
   amount: number | null
+  deduction: number | null
+  netAmount: number | null
 }
 
 export type PaylawRowMinAggregateOutputType = {
@@ -43,6 +47,8 @@ export type PaylawRowMinAggregateOutputType = {
   daysWorked: number | null
   dayRate: number | null
   amount: number | null
+  deduction: number | null
+  netAmount: number | null
   signature: string | null
   paylawId: string | null
   employeeId: string | null
@@ -53,6 +59,8 @@ export type PaylawRowMaxAggregateOutputType = {
   daysWorked: number | null
   dayRate: number | null
   amount: number | null
+  deduction: number | null
+  netAmount: number | null
   signature: string | null
   paylawId: string | null
   employeeId: string | null
@@ -63,6 +71,8 @@ export type PaylawRowCountAggregateOutputType = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction: number
+  netAmount: number
   signature: number
   paylawId: number
   employeeId: number
@@ -75,12 +85,16 @@ export type PaylawRowAvgAggregateInputType = {
   daysWorked?: true
   dayRate?: true
   amount?: true
+  deduction?: true
+  netAmount?: true
 }
 
 export type PaylawRowSumAggregateInputType = {
   daysWorked?: true
   dayRate?: true
   amount?: true
+  deduction?: true
+  netAmount?: true
 }
 
 export type PaylawRowMinAggregateInputType = {
@@ -88,6 +102,8 @@ export type PaylawRowMinAggregateInputType = {
   daysWorked?: true
   dayRate?: true
   amount?: true
+  deduction?: true
+  netAmount?: true
   signature?: true
   paylawId?: true
   employeeId?: true
@@ -98,6 +114,8 @@ export type PaylawRowMaxAggregateInputType = {
   daysWorked?: true
   dayRate?: true
   amount?: true
+  deduction?: true
+  netAmount?: true
   signature?: true
   paylawId?: true
   employeeId?: true
@@ -108,6 +126,8 @@ export type PaylawRowCountAggregateInputType = {
   daysWorked?: true
   dayRate?: true
   amount?: true
+  deduction?: true
+  netAmount?: true
   signature?: true
   paylawId?: true
   employeeId?: true
@@ -206,6 +226,8 @@ export type PaylawRowGroupByOutputType = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction: number
+  netAmount: number
   signature: string | null
   paylawId: string
   employeeId: string
@@ -240,6 +262,8 @@ export type PaylawRowWhereInput = {
   daysWorked?: Prisma.IntFilter<"PaylawRow"> | number
   dayRate?: Prisma.FloatFilter<"PaylawRow"> | number
   amount?: Prisma.FloatFilter<"PaylawRow"> | number
+  deduction?: Prisma.FloatFilter<"PaylawRow"> | number
+  netAmount?: Prisma.FloatFilter<"PaylawRow"> | number
   signature?: Prisma.StringNullableFilter<"PaylawRow"> | string | null
   paylawId?: Prisma.StringFilter<"PaylawRow"> | string
   employeeId?: Prisma.StringFilter<"PaylawRow"> | string
@@ -253,6 +277,8 @@ export type PaylawRowOrderByWithRelationInput = {
   daysWorked?: Prisma.SortOrder
   dayRate?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   signature?: Prisma.SortOrderInput | Prisma.SortOrder
   paylawId?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
@@ -269,6 +295,8 @@ export type PaylawRowWhereUniqueInput = Prisma.AtLeast<{
   daysWorked?: Prisma.IntFilter<"PaylawRow"> | number
   dayRate?: Prisma.FloatFilter<"PaylawRow"> | number
   amount?: Prisma.FloatFilter<"PaylawRow"> | number
+  deduction?: Prisma.FloatFilter<"PaylawRow"> | number
+  netAmount?: Prisma.FloatFilter<"PaylawRow"> | number
   signature?: Prisma.StringNullableFilter<"PaylawRow"> | string | null
   paylawId?: Prisma.StringFilter<"PaylawRow"> | string
   employeeId?: Prisma.StringFilter<"PaylawRow"> | string
@@ -282,6 +310,8 @@ export type PaylawRowOrderByWithAggregationInput = {
   daysWorked?: Prisma.SortOrder
   dayRate?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   signature?: Prisma.SortOrderInput | Prisma.SortOrder
   paylawId?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
@@ -301,6 +331,8 @@ export type PaylawRowScalarWhereWithAggregatesInput = {
   daysWorked?: Prisma.IntWithAggregatesFilter<"PaylawRow"> | number
   dayRate?: Prisma.FloatWithAggregatesFilter<"PaylawRow"> | number
   amount?: Prisma.FloatWithAggregatesFilter<"PaylawRow"> | number
+  deduction?: Prisma.FloatWithAggregatesFilter<"PaylawRow"> | number
+  netAmount?: Prisma.FloatWithAggregatesFilter<"PaylawRow"> | number
   signature?: Prisma.StringNullableWithAggregatesFilter<"PaylawRow"> | string | null
   paylawId?: Prisma.StringWithAggregatesFilter<"PaylawRow"> | string
   employeeId?: Prisma.StringWithAggregatesFilter<"PaylawRow"> | string
@@ -312,6 +344,8 @@ export type PaylawRowCreateInput = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction?: number
+  netAmount?: number
   signature?: string | null
   attendance: Prisma.JsonNullValueInput | runtime.InputJsonValue
   paylaw: Prisma.PaylawCreateNestedOneWithoutRowsInput
@@ -323,6 +357,8 @@ export type PaylawRowUncheckedCreateInput = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction?: number
+  netAmount?: number
   signature?: string | null
   paylawId: string
   employeeId: string
@@ -334,6 +370,8 @@ export type PaylawRowUpdateInput = {
   daysWorked?: Prisma.IntFieldUpdateOperationsInput | number
   dayRate?: Prisma.FloatFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attendance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   paylaw?: Prisma.PaylawUpdateOneRequiredWithoutRowsNestedInput
@@ -345,6 +383,8 @@ export type PaylawRowUncheckedUpdateInput = {
   daysWorked?: Prisma.IntFieldUpdateOperationsInput | number
   dayRate?: Prisma.FloatFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paylawId?: Prisma.StringFieldUpdateOperationsInput | string
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -356,6 +396,8 @@ export type PaylawRowCreateManyInput = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction?: number
+  netAmount?: number
   signature?: string | null
   paylawId: string
   employeeId: string
@@ -367,6 +409,8 @@ export type PaylawRowUpdateManyMutationInput = {
   daysWorked?: Prisma.IntFieldUpdateOperationsInput | number
   dayRate?: Prisma.FloatFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attendance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
 }
@@ -376,6 +420,8 @@ export type PaylawRowUncheckedUpdateManyInput = {
   daysWorked?: Prisma.IntFieldUpdateOperationsInput | number
   dayRate?: Prisma.FloatFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paylawId?: Prisma.StringFieldUpdateOperationsInput | string
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -397,6 +443,8 @@ export type PaylawRowCountOrderByAggregateInput = {
   daysWorked?: Prisma.SortOrder
   dayRate?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   signature?: Prisma.SortOrder
   paylawId?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
@@ -407,6 +455,8 @@ export type PaylawRowAvgOrderByAggregateInput = {
   daysWorked?: Prisma.SortOrder
   dayRate?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
 }
 
 export type PaylawRowMaxOrderByAggregateInput = {
@@ -414,6 +464,8 @@ export type PaylawRowMaxOrderByAggregateInput = {
   daysWorked?: Prisma.SortOrder
   dayRate?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   signature?: Prisma.SortOrder
   paylawId?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
@@ -424,6 +476,8 @@ export type PaylawRowMinOrderByAggregateInput = {
   daysWorked?: Prisma.SortOrder
   dayRate?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
   signature?: Prisma.SortOrder
   paylawId?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
@@ -433,6 +487,8 @@ export type PaylawRowSumOrderByAggregateInput = {
   daysWorked?: Prisma.SortOrder
   dayRate?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  deduction?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
 }
 
 export type PaylawRowCreateNestedManyWithoutEmployeeInput = {
@@ -524,6 +580,8 @@ export type PaylawRowCreateWithoutEmployeeInput = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction?: number
+  netAmount?: number
   signature?: string | null
   attendance: Prisma.JsonNullValueInput | runtime.InputJsonValue
   paylaw: Prisma.PaylawCreateNestedOneWithoutRowsInput
@@ -534,6 +592,8 @@ export type PaylawRowUncheckedCreateWithoutEmployeeInput = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction?: number
+  netAmount?: number
   signature?: string | null
   paylawId: string
   attendance: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -573,6 +633,8 @@ export type PaylawRowScalarWhereInput = {
   daysWorked?: Prisma.IntFilter<"PaylawRow"> | number
   dayRate?: Prisma.FloatFilter<"PaylawRow"> | number
   amount?: Prisma.FloatFilter<"PaylawRow"> | number
+  deduction?: Prisma.FloatFilter<"PaylawRow"> | number
+  netAmount?: Prisma.FloatFilter<"PaylawRow"> | number
   signature?: Prisma.StringNullableFilter<"PaylawRow"> | string | null
   paylawId?: Prisma.StringFilter<"PaylawRow"> | string
   employeeId?: Prisma.StringFilter<"PaylawRow"> | string
@@ -584,6 +646,8 @@ export type PaylawRowCreateWithoutPaylawInput = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction?: number
+  netAmount?: number
   signature?: string | null
   attendance: Prisma.JsonNullValueInput | runtime.InputJsonValue
   employee: Prisma.EmployeeCreateNestedOneWithoutPaylawRowsInput
@@ -594,6 +658,8 @@ export type PaylawRowUncheckedCreateWithoutPaylawInput = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction?: number
+  netAmount?: number
   signature?: string | null
   employeeId: string
   attendance: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -630,6 +696,8 @@ export type PaylawRowCreateManyEmployeeInput = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction?: number
+  netAmount?: number
   signature?: string | null
   paylawId: string
   attendance: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -640,6 +708,8 @@ export type PaylawRowUpdateWithoutEmployeeInput = {
   daysWorked?: Prisma.IntFieldUpdateOperationsInput | number
   dayRate?: Prisma.FloatFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attendance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   paylaw?: Prisma.PaylawUpdateOneRequiredWithoutRowsNestedInput
@@ -650,6 +720,8 @@ export type PaylawRowUncheckedUpdateWithoutEmployeeInput = {
   daysWorked?: Prisma.IntFieldUpdateOperationsInput | number
   dayRate?: Prisma.FloatFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paylawId?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -660,6 +732,8 @@ export type PaylawRowUncheckedUpdateManyWithoutEmployeeInput = {
   daysWorked?: Prisma.IntFieldUpdateOperationsInput | number
   dayRate?: Prisma.FloatFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paylawId?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -670,6 +744,8 @@ export type PaylawRowCreateManyPaylawInput = {
   daysWorked: number
   dayRate: number
   amount: number
+  deduction?: number
+  netAmount?: number
   signature?: string | null
   employeeId: string
   attendance: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -680,6 +756,8 @@ export type PaylawRowUpdateWithoutPaylawInput = {
   daysWorked?: Prisma.IntFieldUpdateOperationsInput | number
   dayRate?: Prisma.FloatFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   attendance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutPaylawRowsNestedInput
@@ -690,6 +768,8 @@ export type PaylawRowUncheckedUpdateWithoutPaylawInput = {
   daysWorked?: Prisma.IntFieldUpdateOperationsInput | number
   dayRate?: Prisma.FloatFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -700,6 +780,8 @@ export type PaylawRowUncheckedUpdateManyWithoutPaylawInput = {
   daysWorked?: Prisma.IntFieldUpdateOperationsInput | number
   dayRate?: Prisma.FloatFieldUpdateOperationsInput | number
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  deduction?: Prisma.FloatFieldUpdateOperationsInput | number
+  netAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   signature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   employeeId?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -712,6 +794,8 @@ export type PaylawRowSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   daysWorked?: boolean
   dayRate?: boolean
   amount?: boolean
+  deduction?: boolean
+  netAmount?: boolean
   signature?: boolean
   paylawId?: boolean
   employeeId?: boolean
@@ -725,6 +809,8 @@ export type PaylawRowSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   daysWorked?: boolean
   dayRate?: boolean
   amount?: boolean
+  deduction?: boolean
+  netAmount?: boolean
   signature?: boolean
   paylawId?: boolean
   employeeId?: boolean
@@ -738,6 +824,8 @@ export type PaylawRowSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   daysWorked?: boolean
   dayRate?: boolean
   amount?: boolean
+  deduction?: boolean
+  netAmount?: boolean
   signature?: boolean
   paylawId?: boolean
   employeeId?: boolean
@@ -751,13 +839,15 @@ export type PaylawRowSelectScalar = {
   daysWorked?: boolean
   dayRate?: boolean
   amount?: boolean
+  deduction?: boolean
+  netAmount?: boolean
   signature?: boolean
   paylawId?: boolean
   employeeId?: boolean
   attendance?: boolean
 }
 
-export type PaylawRowOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "daysWorked" | "dayRate" | "amount" | "signature" | "paylawId" | "employeeId" | "attendance", ExtArgs["result"]["paylawRow"]>
+export type PaylawRowOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "daysWorked" | "dayRate" | "amount" | "deduction" | "netAmount" | "signature" | "paylawId" | "employeeId" | "attendance", ExtArgs["result"]["paylawRow"]>
 export type PaylawRowInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   paylaw?: boolean | Prisma.PaylawDefaultArgs<ExtArgs>
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -782,6 +872,8 @@ export type $PaylawRowPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     daysWorked: number
     dayRate: number
     amount: number
+    deduction: number
+    netAmount: number
     signature: string | null
     paylawId: string
     employeeId: string
@@ -1215,6 +1307,8 @@ export interface PaylawRowFieldRefs {
   readonly daysWorked: Prisma.FieldRef<"PaylawRow", 'Int'>
   readonly dayRate: Prisma.FieldRef<"PaylawRow", 'Float'>
   readonly amount: Prisma.FieldRef<"PaylawRow", 'Float'>
+  readonly deduction: Prisma.FieldRef<"PaylawRow", 'Float'>
+  readonly netAmount: Prisma.FieldRef<"PaylawRow", 'Float'>
   readonly signature: Prisma.FieldRef<"PaylawRow", 'String'>
   readonly paylawId: Prisma.FieldRef<"PaylawRow", 'String'>
   readonly employeeId: Prisma.FieldRef<"PaylawRow", 'String'>
