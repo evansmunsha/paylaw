@@ -9,7 +9,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     // Register the service worker for offline support
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
-        .register('/sw.js')
+        .register('/sw.js', { scope: '/' })
         .then(reg => console.log('SW registered:', reg.scope))
         .catch(err => console.log('SW failed:', err))
     }

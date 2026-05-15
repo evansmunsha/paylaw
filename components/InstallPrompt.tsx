@@ -40,8 +40,15 @@ export default function InstallPrompt() {
       setShow(true)
     }
 
+    const appInstalled = () => setIsInstalled(true)
+
     window.addEventListener('beforeinstallprompt', handler)
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+    window.addEventListener('appinstalled', appInstalled)
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler)
+      window.removeEventListener('appinstalled', appInstalled)
+    }
   }, [])
 
   async function handleInstall() {

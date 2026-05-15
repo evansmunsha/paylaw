@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { Providers } from './providers'
+import InstallPrompt from '@/components/InstallPrompt'
 
 export const metadata: Metadata = {
   title: 'PayLaw — Construction Payroll',
@@ -28,12 +29,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* iOS home screen icon */}
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png"/>
+        {/* PWA metadata */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-title" content="PayLaw" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
       </head>
       <body>
         <Providers>
           {children}
+          <InstallPrompt />
         </Providers>
       </body>
     </html>
