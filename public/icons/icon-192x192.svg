@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
-  <rect width="192" height="192" rx="36" ry="36" fill="#000"/>
-  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
-        font-family="Inter, system-ui, sans-serif" font-size="72" fill="#fff" font-weight="700">
-    PL
-  </text>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="90" fill="#070b1d"/>
+  <rect x="0" y="336" width="512" height="72" fill="#c1630f"/>
+  <text x="102" y="330" font-family="Inter, system-ui, sans-serif" font-size="280" font-weight="800" fill="#fff">P</text>
+  <text x="264" y="330" font-family="Inter, system-ui, sans-serif" font-size="280" font-weight="800" fill="#b3ff31">L</text>
+  <text x="256" y="470" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="56" font-weight="700" fill="#7a8aa3">PAYLAW</text>
 </svg>

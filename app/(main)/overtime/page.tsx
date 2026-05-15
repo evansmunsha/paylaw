@@ -16,9 +16,13 @@ export default async function OvertimePage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
+  const userWhere = session.user.role === 'foreman'
+    ? { userId: session.user.adminId!, site: session.user.site! }
+    : { userId: session.user.id }
+
   const [overtimes, settings] = await Promise.all([
     prisma.overtime.findMany({
-      where: { userId: session.user.id },
+      where: userWhere,
       include: { rows: true },
       orderBy: { createdAt: 'desc' },
     }),
