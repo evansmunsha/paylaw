@@ -36,7 +36,7 @@ export async function POST(
   if (action === 'approve') {
     await prisma.overtime.update({
       where: { id },
-      data:  { status: 'approved', rejectionNote: null },
+      data:  { status: 'approved' },
     })
 
     await logAction({
@@ -57,8 +57,7 @@ export async function POST(
     await prisma.overtime.update({
       where: { id },
       data:  {
-        status:        'rejected',
-        rejectionNote: note || 'No reason provided',
+        status: 'rejected',
       },
     })
 
