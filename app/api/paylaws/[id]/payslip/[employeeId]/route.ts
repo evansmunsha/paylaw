@@ -57,6 +57,7 @@ export async function GET(
     month:       paylaw.month,
     year:        paylaw.year,
     preparedBy:  paylaw.preparedBy,
+    currency:    settings?.currency || 'ZMW',
 
     // Normal pay
     dayRate:     row.dayRate,

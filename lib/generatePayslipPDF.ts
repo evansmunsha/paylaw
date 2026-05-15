@@ -135,7 +135,7 @@ export function generatePayslipPDF(data: PayslipData, currency: string = 'ZMW') 
   doc.setFontSize(8)
   doc.setTextColor(...BLACK)
   doc.text(`${monthName} ${data.year}`, rightX + 24, y)
-  doc.text(`K ${data.dayRate}/day`, rightX + 24, y + 6)
+  doc.text(`${symbol} ${data.dayRate}/day`, rightX + 24, y + 6)
   doc.text(data.preparedBy, rightX + 24, y + 12)
 
   y += 18
@@ -284,7 +284,7 @@ export function generatePayslipPDF(data: PayslipData, currency: string = 'ZMW') 
       }
 
       // Deduction row — red
-      if (label.startsWith('Deduction') || label.startsWith('− K')) {
+      if (label.startsWith('Deduction')) {
         hook.cell.styles.fillColor  = RED_LIGHT
         hook.cell.styles.textColor  = RED_DARK
         hook.cell.styles.fontStyle  = 'bold'
@@ -297,8 +297,7 @@ export function generatePayslipPDF(data: PayslipData, currency: string = 'ZMW') 
       }
 
       // Total row — green and bold
-      if (label === 'TOTAL TAKE-HOME PAY' || label.startsWith('K ') &&
-          hook.row.index === payRows.length - 1) {
+      if (hook.row.index === payRows.length - 1) {
         hook.cell.styles.fillColor  = GREEN_LIGHT
         hook.cell.styles.textColor  = GREEN_DARK
         hook.cell.styles.fontStyle  = 'bold'

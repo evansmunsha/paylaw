@@ -62,6 +62,7 @@ export const config = {
     '/settings/:path*',
     '/audit/:path*',
     '/sites/:path*',
+    '/notifications/:path*',
     '/login',
     '/home',
     '/register',

@@ -2,6 +2,7 @@
 
 import { useSession, signOut } from 'next-auth/react'
 import { useState, useEffect } from 'react'
+import NotificationBell from './NotificationBell'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -74,7 +75,7 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+        <div className="flex items-center gap-2 shrink-0 ml-3">
 
           {/* Install button — only show if not installed */}
           {!isInstalled && (
@@ -94,6 +95,9 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
               Install app
             </button>
           )}
+
+          {/* Notification bell */}
+          <NotificationBell />
 
           {/* Avatar + dropdown */}
           <div className="relative">

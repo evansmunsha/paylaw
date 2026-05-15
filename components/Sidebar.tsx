@@ -161,6 +161,21 @@ const navItems: NavItem[] = [
     </svg>
   ),
 },
+{
+  label: 'Notifications',
+  href: '/notifications',
+  roles: ['admin', 'foreman'],
+  icon: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M8 2a4.5 4.5 0 00-4.5 4.5v2.5l-1 1.5h11l-1-1.5V6.5A4.5 4.5 0 008 2z"
+            stroke="currentColor" strokeWidth="1.3"
+            strokeLinejoin="round"/>
+      <path d="M6.5 12.5a1.5 1.5 0 003 0"
+            stroke="currentColor" strokeWidth="1.3"
+            strokeLinecap="round"/>
+    </svg>
+  ),
+},
 ]
 
 export default function Sidebar() {

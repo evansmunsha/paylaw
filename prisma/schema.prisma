@@ -158,3 +158,16 @@ model AuditLog {
   details    String?  // optional extra info
   createdAt  DateTime @default(now())
 }
+
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   // who receives this notification
+  title     String
+  message   String
+  type      String   // submitted, approved, rejected
+  entityType String  // paylaw, overtime
+  entityId  String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

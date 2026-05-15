@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAction } from '@/lib/audit'
+import { notify } from '@/lib/notify'
 
 const MONTH_NAMES = [
   'January','February','March','April','May','June',
@@ -110,6 +111,18 @@ export async function POST(req: Request) {
     userRole:   session.user.role || 'admin',
     adminId:    ownerId,
   })
+
+  // Notify admin when a foreman submits
+  if (status === 'submitted' && session.user.role === 'foreman') {
+    await notify({
+      userId:     session.user.adminId!,
+      title:      '📋 Paylaw Submitted for Approval',
+      message:    `${session.user.name || 'A foreman'} submitted a paylaw for ${site} — ${MONTH_NAMES[parseInt(month) - 1]} ${year}. Please review and approve.`,
+      type:       'submitted',
+      entityType: 'paylaw',
+      entityId:   paylaw.id,
+    })
+  }
 
   return NextResponse.json(paylaw, { status: 201 })
 }
