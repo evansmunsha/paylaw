@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { logAction } from '@/lib/audit'
 
 export async function GET() {
   const session = await getServerSession(authOptions)
@@ -9,13 +10,8 @@ export async function GET() {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
   }
 
-  // Foremen see only employees at their site
-  // Admin sees all their employees
   const where = session.user.role === 'foreman'
-    ? {
-        userId: session.user.adminId!,
-        site:   session.user.site!,
-      }
+    ? { userId: session.user.adminId!, site: session.user.site! }
     : { userId: session.user.id }
 
   const employees = await prisma.employee.findMany({
@@ -41,13 +37,10 @@ export async function POST(req: Request) {
     )
   }
 
-  // Foremen create employees under the admin's account
-  // and can only add to their assigned site
   const ownerId = session.user.role === 'foreman'
     ? session.user.adminId!
     : session.user.id
 
-  // Foremen cannot add employees to a different site
   if (
     session.user.role === 'foreman' &&
     session.user.site &&
@@ -64,10 +57,21 @@ export async function POST(req: Request) {
       name,
       jobTitle,
       site,
-      dayRate:  parseFloat(dayRate)  || 0,
-      otRate:   parseFloat(otRate)   || 0,
-      userId:   ownerId,
+      dayRate: parseFloat(dayRate) || 0,
+      otRate:  parseFloat(otRate)  || 0,
+      userId:  ownerId,
     },
+  })
+
+  await logAction({
+    action:     'created',
+    entityType: 'employee',
+    entityId:   employee.id,
+    entityName: `${employee.name} — ${employee.site}`,
+    userId:     session.user.id,
+    userName:   session.user.name || session.user.email || 'Unknown',
+    userRole:   session.user.role || 'admin',
+    adminId:    ownerId,
   })
 
   return NextResponse.json(employee, { status: 201 })

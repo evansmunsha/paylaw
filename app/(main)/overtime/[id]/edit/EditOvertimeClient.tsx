@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { getCurrencySymbol, formatMoney } from '@/lib/currency'
 
 interface Employee {
   id: string
@@ -45,6 +46,7 @@ interface WorkerRow {
 interface Props {
   overtime: ExistingOvertime
   employees: Employee[]
+  currency: string
 }
 
 const MONTH_NAMES = [
@@ -54,8 +56,9 @@ const MONTH_NAMES = [
 
 const DAY_LABELS = ['Su','Mo','Tu','We','Th','Fr','Sa']
 
-export default function EditOvertimeClient({ overtime, employees }: Props) {
+export default function EditOvertimeClient({ overtime, employees, currency }: Props) {
   const router = useRouter()
+  const symbol = getCurrencySymbol(currency)
 
   const [site, setSite]             = useState(overtime.site)
   const [month, setMonth]           = useState(overtime.month)
@@ -225,7 +228,7 @@ export default function EditOvertimeClient({ overtime, employees }: Props) {
         </span>
         <span className="text-gray-400">×</span>
         <span className="bg-amber-100 text-amber-800 font-medium px-2 py-0.5 rounded">
-          rate per hour (K)
+          rate per hour ({symbol})
         </span>
       </div>
 
@@ -341,7 +344,7 @@ export default function EditOvertimeClient({ overtime, employees }: Props) {
             <option value="">Add another worker...</option>
             {availableEmployees.map(e => (
               <option key={e.id} value={e.id}>
-                {e.name} — {e.jobTitle} (K {e.otRate}/hr OT)
+                {e.name} — {e.jobTitle} ({symbol} {e.otRate}/hr OT)
               </option>
             ))}
           </select>
@@ -393,7 +396,7 @@ export default function EditOvertimeClient({ overtime, employees }: Props) {
                                border-gray-200 text-center text-xs font-medium
                                text-gray-400 uppercase tracking-wide px-3 py-3
                                min-w-20">
-                  K / hr
+                  {symbol} / hr
                 </th>
 
                 {allDays.map(day => {
@@ -508,7 +511,7 @@ export default function EditOvertimeClient({ overtime, employees }: Props) {
 
                     <td className="px-3 py-2.5 text-right text-sm font-semibold
                                    text-amber-700 whitespace-nowrap">
-                      {amt > 0 ? `K ${amt.toLocaleString()}` : '—'}
+                      {amt > 0 ? formatMoney(amt, currency) : '—'}
                     </td>
 
                     <td className="px-2 py-2.5">
@@ -573,7 +576,7 @@ export default function EditOvertimeClient({ overtime, employees }: Props) {
                 </td>
                 <td className="px-3 py-2 text-right text-xs font-bold
                                text-amber-700 whitespace-nowrap">
-                  K {grandAmount.toLocaleString()}
+                  {formatMoney(grandAmount, currency)}
                 </td>
                 <td colSpan={2}/>
               </tr>
@@ -601,7 +604,7 @@ export default function EditOvertimeClient({ overtime, employees }: Props) {
               Total OT pay
             </p>
             <p className="text-xl font-semibold text-amber-700">
-              K {grandAmount.toLocaleString()}
+              {formatMoney(grandAmount, currency)}
             </p>
           </div>
         </div>

@@ -60,8 +60,11 @@ export const config = {
     '/employees/:path*',
     '/summary/:path*',
     '/settings/:path*',
+    '/audit/:path*',
+    '/sites/:path*',
     '/login',
     '/home',
     '/register',
+    
   ],
 }

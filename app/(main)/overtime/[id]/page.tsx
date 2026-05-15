@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { formatMoney, getCurrencySymbol } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
 import Link from 'next/link'
 import DownloadOvertimePDF from './DownloadOvertimePDF'
@@ -24,16 +25,24 @@ export default async function ViewOvertimePage({
 
   const { id } = await params
 
-  const overtime = await prisma.overtime.findFirst({
-    where: { id, userId: session.user.id },
-    include: {
-      rows: {
-        include: { employee: true },
+  const [overtime, settings] = await Promise.all([
+    prisma.overtime.findFirst({
+      where: { id, userId: session.user.id },
+      include: {
+        rows: {
+          include: { employee: true },
+        },
       },
-    },
-  })
+    }),
+    prisma.settings.findUnique({
+      where: { userId: session.user.id },
+    }),
+  ])
 
   if (!overtime) notFound()
+
+  const currency = settings?.currency || 'ZMW'
+  const currencySymbol = getCurrencySymbol(currency)
 
   const monthName   = MONTH_NAMES[overtime.month - 1]
   const daysInMonth = new Date(overtime.year, overtime.month, 0).getDate()
@@ -112,6 +121,7 @@ export default async function ViewOvertimePage({
                 month={overtime.month}
                 year={overtime.year}
                 preparedBy={overtime.preparedBy}
+                currency={currency}
                 rows={overtime.rows.map(r => ({
                     employeeId: r.employeeId,
                     name: r.employee.name,
@@ -213,7 +223,7 @@ export default async function ViewOvertimePage({
                                  border-gray-200 text-center text-xs font-medium
                                  text-gray-400 uppercase tracking-wide px-3 py-3
                                  min-w-20">
-                    K / hr
+                    {currencySymbol} / hr
                   </th>
 
                   {allDays.map(day => {
@@ -281,7 +291,7 @@ export default async function ViewOvertimePage({
                         <span className="text-xs font-semibold text-amber-700
                                          bg-amber-50 border border-amber-200
                                          rounded px-2 py-0.5">
-                          K {row.otRate}
+                          {currencySymbol} {row.otRate}
                         </span>
                       </td>
 
@@ -315,7 +325,7 @@ export default async function ViewOvertimePage({
 
                       <td className="px-3 py-2.5 text-right text-sm font-semibold
                                      text-amber-700 whitespace-nowrap">
-                        K {row.amount.toLocaleString()}
+                        {formatMoney(row.amount, currency)}
                       </td>
 
                       <td className="px-3 py-2.5 text-xs text-gray-500 italic">
@@ -352,7 +362,7 @@ export default async function ViewOvertimePage({
                   </td>
                   <td className="px-3 py-2 text-right text-xs font-bold
                                  text-amber-700 whitespace-nowrap">
-                    K {grandAmount.toLocaleString()}
+                    {formatMoney(grandAmount, currency)}
                   </td>
                   <td/>
                 </tr>
@@ -382,7 +392,7 @@ export default async function ViewOvertimePage({
                 Total OT payout
               </p>
               <p className="text-base font-bold text-amber-700">
-                K {grandAmount.toLocaleString()}
+                {formatMoney(grandAmount, currency)}
               </p>
             </div>
           </div>

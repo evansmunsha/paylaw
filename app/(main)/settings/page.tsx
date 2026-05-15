@@ -17,7 +17,7 @@ export default async function SettingsPage() {
     <div className="flex flex-col min-h-screen">
       <Topbar
         title="Settings"
-        subtitle="Company info printed on every PDF"
+        subtitle="Company info, currency and preferences"
       />
       <SettingsClient
         initial={{
@@ -26,6 +26,7 @@ export default async function SettingsPage() {
           phone:       settings?.phone       || '',
           email:       settings?.email       || '',
           address:     settings?.address     || '',
+          currency:    settings?.currency    || 'ZMW',
         }}
       />
     </div>

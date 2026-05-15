@@ -57,7 +57,8 @@ export const ModelName = {
   PaylawRow: 'PaylawRow',
   Overtime: 'Overtime',
   OvertimeRow: 'OvertimeRow',
-  Settings: 'Settings'
+  Settings: 'Settings',
+  AuditLog: 'AuditLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -174,10 +175,28 @@ export const SettingsScalarFieldEnum = {
   phone: 'phone',
   email: 'email',
   address: 'address',
+  currency: 'currency',
   userId: 'userId'
 } as const
 
 export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
+
+
+export const AuditLogScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  entityName: 'entityName',
+  userId: 'userId',
+  userName: 'userName',
+  userRole: 'userRole',
+  adminId: 'adminId',
+  details: 'details',
+  createdAt: 'createdAt'
+} as const
+
+export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
 export const SortOrder = {

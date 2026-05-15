@@ -5,8 +5,9 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white flex flex-col">
 
       {/* ── NAV ── */}
-      <nav className="flex items-center justify-between px-6 md:px-16 py-5
-                      border-b border-gray-100 sticky top-0 bg-white z-50">
+      <nav className="flex items-center justify-between px-6 md:px-16
+                      py-5 border-b border-gray-100 sticky top-0
+                      bg-white z-50">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-black rounded-lg flex items-center
                           justify-center flex-shrink-0">
@@ -16,13 +17,22 @@ export default function LandingPage() {
             PAYLAW
           </span>
         </div>
-        <Link
-          href="/login"
-          className="bg-black text-white text-sm font-medium px-5 py-2.5
-                     rounded-lg hover:bg-gray-800 transition-colors"
-        >
-          Sign in
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/login"
+            className="text-sm text-gray-500 hover:text-gray-800
+                       transition-colors"
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/register"
+            className="bg-black text-white text-sm font-medium px-5 py-2.5
+                       rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            Get started free
+          </Link>
+        </div>
       </nav>
 
       {/* ── HERO ── */}
@@ -31,8 +41,9 @@ export default function LandingPage() {
         <div className="inline-flex items-center gap-2 bg-green-50 border
                         border-green-100 rounded-full px-4 py-1.5 text-xs
                         font-medium text-green-700 mb-6">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"/>
-          Built for Zambian construction sites
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500
+                           inline-block"/>
+          Simple payroll for construction companies worldwide
         </div>
 
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900
@@ -43,43 +54,59 @@ export default function LandingPage() {
 
         <p className="text-base md:text-lg text-gray-500 max-w-xl mb-8
                       leading-relaxed">
-          Mark monthly attendance, track overtime hours, calculate salaries
-          automatically and download a clean PDF — all in one place.
-          No spreadsheets. No maths errors.
+          Mark monthly attendance, track overtime, calculate salaries
+          automatically and download a clean PDF — in any currency.
+          No spreadsheets. No maths errors. Works on any phone.
         </p>
 
         <div className="flex gap-3 flex-wrap justify-center">
           <Link
-            href="/login"
+            href="/register"
             className="bg-black text-white text-sm font-medium px-6 py-3
-                      rounded-lg hover:bg-gray-800 transition-colors"
+                       rounded-lg hover:bg-gray-800 transition-colors"
           >
-            Get started →
+            Create free account →
           </Link>
-
-            <Link
-              href="/register"
-              className="bg-black text-white text-sm font-medium px-6 py-3
-                        rounded-lg hover:bg-gray-800 transition-colors"
-            >
-              Get started free →
-            </Link>
-
-          <a
+          <Link
             href="#how-it-works"
             className="border border-gray-200 text-gray-700 text-sm
-                      font-medium px-6 py-3 rounded-lg hover:bg-gray-50
-                        transition-colors"
+                       font-medium px-6 py-3 rounded-lg hover:bg-gray-50
+                       transition-colors"
+          >
+            See how it works
+          </Link>
+        </div>
+
+        {/* Supported currencies */}
+        <div className="flex items-center gap-3 mt-8 flex-wrap justify-center">
+          <span className="text-xs text-gray-400">Supports:</span>
+          {[
+            { flag: '🇿🇲', code: 'ZMW' },
+            { flag: '🇺🇸', code: 'USD' },
+            { flag: '🇬🇧', code: 'GBP' },
+            { flag: '🇪🇺', code: 'EUR' },
+            { flag: '🇿🇦', code: 'ZAR' },
+            { flag: '🇳🇬', code: 'NGN' },
+            { flag: '🇰🇪', code: 'KES' },
+          ].map(c => (
+            <span
+              key={c.code}
+              className="flex items-center gap-1 text-xs text-gray-500
+                         bg-gray-50 border border-gray-100 px-2 py-1
+                         rounded-full"
             >
-                See how it works
-            </a>
+              {c.flag} {c.code}
+            </span>
+          ))}
         </div>
       </section>
 
       {/* ── VIDEO SECTION ── */}
-      <section id="how-it-works"
-               className="px-6 md:px-16 py-12 md:py-16 bg-gray-50
-                          border-y border-gray-100">
+      <section
+        id="how-it-works"
+        className="px-6 md:px-16 py-12 md:py-16 bg-gray-50
+                   border-y border-gray-100"
+      >
         <div className="max-w-4xl mx-auto">
           <p className="text-xs font-semibold text-gray-400 uppercase
                         tracking-widest text-center mb-3">
@@ -90,36 +117,24 @@ export default function LandingPage() {
             From attendance to payslip in minutes
           </h2>
 
-          {/* Video placeholder — replace src with your real video */}
+          {/* Video placeholder */}
           <div className="bg-gray-900 rounded-2xl overflow-hidden
                           aspect-video flex items-center justify-center
-                          relative shadow-2xl">
-            {/* 
-              To add a real video:
-              Replace this div with:
-              <video controls poster="/video-thumbnail.png" className="w-full h-full">
-                <source src="/paylaw-demo.mp4" type="video/mp4"/>
-              </video>
-
-              Or for YouTube:
-              <iframe
-                className="w-full h-full"
-                src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
-                allowFullScreen
-              />
-            */}
+                          shadow-2xl">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-white/10 flex items-center
-                              justify-center mx-auto mb-4 cursor-pointer
-                              hover:bg-white/20 transition-colors">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+              <div className="w-16 h-16 rounded-full bg-white/10 flex
+                              items-center justify-center mx-auto mb-4
+                              cursor-pointer hover:bg-white/20
+                              transition-colors">
+                <svg width="24" height="24" viewBox="0 0 24 24"
+                     fill="white">
                   <path d="M8 5v14l11-7z"/>
                 </svg>
               </div>
-              <p className="text-white/60 text-sm">
-                Demo video coming soon
+              <p className="text-white/60 text-sm">Demo video coming soon</p>
+              <p className="text-white/30 text-xs mt-1">
+                Replace with your screen recording
               </p>
-              
             </div>
           </div>
         </div>
@@ -138,137 +153,122 @@ export default function LandingPage() {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            <div className="border border-gray-100 rounded-xl p-5">
-              <div className="w-10 h-10 bg-green-50 rounded-lg flex
-                              items-center justify-center mb-4">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <rect x="3" y="2" width="14" height="16" rx="2"
-                        stroke="#16a34a" strokeWidth="1.5"/>
-                  <line x1="7" y1="7" x2="13" y2="7" stroke="#16a34a"
-                        strokeWidth="1.3" strokeLinecap="round"/>
-                  <line x1="7" y1="10" x2="13" y2="10" stroke="#16a34a"
-                        strokeWidth="1.3" strokeLinecap="round"/>
-                  <line x1="7" y1="13" x2="10" y2="13" stroke="#16a34a"
-                        strokeWidth="1.3" strokeLinecap="round"/>
-                </svg>
+            {[
+              {
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20"
+                       fill="none">
+                    <rect x="3" y="2" width="14" height="16" rx="2"
+                          stroke="#16a34a" strokeWidth="1.5"/>
+                    <line x1="7" y1="7" x2="13" y2="7"
+                          stroke="#16a34a" strokeWidth="1.3"
+                          strokeLinecap="round"/>
+                    <line x1="7" y1="10" x2="13" y2="10"
+                          stroke="#16a34a" strokeWidth="1.3"
+                          strokeLinecap="round"/>
+                    <line x1="7" y1="13" x2="10" y2="13"
+                          stroke="#16a34a" strokeWidth="1.3"
+                          strokeLinecap="round"/>
+                  </svg>
+                ),
+                bg: 'bg-green-50',
+                title: 'Monthly attendance grid',
+                desc: 'Click each day to mark a worker present or absent. All 30 or 31 days at once. Weekends highlighted automatically.',
+              },
+              {
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20"
+                       fill="none">
+                    <circle cx="10" cy="10" r="8" stroke="#d97706"
+                            strokeWidth="1.5"/>
+                    <path d="M10 6V10.5L12.5 13" stroke="#d97706"
+                          strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                ),
+                bg: 'bg-amber-50',
+                title: 'Overtime tracking',
+                desc: 'Enter overtime hours per day per worker. Normal pay and overtime are kept separate so your records are clean.',
+              },
+              {
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20"
+                       fill="none">
+                    <path d="M4 14h12M10 4v8M7 9l3 3 3-3"
+                          stroke="#374151" strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"/>
+                  </svg>
+                ),
+                bg: 'bg-gray-100',
+                title: 'PDF payslips',
+                desc: 'Download professional PDF payslips with one click. Shows attendance, amounts, deductions and signature fields.',
+              },
+              {
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20"
+                       fill="none">
+                    <rect x="2" y="10" width="4" height="8" rx="1"
+                          fill="#3b82f6" opacity=".4"/>
+                    <rect x="8" y="6" width="4" height="12" rx="1"
+                          fill="#3b82f6" opacity=".7"/>
+                    <rect x="14" y="2" width="4" height="16" rx="1"
+                          fill="#3b82f6"/>
+                  </svg>
+                ),
+                bg: 'bg-blue-50',
+                title: 'Pay summary',
+                desc: 'Full breakdown of normal pay plus overtime per worker and per site. Visual chart makes it easy to review.',
+              },
+              {
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20"
+                       fill="none">
+                    <circle cx="10" cy="10" r="8" stroke="#7c3aed"
+                            strokeWidth="1.5"/>
+                    <path d="M6 10l3 3 5-5" stroke="#7c3aed"
+                          strokeWidth="1.5" strokeLinecap="round"
+                          strokeLinejoin="round"/>
+                  </svg>
+                ),
+                bg: 'bg-purple-50',
+                title: 'Foreman accounts',
+                desc: 'Invite foremen to mark attendance for their site. You review and approve before any PDF is generated.',
+              },
+              {
+                icon: (
+                  <svg width="20" height="20" viewBox="0 0 20 20"
+                       fill="none">
+                    <rect x="3" y="3" width="14" height="14" rx="3"
+                          stroke="#111827" strokeWidth="1.5"/>
+                    <path d="M7 10h6M10 7v6" stroke="#111827"
+                          strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                ),
+                bg: 'bg-gray-100',
+                title: 'Works on any device',
+                desc: 'Install PayLaw on your phone, tablet or computer. Works like a real app — even offline when there is no internet.',
+              },
+            ].map((f, i) => (
+              <div key={i}
+                   className="border border-gray-100 rounded-xl p-5">
+                <div className={`w-10 h-10 ${f.bg} rounded-lg flex
+                                 items-center justify-center mb-4`}>
+                  {f.icon}
+                </div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                  {f.title}
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  {f.desc}
+                </p>
               </div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                Monthly attendance grid
-              </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Click each day to mark a worker present or absent.
-                The grid shows all 30 or 31 days at once.
-                Weekends are highlighted automatically.
-              </p>
-            </div>
-
-            <div className="border border-gray-100 rounded-xl p-5">
-              <div className="w-10 h-10 bg-amber-50 rounded-lg flex
-                              items-center justify-center mb-4">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="10" r="8" stroke="#d97706" strokeWidth="1.5"/>
-                  <path d="M10 6V10.5L12.5 13" stroke="#d97706"
-                        strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                Overtime tracking
-              </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Enter overtime hours per day per worker.
-                Normal pay and overtime are kept completely separate
-                so your records are always clean and auditable.
-              </p>
-            </div>
-
-            <div className="border border-gray-100 rounded-xl p-5">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex
-                              items-center justify-center mb-4">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M4 14h12M10 4v8M7 9l3 3 3-3"
-                        stroke="#374151" strokeWidth="1.5"
-                        strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                PDF payslips
-              </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Download a professional PDF paylaw with one click.
-                Shows all workers, attendance, amounts, and signature fields.
-                Ready to print and hand to your workers.
-              </p>
-            </div>
-
-            <div className="border border-gray-100 rounded-xl p-5">
-              <div className="w-10 h-10 bg-blue-50 rounded-lg flex
-                              items-center justify-center mb-4">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <rect x="2" y="10" width="4" height="8" rx="1"
-                        fill="#3b82f6" opacity=".4"/>
-                  <rect x="8" y="6" width="4" height="12" rx="1"
-                        fill="#3b82f6" opacity=".7"/>
-                  <rect x="14" y="2" width="4" height="16" rx="1"
-                        fill="#3b82f6"/>
-                </svg>
-              </div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                Pay summary
-              </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                See a full breakdown of normal pay plus overtime
-                per worker and per site. Visual bar chart makes
-                it easy to see who earned the most.
-              </p>
-            </div>
-
-            <div className="border border-gray-100 rounded-xl p-5">
-              <div className="w-10 h-10 bg-purple-50 rounded-lg flex
-                              items-center justify-center mb-4">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 2a8 8 0 100 16A8 8 0 0010 2z"
-                        stroke="#7c3aed" strokeWidth="1.5"/>
-                  <path d="M6 10l3 3 5-5" stroke="#7c3aed"
-                        strokeWidth="1.5" strokeLinecap="round"
-                        strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                Save and continue
-              </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Save a draft and come back the next day to keep marking.
-                Your attendance is saved exactly as you left it.
-                No data is lost.
-              </p>
-            </div>
-
-            <div className="border border-gray-100 rounded-xl p-5">
-              <div className="w-10 h-10 bg-gray-900 rounded-lg flex
-                              items-center justify-center mb-4">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <rect x="3" y="3" width="14" height="14" rx="3"
-                        stroke="white" strokeWidth="1.5"/>
-                  <path d="M7 10h6M10 7v6" stroke="white"
-                        strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                Works on any device
-              </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Install PayLaw on your phone, tablet, or computer.
-                Works like a real app — no browser needed after install.
-                Even works offline when there is no internet.
-              </p>
-            </div>
-
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── PDF PREVIEW SECTION ── */}
+
+
       <section className="px-6 md:px-16 py-12 md:py-16 bg-gray-50
                           border-y border-gray-100">
         <div className="max-w-4xl mx-auto">
@@ -329,9 +329,9 @@ export default function LandingPage() {
                     </thead>
                     <tbody>
                       {[
-                        ['J. Banda', '✓','✓','✓','✓','✓', '22', 'K 1,980'],
-                        ['P. Mwale', '✓','✓','–','✓','✓', '18', 'K 1,440'],
-                        ['G. Phiri', '✓','✓','✓','–','✓', '20', 'K 2,400'],
+                        ['J. Banda', '✓','✓','✓','✓','✓', '22', '$ 1,980'],
+                        ['P. Mwale', '✓','✓','–','✓','✓', '18', '$ 1,440'],
+                        ['G. Phiri', '✓','✓','✓','–','✓', '20', '$ 2,400'],
                       ].map((row, i) => (
                         <tr key={i} className={i % 2 === 0
                           ? 'bg-white' : 'bg-gray-50'}>
@@ -370,7 +370,7 @@ export default function LandingPage() {
                         </td>
                         <td className="px-2 py-1 text-right border
                                        border-gray-200 text-green-700">
-                          K 5,820
+                          $ 5,820
                         </td>
                       </tr>
                     </tbody>
@@ -378,9 +378,9 @@ export default function LandingPage() {
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-4 text-xs">
                   <div>
-                    <p className="text-gray-500">Salaries: <span className="font-bold text-gray-900">K 5,820</span></p>
-                    <p className="text-gray-500 mt-1">Food expense: <span className="font-bold">K 200</span></p>
-                    <p className="text-gray-500 mt-1">Total spent: <span className="font-bold text-gray-900">K 6,020</span></p>
+                    <p className="text-gray-500">Salaries: <span className="font-bold text-gray-900">$ 5,820</span></p>
+                    <p className="text-gray-500 mt-1">Food expense: <span className="font-bold">$ 200</span></p>
+                    <p className="text-gray-500 mt-1">Total spent: <span className="font-bold text-gray-900">$ 6,020</span></p>
                   </div>
                   <div className="text-right">
                     <p className="text-gray-500">Prepared by:</p>
@@ -435,9 +435,9 @@ export default function LandingPage() {
                     </thead>
                     <tbody>
                       {[
-                        ['J. Banda',  '2','0','3','2','1','12h','K 360'],
-                        ['P. Mwale',  '0','2','0','3','0','8h', 'K 224'],
-                        ['G. Phiri',  '3','3','0','3','3','16h','K 720'],
+                        ['J. Banda',  '2','0','3','2','1','12h','$ 360'],
+                        ['P. Mwale',  '0','2','0','3','0','8h', '$ 224'],
+                        ['G. Phiri',  '3','3','0','3','3','16h','$ 720'],
                       ].map((row, i) => (
                         <tr key={i} className={i % 2 === 0
                           ? 'bg-white' : 'bg-gray-50'}>
@@ -476,7 +476,7 @@ export default function LandingPage() {
                         </td>
                         <td className="px-2 py-1 text-right border
                                        border-gray-200 text-amber-700">
-                          K 1,304
+                          $ 1,304
                         </td>
                       </tr>
                     </tbody>
@@ -485,7 +485,7 @@ export default function LandingPage() {
                 <div className="mt-4 grid grid-cols-2 gap-4 text-xs">
                   <div>
                     <p className="text-gray-500">Total OT hours: <span className="font-bold text-gray-900">36 hrs</span></p>
-                    <p className="text-gray-500 mt-1">Total OT payout: <span className="font-bold text-amber-700">K 1,304</span></p>
+                    <p className="text-gray-500 mt-1">Total OT payout: <span className="font-bold text-amber-700">$ 1,304</span></p>
                   </div>
                   <div className="text-right">
                     <p className="text-gray-500">Prepared by:</p>
@@ -501,7 +501,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS STEPS ── */}
+
+
+
+
+      {/* ── HOW IT WORKS ── */}
       <section className="px-6 md:px-16 py-12 md:py-16">
         <div className="max-w-3xl mx-auto">
           <p className="text-xs font-semibold text-gray-400 uppercase
@@ -517,20 +521,20 @@ export default function LandingPage() {
             {[
               {
                 step: '01',
-                title: 'Add your workers',
-                desc: 'Enter each worker\'s name, job title, day rate and overtime rate once. They are saved and reused every month.',
+                title: 'Create your account',
+                desc: 'Sign up free. Your company data is completely private and separate from everyone else\'s.',
                 color: 'bg-green-50 text-green-700 border-green-100',
               },
               {
                 step: '02',
-                title: 'Mark attendance daily',
-                desc: 'Open the paylaw and click each day to mark workers present or absent. Save a draft and come back tomorrow.',
+                title: 'Add your workers',
+                desc: 'Enter each worker\'s name, job title, day rate and overtime rate once. Saved and reused every month.',
                 color: 'bg-blue-50 text-blue-700 border-blue-100',
               },
               {
                 step: '03',
-                title: 'Record overtime hours',
-                desc: 'On the overtime sheet type how many extra hours each worker did per day. Separate from normal pay.',
+                title: 'Mark attendance daily',
+                desc: 'Open the paylaw and click each day. Save a draft and come back tomorrow. Your marks are saved.',
                 color: 'bg-amber-50 text-amber-700 border-amber-100',
               },
               {
@@ -541,9 +545,9 @@ export default function LandingPage() {
               },
             ].map((item, i) => (
               <div key={i} className="flex gap-5 items-start">
-                <div className={`w-12 h-12 rounded-xl border flex items-center
-                                 justify-center flex-shrink-0 font-bold text-sm
-                                 ${item.color}`}>
+                <div className={`w-12 h-12 rounded-xl border flex
+                                 items-center justify-center flex-shrink-0
+                                 font-bold text-sm ${item.color}`}>
                   {item.step}
                 </div>
                 <div className="pt-1">
@@ -560,6 +564,43 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── WHO IS IT FOR ── */}
+      <section className="px-6 md:px-16 py-12 md:py-16 bg-gray-50
+                          border-y border-gray-100">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-xs font-semibold text-gray-400 uppercase
+                        tracking-widest mb-3">
+            Who uses PayLaw
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">
+            Built for any company that pays daily workers
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { emoji: '🏗️', label: 'Construction' },
+              { emoji: '🌾', label: 'Agriculture' },
+              { emoji: '🏭', label: 'Manufacturing' },
+              { emoji: '🏠', label: 'Property' },
+              { emoji: '🛣️', label: 'Roads & Civil' },
+              { emoji: '⛏️', label: 'Mining' },
+              { emoji: '🌿', label: 'Landscaping' },
+              { emoji: '🔧', label: 'Engineering' },
+            ].map(item => (
+              <div
+                key={item.label}
+                className="bg-white border border-gray-100 rounded-xl
+                           p-4 text-center"
+              >
+                <span className="text-2xl block mb-2">{item.emoji}</span>
+                <span className="text-xs text-gray-600 font-medium">
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA ── */}
       <section className="px-6 md:px-16 py-12 md:py-16 bg-gray-900">
         <div className="max-w-2xl mx-auto text-center">
@@ -570,21 +611,13 @@ export default function LandingPage() {
             PayLaw replaces your handwritten paylaw sheets with a fast,
             accurate digital system. Install it on your phone and use it
             anywhere — even without internet.
+            Works in any currency, for any country.
           </p>
-          <Link
-            href="/login"
-            className="bg-white text-gray-900 text-sm font-semibold
-                       px-8 py-3.5 rounded-lg hover:bg-gray-100
-                       transition-colors inline-block"
-          >
-            Sign in to PayLaw →
-          </Link>
-
           <Link
             href="/register"
             className="bg-white text-gray-900 text-sm font-semibold
-                      px-8 py-3.5 rounded-lg hover:bg-gray-100
-                      transition-colors inline-block"
+                       px-8 py-3.5 rounded-lg hover:bg-gray-100
+                       transition-colors inline-block"
           >
             Create your free account →
           </Link>
@@ -604,17 +637,28 @@ export default function LandingPage() {
           </span>
         </div>
         <div className="flex items-center gap-6">
-          <Link href="/privacy"
-            className="text-xs text-gray-400 hover:text-gray-700">
+          <Link
+            href="/privacy"
+            className="text-xs text-gray-400 hover:text-gray-700"
+          >
             Privacy Policy
           </Link>
-          <Link href="/login"
-            className="text-xs text-gray-400 hover:text-gray-700">
+          <Link
+            href="/login"
+            className="text-xs text-gray-400 hover:text-gray-700"
+          >
             Sign in
+          </Link>
+          <Link
+            href="/register"
+            className="text-xs text-gray-400 hover:text-gray-700"
+          >
+            Register
           </Link>
         </div>
         <p className="text-xs text-gray-400">
-          © {new Date().getFullYear()} PayLaw. Built for Zambia 🇿🇲
+          © {new Date().getFullYear()} PayLaw.
+          Built for construction teams everywhere.
         </p>
       </footer>
 

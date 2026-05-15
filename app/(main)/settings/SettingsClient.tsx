@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 
 interface Settings {
   companyName: string
@@ -8,6 +9,7 @@ interface Settings {
   phone: string
   email: string
   address: string
+  currency: string
 }
 
 interface Props {
@@ -50,6 +52,8 @@ export default function SettingsClient({ initial }: Props) {
     }
   }
 
+  const selectedCurrency = CURRENCIES.find(c => c.code === form.currency)
+
   return (
     <div className="p-4 md:p-6 flex flex-col gap-5 max-w-2xl">
 
@@ -89,7 +93,7 @@ export default function SettingsClient({ initial }: Props) {
             <input
               className="border border-gray-200 rounded-lg px-3 py-2
                          text-sm outline-none focus:border-gray-400"
-              placeholder="e.g. Lusaka Central"
+              placeholder="e.g. Main Site"
               value={form.siteName}
               onChange={e => update('siteName', e.target.value)}
             />
@@ -118,7 +122,7 @@ export default function SettingsClient({ initial }: Props) {
                 type="email"
                 className="border border-gray-200 rounded-lg px-3 py-2
                            text-sm outline-none focus:border-gray-400"
-                placeholder="e.g. info@company.com"
+                placeholder="info@company.com"
                 value={form.email}
                 onChange={e => update('email', e.target.value)}
               />
@@ -133,13 +137,68 @@ export default function SettingsClient({ initial }: Props) {
             <input
               className="border border-gray-200 rounded-lg px-3 py-2
                          text-sm outline-none focus:border-gray-400"
-              placeholder="e.g. Cairo Road, Lusaka, Zambia"
+              placeholder="e.g. Cairo Road, Lusaka"
               value={form.address}
               onChange={e => update('address', e.target.value)}
             />
           </div>
 
         </div>
+      </div>
+
+      {/* Currency selection */}
+      <div className="bg-white border border-gray-100 rounded-xl p-5">
+        <p className="text-xs font-semibold text-gray-400 uppercase
+                      tracking-wider mb-4 flex items-center gap-3
+                      after:flex-1 after:h-px after:bg-gray-100
+                      after:content-['']">
+          Currency
+        </p>
+        <p className="text-xs text-gray-400 mb-4">
+          Choose the currency used across the whole app — paylaw sheets,
+          overtime, PDF reports and summaries.
+        </p>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4
+                        gap-2">
+          {CURRENCIES.map(c => (
+            <button
+              key={c.code}
+              onClick={() => update('currency', c.code)}
+              className={`flex flex-col items-center gap-1.5 p-3
+                          rounded-xl border-2 transition-all
+                ${form.currency === c.code
+                  ? 'border-black bg-gray-50'
+                  : 'border-gray-100 hover:border-gray-200 bg-white'}`}
+            >
+              <span className="text-2xl">{c.flag}</span>
+              <span className="text-sm font-bold text-gray-900">
+                {c.symbol}
+              </span>
+              <span className="text-xs text-gray-500 text-center
+                               leading-tight">
+                {c.code}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {selectedCurrency && (
+          <div className="mt-4 bg-gray-50 border border-gray-100
+                          rounded-lg px-4 py-3 flex items-center gap-3">
+            <span className="text-xl">{selectedCurrency.flag}</span>
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                {selectedCurrency.name} ({selectedCurrency.code})
+              </p>
+              <p className="text-xs text-gray-400">
+                Amounts will show as{' '}
+                <strong>{selectedCurrency.symbol} 1,500</strong>
+                {' '}throughout the app
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* PDF preview */}
@@ -154,7 +213,7 @@ export default function SettingsClient({ initial }: Props) {
                         font-mono">
           <div className="text-center border-b border-gray-300 pb-3 mb-3">
             {form.companyName ? (
-              <p className="text-base font-bold text-gray-900 tracking-wide">
+              <p className="text-base font-bold text-gray-900">
                 {form.companyName}
               </p>
             ) : (
@@ -162,20 +221,21 @@ export default function SettingsClient({ initial }: Props) {
                 Your company name
               </p>
             )}
-            <p className="text-lg font-black text-gray-900 tracking-widest
-                          mt-1">
+            <p className="text-lg font-black text-gray-900
+                          tracking-widest mt-1">
               PAYLAW
             </p>
             <div className="flex justify-center gap-4 mt-2 text-xs
                             text-gray-500 flex-wrap">
-              {form.phone && <span>📞 {form.phone}</span>}
-              {form.email && <span>✉ {form.email}</span>}
+              {form.phone   && <span>📞 {form.phone}</span>}
+              {form.email   && <span>✉ {form.email}</span>}
               {form.address && <span>📍 {form.address}</span>}
             </div>
           </div>
           <div className="text-xs text-gray-400 text-center">
             Site: {form.siteName || 'Site name'} &nbsp;·&nbsp;
-            Period: Month Year
+            Period: Month Year &nbsp;·&nbsp;
+            Currency: {selectedCurrency?.symbol || getCurrencySymbol('ZMW')}
           </div>
         </div>
       </div>

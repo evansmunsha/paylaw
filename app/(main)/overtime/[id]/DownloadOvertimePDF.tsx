@@ -19,6 +19,7 @@ interface Props {
   year: number
   preparedBy: string
   rows: OvertimeRow[]
+  currency: string
 }
 
 export default function DownloadOvertimePDF(props: Props) {
@@ -31,7 +32,7 @@ export default function DownloadOvertimePDF(props: Props) {
       const company     = settingsRes.ok ? await settingsRes.json() : {}
 
       const { generateOvertimePDF } = await import('@/lib/generateOvertimePDF')
-      generateOvertimePDF({ ...props, company })
+      generateOvertimePDF({ ...props, company }, props.currency)
     } catch {
       alert('Could not generate PDF. Try again.')
     } finally {

@@ -124,6 +124,43 @@ const navItems: NavItem[] = [
       </svg>
     ),
   },
+  {
+  label: 'Audit Log',
+  href: '/audit',
+  roles: ['admin', 'foreman'],
+  icon: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="1" width="12" height="14" rx="2"
+            stroke="currentColor" strokeWidth="1.3"/>
+      <line x1="5" y1="5" x2="11" y2="5" stroke="currentColor"
+            strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="5" y1="8" x2="11" y2="8" stroke="currentColor"
+            strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="5" y1="11" x2="8" y2="11" stroke="currentColor"
+            strokeWidth="1.2" strokeLinecap="round"/>
+      <circle cx="12" cy="11" r="2.5" fill="white"
+              stroke="currentColor" strokeWidth="1.2"/>
+      <line x1="11" y1="11" x2="13" y2="11" stroke="currentColor"
+            strokeWidth="1" strokeLinecap="round"/>
+      <line x1="12" y1="10" x2="12" y2="12" stroke="currentColor"
+            strokeWidth="1" strokeLinecap="round"/>
+    </svg>
+  ),
+},
+{
+  label: 'Sites',
+  href: '/sites',
+  roles: ['admin'],
+  icon: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M8 1.5L14 5v6L8 14.5L2 11V5L8 1.5Z"
+            stroke="currentColor" strokeWidth="1.3"
+            strokeLinejoin="round"/>
+      <circle cx="8" cy="8" r="2" stroke="currentColor"
+              strokeWidth="1.3"/>
+    </svg>
+  ),
+},
 ]
 
 export default function Sidebar() {

@@ -137,7 +137,24 @@ model Settings {
   phone       String  @default("")
   email       String  @default("")
   address     String  @default("")
+  currency    String  @default("ZMW")  // ← added this
 
   userId      String  @unique
   user        User    @relation(fields: [userId], references: [id])
+}
+
+
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String   // created, updated, deleted, approved, rejected, submitted
+  entityType String   // paylaw, overtime, employee
+  entityId   String
+  entityName String   // human readable e.g. "Lusaka Central — May 2026"
+  userId     String   // who did it
+  userName   String
+  userRole   String   // admin or foreman
+  adminId    String   // which company account this belongs to
+  details    String?  // optional extra info
+  createdAt  DateTime @default(now())
 }

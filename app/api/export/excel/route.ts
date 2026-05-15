@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getCurrencySymbol } from '@/lib/currency'
 import * as XLSX from 'xlsx'
 
 export async function GET(req: Request) {
@@ -29,7 +30,7 @@ export async function GET(req: Request) {
     ? { userId: session.user.id, year }
     : { userId: session.user.id, month, year }
 
-  const [paylaws, overtimes] = await Promise.all([
+  const [paylaws, overtimes, settings] = await Promise.all([
     prisma.paylaw.findMany({
       where: paylawWhere,
       include: { rows: { include: { employee: true } } },
@@ -40,7 +41,13 @@ export async function GET(req: Request) {
       include: { rows: { include: { employee: true } } },
       orderBy: [{ month: 'asc' }, { createdAt: 'asc' }],
     }),
+    prisma.settings.findUnique({
+      where: { userId: session.user.id },
+    }),
   ])
+
+  const currency = settings?.currency || 'ZMW'
+  const symbol = getCurrencySymbol(currency)
 
   // ── Build workbook ───────────────────────────────────
   const wb = XLSX.utils.book_new()
@@ -102,9 +109,9 @@ export async function GET(req: Request) {
     [
       'Name', 'Job Title', 'Site',
       type === 'ytd' ? 'Months Active' : 'Month',
-      'Days Worked', 'Gross Pay (K)', 'Deductions (K)',
-      'Net Pay (K)', 'OT Hours', 'OT Pay (K)',
-      'Total Earned (K)',
+      'Days Worked', `Gross Pay (${symbol})`, `Deductions (${symbol})`,
+      `Net Pay (${symbol})`, 'OT Hours', `OT Pay (${symbol})`,
+      `Total Earned (${symbol})`,
     ],
     // Data rows
     ...Object.values(workerMap).map(w => [
@@ -157,7 +164,7 @@ export async function GET(req: Request) {
   // ── Sheet 2: Monthly breakdown ───────────────────────
   const monthlyRows: (string | number)[][] = [
     ['Month', 'Site', 'Workers', 'Days Worked',
-     'Normal Pay (K)', 'OT Pay (K)', 'Food & Expenses (K)', 'Total (K)'],
+     `Normal Pay (${symbol})`, `OT Pay (${symbol})`, `Food & Expenses (${symbol})`, `Total (${symbol})`],
   ]
 
   for (const p of paylaws) {
@@ -194,8 +201,8 @@ export async function GET(req: Request) {
 
   // ── Sheet 3: Paylaw details ──────────────────────────
   const paylawRows: (string | number)[][] = [
-    ['Month', 'Site', 'Worker Name', 'Job Title', 'Day Rate (K)',
-     'Days Worked', 'Gross Pay (K)', 'Deduction (K)', 'Net Pay (K)',
+    ['Month', 'Site', 'Worker Name', 'Job Title', `Day Rate (${symbol})`,
+     'Days Worked', `Gross Pay (${symbol})`, `Deduction (${symbol})`, `Net Pay (${symbol})`,
      'Signature'],
   ]
 
@@ -228,7 +235,7 @@ export async function GET(req: Request) {
   // ── Sheet 4: Overtime details ────────────────────────
   const otRows: (string | number)[][] = [
     ['Month', 'Site', 'Worker Name', 'Job Title',
-     'OT Rate (K/hr)', 'Total Hours', 'OT Pay (K)', 'Signature'],
+     `OT Rate (${symbol}/hr)`, 'Total Hours', `OT Pay (${symbol})`, 'Signature'],
   ]
 
   for (const o of overtimes) {

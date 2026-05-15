@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'PayLaw — Construction Payroll',
@@ -34,7 +31,7 @@ export default function RootLayout({
         {/* iOS home screen icon */}
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png"/>
       </head>
-      <body className={inter.className}>
+      <body>
         <Providers>
           {children}
         </Providers>

@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { logAction } from '@/lib/audit'
+
+const MONTH_NAMES = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December'
+]
 
 export async function GET() {
   const session = await getServerSession(authOptions)
@@ -9,13 +15,8 @@ export async function GET() {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
   }
 
-  // Foremen see only their site's paylaws
-  // Admins see all their paylaws
   const where = session.user.role === 'foreman'
-    ? {
-        userId: session.user.adminId!, // foreman's data lives under admin
-        site:   session.user.site!,
-      }
+    ? { userId: session.user.adminId!, site: session.user.site! }
     : { userId: session.user.id }
 
   const paylaws = await prisma.paylaw.findMany({
@@ -45,13 +46,10 @@ export async function POST(req: Request) {
     )
   }
 
-  // Foremen create under the admin's userId
-  // so the admin can see everything
   const ownerId = session.user.role === 'foreman'
     ? session.user.adminId!
     : session.user.id
 
-  // Foremen can only create paylaws for their assigned site
   if (
     session.user.role === 'foreman' &&
     session.user.site &&
@@ -66,13 +64,13 @@ export async function POST(req: Request) {
   const paylaw = await prisma.paylaw.create({
     data: {
       site,
-      month: parseInt(month),
-      year: parseInt(year),
+      month:      parseInt(month),
+      year:       parseInt(year),
       preparedBy,
       foodExpense: parseFloat(foodExpense) || 0,
       otherDeduct: parseFloat(otherDeduct) || 0,
-      status: status || 'draft',
-      userId: ownerId,
+      status:      status || 'draft',
+      userId:      ownerId,
     },
   })
 
@@ -100,6 +98,18 @@ export async function POST(req: Request) {
       })),
     })
   }
+
+  // Log the action
+  await logAction({
+    action:     status === 'submitted' ? 'submitted' : 'created',
+    entityType: 'paylaw',
+    entityId:   paylaw.id,
+    entityName: `${site} — ${MONTH_NAMES[parseInt(month) - 1]} ${year}`,
+    userId:     session.user.id,
+    userName:   session.user.name || session.user.email || 'Unknown',
+    userRole:   session.user.role || 'admin',
+    adminId:    ownerId,
+  })
 
   return NextResponse.json(paylaw, { status: 201 })
 }

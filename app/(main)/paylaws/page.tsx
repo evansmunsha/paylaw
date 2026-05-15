@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { formatMoney } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
 import Link from 'next/link'
 import DeletePaylaw from './DeletePaylaw'
@@ -15,11 +16,18 @@ export default async function PaylawsPage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
-  const paylaws = await prisma.paylaw.findMany({
-    where: { userId: session.user.id },
-    include: { rows: true },
-    orderBy: { createdAt: 'desc' },
-  })
+  const [paylaws, settings] = await Promise.all([
+    prisma.paylaw.findMany({
+      where: { userId: session.user.id },
+      include: { rows: true },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.settings.findUnique({
+      where: { userId: session.user.id },
+    }),
+  ])
+
+  const currency = settings?.currency || 'ZMW'
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -122,7 +130,7 @@ export default async function PaylawsPage() {
                         </td>
                         <td className="px-4 md:px-5 py-3 text-sm font-semibold
                                        text-green-700 whitespace-nowrap">
-                          K {total.toLocaleString()}
+                          {formatMoney(total, currency)}
                         </td>
                         <td className="px-4 md:px-5 py-3">
                           <span className={`text-xs font-medium px-2 py-0.5

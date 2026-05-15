@@ -2,9 +2,13 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { logAction } from '@/lib/audit'
 
+const MONTH_NAMES = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December'
+]
 
-// ── PATCH — update existing paylaw ───────────────────
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -16,9 +20,12 @@ export async function PATCH(
 
   const { id } = await params
 
-// Security — make sure this paylaw belongs to this user
+  const ownerId = session.user.role === 'foreman'
+    ? session.user.adminId!
+    : session.user.id
+
   const existing = await prisma.paylaw.findFirst({
-    where: { id, userId: session.user.id },
+    where: { id, userId: ownerId },
   })
 
   if (!existing) {
@@ -30,24 +37,19 @@ export async function PATCH(
     foodExpense, otherDeduct, status, rows,
   } = await req.json()
 
-// Step 1 — update the paylaw header
   await prisma.paylaw.update({
     where: { id },
     data: {
       site,
-      month: parseInt(month),
-      year: parseInt(year),
+      month:       parseInt(month),
+      year:        parseInt(year),
       preparedBy,
       foodExpense: parseFloat(foodExpense) || 0,
       otherDeduct: parseFloat(otherDeduct) || 0,
-      status: status || 'draft',
+      status:      status || 'draft',
     },
   })
 
-
-// Step 2 — delete all old rows then recreate them
-  // This is the simplest way to handle attendance changes
-  // without tracking which rows changed
   await prisma.paylawRow.deleteMany({ where: { paylawId: id } })
 
   if (rows && rows.length > 0) {
@@ -75,10 +77,24 @@ export async function PATCH(
     })
   }
 
+  // Log the action
+  await logAction({
+    action:
+      status === 'submitted' ? 'submitted' :
+      status === 'approved'  ? 'approved'  :
+      'updated',
+    entityType: 'paylaw',
+    entityId:   id,
+    entityName: `${existing.site} — ${MONTH_NAMES[existing.month - 1]} ${existing.year}`,
+    userId:     session.user.id,
+    userName:   session.user.name || session.user.email || 'Unknown',
+    userRole:   session.user.role || 'admin',
+    adminId:    ownerId,
+  })
+
   return NextResponse.json({ message: 'Updated' })
 }
 
-// ── DELETE — delete a paylaw ─────────────────────────
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -98,9 +114,20 @@ export async function DELETE(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-// Delete rows first then the paylaw
   await prisma.paylawRow.deleteMany({ where: { paylawId: id } })
   await prisma.paylaw.delete({ where: { id } })
+
+  // Log the action
+  await logAction({
+    action:     'deleted',
+    entityType: 'paylaw',
+    entityId:   id,
+    entityName: `${existing.site} — ${MONTH_NAMES[existing.month - 1]} ${existing.year}`,
+    userId:     session.user.id,
+    userName:   session.user.name || session.user.email || 'Unknown',
+    userRole:   session.user.role || 'admin',
+    adminId:    session.user.id,
+  })
 
   return NextResponse.json({ message: 'Deleted' })
 }

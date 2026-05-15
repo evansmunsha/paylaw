@@ -11,44 +11,42 @@ export default async function EmployeesPage() {
 
   const isForeman = session.user.role === 'foreman'
 
-  // Foremen see only employees at their site
-  // owned by their admin
-  // Admins see all their own employees
   const where = isForeman
     ? {
-        userId: session.user.adminId!, // employees belong to admin
-        site:   session.user.site!,    // filter to foreman's site only
+        userId: session.user.adminId!,
+        site:   session.user.site!,
       }
     : { userId: session.user.id }
 
-  const employees = await prisma.employee.findMany({
-    where,
-    orderBy: { name: 'asc' },
-  })
+  const [employees, foremanUsers, settings] = await Promise.all([
+    prisma.employee.findMany({
+      where,
+      orderBy: { name: 'asc' },
+    }),
+    isForeman
+      ? Promise.resolve([])
+      : prisma.user.findMany({
+          where: { adminId: session.user.id, role: 'foreman' },
+          select: { site: true, name: true },
+        }),
+    prisma.settings.findUnique({
+      where: { userId: isForeman ? session.user.adminId! : session.user.id },
+    }),
+  ])
 
-  // For admin — fetch all foreman sites so they can
-  // assign workers to them from a dropdown
-  const foremanSites = isForeman
-    ? []
-    : await prisma.user.findMany({
-        where: { adminId: session.user.id, role: 'foreman' },
-        select: { site: true, name: true },
-      })
-
-  // Get unique sites from existing employees
   const existingSites = isForeman
     ? [session.user.site!]
     : [...new Set(employees.map(e => e.site).filter(Boolean))]
 
-  // Combine foreman sites and existing employee sites
-  // so admin can pick any site when adding/editing
   const allSites = isForeman
     ? [session.user.site!]
     : [
         ...new Set([
-          ...foremanSites.map(f => f.site).filter(Boolean) as string[],
+          ...foremanUsers
+            .map(f => f.site)
+            .filter(Boolean) as string[],
           ...existingSites,
-        ])
+        ]),
       ]
 
   return (
@@ -64,7 +62,8 @@ export default async function EmployeesPage() {
       <EmployeeClient
         employees={employees}
         allSites={allSites}
-        foremanSites={foremanSites as { site: string; name: string | null }[]}
+        foremanSites={foremanUsers as { site: string; name: string | null }[]}
+        currency={settings?.currency || 'ZMW'}
       />
     </div>
   )

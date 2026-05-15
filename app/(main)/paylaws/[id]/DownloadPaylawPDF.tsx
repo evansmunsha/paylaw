@@ -21,6 +21,7 @@ interface Props {
   foodExpense: number
   otherDeduct: number
   rows: PaylawRow[]
+  currency: string
 }
 
 export default function DownloadPaylawPDF(props: Props) {
@@ -34,7 +35,7 @@ export default function DownloadPaylawPDF(props: Props) {
       const company     = settingsRes.ok ? await settingsRes.json() : {}
 
       const { generatePaylawPDF } = await import('@/lib/generatePaylawPDF')
-      generatePaylawPDF({ ...props, company })
+      generatePaylawPDF({ ...props, company }, props.currency)
     } catch {
       alert('Could not generate PDF. Try again.')
     } finally {

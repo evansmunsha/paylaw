@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { formatMoney } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
 import Link from 'next/link'
 import YTDClient from './YTDClient'
@@ -27,7 +28,7 @@ export default async function YTDPage({
     : now.getFullYear()
 
   // Fetch ALL paylaws and overtime for this year
-  const [paylaws, overtimes] = await Promise.all([
+  const [paylaws, overtimes, settings] = await Promise.all([
     prisma.paylaw.findMany({
       where: { userId: session.user.id, year },
       include: {
@@ -42,7 +43,12 @@ export default async function YTDPage({
       },
       orderBy: { month: 'asc' },
     }),
+    prisma.settings.findUnique({
+      where: { userId: session.user.id },
+    }),
   ])
+
+  const currency = settings?.currency || 'ZMW'
 
   // ── Monthly totals (1–12) ────────────────────────────
   const monthlyData = Array.from({ length: 12 }, (_, i) => {
@@ -255,7 +261,7 @@ export default async function YTDPage({
               Normal pay {year}
             </p>
             <p className="text-2xl font-semibold text-green-700">
-              K {ytdNormal.toLocaleString()}
+              {formatMoney(ytdNormal, settings?.currency || 'ZMW')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               {paylaws.length} paylaws
@@ -269,7 +275,7 @@ export default async function YTDPage({
               Overtime {year}
             </p>
             <p className="text-2xl font-semibold text-amber-700">
-              K {ytdOT.toLocaleString()}
+              {formatMoney(ytdOT, settings?.currency || 'ZMW')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               {overtimes.length} OT sheets
@@ -283,7 +289,7 @@ export default async function YTDPage({
               Food &amp; expenses {year}
             </p>
             <p className="text-2xl font-semibold text-red-600">
-              K {ytdFood.toLocaleString()}
+              {formatMoney(ytdFood, settings?.currency || 'ZMW')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               Across all sites
@@ -297,7 +303,7 @@ export default async function YTDPage({
               Total spent {year}
             </p>
             <p className="text-2xl font-semibold text-gray-900">
-              K {ytdTotal.toLocaleString()}
+              {formatMoney(ytdTotal, settings?.currency || 'ZMW')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               Everything combined
@@ -306,7 +312,7 @@ export default async function YTDPage({
         </div>
 
         {/* Monthly chart — pass to client component */}
-        <YTDClient monthlyData={monthlyData} year={year} />
+        <YTDClient monthlyData={monthlyData} year={year} currency={settings?.currency || 'ZMW'} />
 
         {/* Monthly breakdown table */}
         <div className="bg-white border border-gray-100 rounded-xl
@@ -378,24 +384,24 @@ export default async function YTDPage({
                     <td className="px-5 py-3 text-sm font-medium
                                    text-green-700">
                       {m.normalPay > 0
-                        ? `K ${m.normalPay.toLocaleString()}`
+                        ? formatMoney(m.normalPay, settings?.currency || 'ZMW')
                         : '—'}
                     </td>
                     <td className="px-5 py-3 text-sm font-medium
                                    text-amber-700">
                       {m.otPay > 0
-                        ? `K ${m.otPay.toLocaleString()}`
+                        ? formatMoney(m.otPay, settings?.currency || 'ZMW')
                         : '—'}
                     </td>
                     <td className="px-5 py-3 text-sm text-gray-500">
                       {m.food > 0
-                        ? `K ${m.food.toLocaleString()}`
+                        ? formatMoney(m.food, settings?.currency || 'ZMW')
                         : '—'}
                     </td>
                     <td className="px-5 py-3 text-right text-sm font-bold
                                    text-gray-900">
                       {m.total > 0
-                        ? `K ${m.total.toLocaleString()}`
+                        ? formatMoney(m.total, settings?.currency || 'ZMW')
                         : '—'}
                     </td>
                   </tr>
@@ -407,17 +413,17 @@ export default async function YTDPage({
                     YTD Total {year}
                   </td>
                   <td className="px-5 py-3 text-sm font-bold text-green-700">
-                    K {ytdNormal.toLocaleString()}
+                    {formatMoney(ytdNormal, settings?.currency || 'ZMW')}
                   </td>
                   <td className="px-5 py-3 text-sm font-bold text-amber-700">
-                    K {ytdOT.toLocaleString()}
+                    {formatMoney(ytdOT, settings?.currency || 'ZMW')}
                   </td>
                   <td className="px-5 py-3 text-sm font-bold text-gray-600">
-                    K {ytdFood.toLocaleString()}
+                    {formatMoney(ytdFood, settings?.currency || 'ZMW')}
                   </td>
                   <td className="px-5 py-3 text-right text-base font-bold
                                  text-gray-900">
-                    K {ytdTotal.toLocaleString()}
+                    {formatMoney(ytdTotal, settings?.currency || 'ZMW')}
                   </td>
                 </tr>
               </tbody>
@@ -502,23 +508,23 @@ export default async function YTDPage({
                       </td>
                       <td className="px-5 py-3 text-sm font-medium
                                      text-green-700">
-                        K {w.netPay.toLocaleString()}
+                        {formatMoney(w.netPay, settings?.currency || 'ZMW')}
                       </td>
                       <td className="px-5 py-3 text-sm font-medium
                                      text-red-600">
                         {w.deductions > 0
-                          ? `− K ${w.deductions.toLocaleString()}`
+                          ? `− ${formatMoney(w.deductions, settings?.currency || 'ZMW')}`
                           : '—'}
                       </td>
                       <td className="px-5 py-3 text-sm font-medium
                                      text-amber-700">
                         {w.otPay > 0
-                          ? `K ${w.otPay.toLocaleString()}`
+                          ? formatMoney(w.otPay, settings?.currency || 'ZMW')
                           : '—'}
                       </td>
                       <td className="px-5 py-3 text-right text-sm font-bold
                                      text-gray-900">
-                        K {w.total.toLocaleString()}
+                        {formatMoney(w.total, settings?.currency || 'ZMW')}
                       </td>
                     </tr>
                   ))}
@@ -530,19 +536,19 @@ export default async function YTDPage({
                       Total — all workers {year}
                     </td>
                     <td className="px-5 py-3 text-sm font-bold text-green-700">
-                      K {ytdNormal.toLocaleString()}
+                      {formatMoney(ytdNormal, settings?.currency || 'ZMW')}
                     </td>
                     <td className="px-5 py-3 text-sm font-bold text-red-600">
                       {workers.reduce((t, w) => t + w.deductions, 0) > 0
-                        ? `− K ${workers.reduce((t, w) => t + w.deductions, 0).toLocaleString()}`
+                        ? `− ${formatMoney(workers.reduce((t, w) => t + w.deductions, 0), settings?.currency || 'ZMW')}`
                         : '—'}
                     </td>
                     <td className="px-5 py-3 text-sm font-bold text-amber-700">
-                      K {ytdOT.toLocaleString()}
+                      {formatMoney(ytdOT, settings?.currency || 'ZMW')}
                     </td>
                     <td className="px-5 py-3 text-right text-base font-bold
                                    text-gray-900">
-                      K {(ytdNormal + ytdOT).toLocaleString()}
+                      {formatMoney((ytdNormal + ytdOT), settings?.currency || 'ZMW')}
                     </td>
                   </tr>
                 </tbody>
@@ -571,21 +577,21 @@ export default async function YTDPage({
                                   py-2.5 border-b border-gray-100 text-sm">
                     <span className="text-gray-500">Normal pay</span>
                     <span className="font-semibold text-green-700">
-                      K {site.normalPay.toLocaleString()}
+                      {formatMoney(site.normalPay, currency)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center
                                   py-2.5 border-b border-gray-100 text-sm">
                     <span className="text-gray-500">Overtime pay</span>
                     <span className="font-semibold text-amber-700">
-                      K {site.otPay.toLocaleString()}
+                      {formatMoney(site.otPay, currency)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center
                                   py-2.5 border-b border-gray-100 text-sm">
                     <span className="text-gray-500">Food &amp; expenses</span>
                     <span className="font-medium text-gray-600">
-                      K {site.food.toLocaleString()}
+                      {formatMoney(site.food, currency)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center
@@ -594,7 +600,7 @@ export default async function YTDPage({
                       Total {year}
                     </span>
                     <span className="text-base font-bold text-gray-900">
-                      K {site.total.toLocaleString()}
+                      {formatMoney(site.total, currency)}
                     </span>
                   </div>
                 </div>

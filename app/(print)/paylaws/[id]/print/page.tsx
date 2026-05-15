@@ -9,6 +9,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { getCurrencySymbol, formatMoney } from '@/lib/currency'
 import type { Metadata } from 'next'
 import PrintButton from './PrintButton'
 
@@ -66,6 +67,9 @@ export default async function PrintPaylawPage({
 
   // Show a 404 page if the record doesn't exist or belongs to another user
   if (!paylaw) notFound()
+
+  const currency = settings?.currency || 'ZMW'
+  const currencySymbol = getCurrencySymbol(currency)
 
   // ── Derived date values ─────────────────────────────────────────────────────
 
@@ -329,7 +333,7 @@ export default async function PrintPaylawPage({
                 {/* Fixed columns: employee info */}
                 <th className="l" style={{ minWidth: '100px' }}>Name</th>
                 <th className="l" style={{ minWidth: '75px' }}>Job Title</th>
-                <th style={{ minWidth: '42px' }}>K/day</th>
+                <th style={{ minWidth: '42px' }}>{currencySymbol}/day</th>
 
                 {/* Dynamic day columns — one per day in the month */}
                 {allDays.map(day => (
@@ -391,7 +395,7 @@ export default async function PrintPaylawPage({
 
                     {/* Summary columns at the end of each row */}
                     <td style={{ fontWeight: 700 }}>{row.daysWorked}</td>
-                    <td style={{ fontWeight: 700, color: '#15803d' }}>K {row.amount.toLocaleString()}</td>
+                    <td style={{ fontWeight: 700, color: '#15803d' }}>{formatMoney(row.amount, currency)}</td>
                     <td style={{ color: '#9ca3af', fontStyle: 'italic' }}>{row.signature || ''}</td>
                   </tr>
                 )
@@ -427,7 +431,7 @@ export default async function PrintPaylawPage({
                 })}
                 {/* Grand totals at the end of the total row */}
                 <td style={{ fontWeight: 700 }}>{totalDays}</td>
-                <td style={{ fontWeight: 700, color: '#15803d' }}>K {totalNormal.toLocaleString()}</td>
+                <td style={{ fontWeight: 700, color: '#15803d' }}>{formatMoney(totalNormal, currency)}</td>
                 <td/> {/* empty signature cell */}
               </tr>
             </tbody>
@@ -445,23 +449,23 @@ export default async function PrintPaylawPage({
                 <tr><td>Absents</td><td><strong>0</strong></td></tr>
                 <tr>
                   <td>Salaries</td>
-                  <td><strong>K {totalNormal.toLocaleString()}</strong></td>
+                  <td><strong>{formatMoney(totalNormal, currency)}</strong></td>
                 </tr>
                 <tr><td>Overtime</td><td>See OT sheet</td></tr>
                 <tr>
                   <td>Food Expense</td>
-                  <td><strong>K {paylaw.foodExpense.toLocaleString()}</strong></td>
+                  <td><strong>{formatMoney(paylaw.foodExpense, currency)}</strong></td>
                 </tr>
                 <tr>
                   <td>Other Deductions</td>
-                  <td><strong>K {paylaw.otherDeduct.toLocaleString()}</strong></td>
+                  <td><strong>{formatMoney(paylaw.otherDeduct, currency)}</strong></td>
                 </tr>
                 {/* Total row — grey background set by .desc-total */}
                 <tr className="desc-total">
                   <td><strong>Total Amount Spent</strong></td>
                   <td>
                     <strong style={{ color: '#15803d' }}>
-                      K {totalSpent.toLocaleString()}
+                      {formatMoney(totalSpent, currency)}
                     </strong>
                   </td>
                 </tr>

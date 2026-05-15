@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { formatMoney } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
 import Link from 'next/link'
 import MonthSelector from './MonthSelector'
@@ -50,7 +51,7 @@ export default async function SummaryPage({
   const safeMonth = Math.min(Math.max(month, 1), 12)
   const safeYear  = year > 2000 && year < 2100 ? year : now.getFullYear()
 
-  const [paylaws, overtimes] = await Promise.all([
+  const [paylaws, overtimes, settings] = await Promise.all([
     prisma.paylaw.findMany({
       where: { userId: session.user.id, month: safeMonth, year: safeYear },
       include: {
@@ -62,6 +63,9 @@ export default async function SummaryPage({
       include: {
         rows: { include: { employee: true } },
       },
+    }),
+    prisma.settings.findUnique({
+      where: { userId: session.user.id },
     }),
   ])
 
@@ -247,7 +251,7 @@ export default async function SummaryPage({
               </span>
             </p>
             <p className="text-3xl font-semibold text-green-700 mt-2">
-              K {totalNormal.toLocaleString()}
+              {formatMoney(totalNormal, settings?.currency || 'ZMW')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               {paylaws.length} paylaw{paylaws.length !== 1 ? 's' : ''}
@@ -267,7 +271,7 @@ export default async function SummaryPage({
               </span>
             </p>
             <p className="text-3xl font-semibold text-amber-700 mt-2">
-              K {totalOT.toLocaleString()}
+              {formatMoney(totalOT, settings?.currency || 'ZMW')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               {overtimes.length} OT sheet{overtimes.length !== 1 ? 's' : ''}
@@ -282,7 +286,7 @@ export default async function SummaryPage({
               Total payout
             </p>
             <p className="text-3xl font-semibold text-gray-900 mt-2">
-              K {totalPay.toLocaleString()}
+              {formatMoney(totalPay, settings?.currency || 'ZMW')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               Normal + overtime · {monthName} {safeYear}
@@ -350,7 +354,7 @@ export default async function SummaryPage({
                     </div>
                     <div className="w-24 text-right flex-shrink-0">
                       <p className="text-xs font-semibold text-gray-900">
-                        K {w.total.toLocaleString()}
+                        {formatMoney(w.total, settings?.currency || 'ZMW')}
                       </p>
                     </div>
                   </div>
@@ -455,18 +459,18 @@ export default async function SummaryPage({
                       </td>
                       <td className="px-5 py-3 text-sm font-semibold
                                      text-green-700 whitespace-nowrap">
-                        K {w.normalPay.toLocaleString()}
+                        {formatMoney(w.normalPay, settings?.currency || 'ZMW')}
                       </td>
                       <td className="px-5 py-3 text-sm text-gray-600 whitespace-nowrap">
                         {w.otHours > 0 ? `${w.otHours} hrs` : '—'}
                       </td>
                       <td className="px-5 py-3 text-sm font-semibold
                                      text-amber-700 whitespace-nowrap">
-                        {w.otPay > 0 ? `K ${w.otPay.toLocaleString()}` : '—'}
+                        {w.otPay > 0 ? formatMoney(w.otPay, settings?.currency || 'ZMW') : '—'}
                       </td>
                       <td className="px-5 py-3 text-right text-sm font-bold
                                      text-gray-900 whitespace-nowrap">
-                        K {w.total.toLocaleString()}
+                        {formatMoney(w.total, settings?.currency || 'ZMW')}
                       </td>
                     </tr>
                   ))}
@@ -485,7 +489,7 @@ export default async function SummaryPage({
                     </td>
                     <td className="px-5 py-3 text-sm font-bold text-green-700
                                    whitespace-nowrap">
-                      K {totalNormal.toLocaleString()}
+                      {formatMoney(totalNormal, settings?.currency || 'ZMW')}
                     </td>
                     <td className="px-5 py-3 text-sm font-bold text-gray-700
                                    whitespace-nowrap">
@@ -493,11 +497,11 @@ export default async function SummaryPage({
                     </td>
                     <td className="px-5 py-3 text-sm font-bold text-amber-700
                                    whitespace-nowrap">
-                      {totalOT > 0 ? `K ${totalOT.toLocaleString()}` : '—'}
+                      {totalOT > 0 ? formatMoney(totalOT, settings?.currency || 'ZMW') : '—'}
                     </td>
                     <td className="px-5 py-3 text-right text-base font-bold
                                    text-gray-900 whitespace-nowrap">
-                      K {totalPay.toLocaleString()}
+                      {formatMoney(totalPay, settings?.currency || 'ZMW')}
                     </td>
                   </tr>
                 </tbody>
@@ -526,29 +530,30 @@ export default async function SummaryPage({
                                   border-b border-gray-100 text-sm">
                     <span className="text-gray-500">Normal pay</span>
                     <span className="font-semibold text-green-700">
-                      K {data.normalPay.toLocaleString()}
+                      {formatMoney(data.normalPay, settings?.currency || 'ZMW')}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-2.5
                                   border-b border-gray-100 text-sm">
                     <span className="text-gray-500">Overtime pay</span>
                     <span className="font-semibold text-amber-700">
-                      K {data.otPay.toLocaleString()}
+                      {formatMoney(data.otPay, settings?.currency || 'ZMW')}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-2.5
                                   border-b border-gray-100 text-sm">
                     <span className="text-gray-500">Food &amp; deductions</span>
                     <span className="font-medium text-gray-700">
-                      K {data.foodExpense.toLocaleString()}
+                      {formatMoney(data.foodExpense, settings?.currency || 'ZMW')}
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-3 text-sm">
                     <span className="font-semibold text-gray-900">Total</span>
                     <span className="text-base font-bold text-gray-900">
-                      K {(
-                        data.normalPay + data.otPay + data.foodExpense
-                      ).toLocaleString()}
+                      {formatMoney(
+                        data.normalPay + data.otPay + data.foodExpense,
+                        settings?.currency || 'ZMW'
+                      )}
                     </span>
                   </div>
                 </div>

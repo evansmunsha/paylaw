@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { getCurrencySymbol, formatMoney } from './currency'
 
 const MONTH_NAMES = [
   'January','February','March','April','May','June',
@@ -40,7 +41,7 @@ interface PayslipData {
   company?: CompanySettings
 }
 
-export function generatePayslipPDF(data: PayslipData) {
+export function generatePayslipPDF(data: PayslipData, currency: string = 'ZMW') {
   // Portrait A5 — compact and personal like a real payslip
   const doc = new jsPDF({
     orientation: 'portrait',
@@ -52,6 +53,7 @@ export function generatePayslipPDF(data: PayslipData) {
   const monthName   = MONTH_NAMES[data.month - 1]
   const daysInMonth = new Date(data.year, data.month, 0).getDate()
   const company     = data.company
+  const symbol      = getCurrencySymbol(currency)
 
   // ── Colours ───────────────────────────────────────────
   const BLACK       = [17,  24,  39]  as [number,number,number]
@@ -225,20 +227,20 @@ export function generatePayslipPDF(data: PayslipData) {
 
   const payRows: (string | number)[][] = [
     ['Days worked',                 `${data.daysWorked} days`],
-    ['Rate per day',                `K ${data.dayRate}`],
-    ['Gross pay',                   `K ${data.grossPay.toLocaleString()}`],
+    ['Rate per day',                `${symbol} ${data.dayRate}`],
+    ['Gross pay',                   formatMoney(data.grossPay, currency)],
   ]
 
   if (data.deduction > 0) {
-    payRows.push(['Deduction (advance/loan)', `− K ${data.deduction.toLocaleString()}`])
+    payRows.push(['Deduction (advance/loan)', `− ${formatMoney(data.deduction, currency)}`])
   }
 
-  payRows.push(['Net normal pay',  `K ${data.netPay.toLocaleString()}`])
+  payRows.push(['Net normal pay',  formatMoney(data.netPay, currency)])
 
   if (data.otPay > 0) {
     payRows.push(
-      ['OT hours worked', `${data.otHours} hrs @ K ${data.otRate}/hr`],
-      ['Overtime pay',    `K ${data.otPay.toLocaleString()}`],
+      ['OT hours worked', `${data.otHours} hrs @ ${symbol} ${data.otRate}/hr`],
+      ['Overtime pay',    formatMoney(data.otPay, currency)],
     )
   }
 
@@ -246,7 +248,7 @@ export function generatePayslipPDF(data: PayslipData) {
 
   payRows.push([
     'TOTAL TAKE-HOME PAY',
-    `K ${totalTakeHome.toLocaleString()}`,
+    formatMoney(totalTakeHome, currency),
   ])
 
   autoTable(doc, {

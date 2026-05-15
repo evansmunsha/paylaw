@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { getCurrencySymbol, formatMoney } from '@/lib/currency'
 
 interface Employee {
   id: string
@@ -49,6 +50,7 @@ interface WorkerRow {
 interface Props {
   paylaw: ExistingPaylaw
   employees: Employee[]
+  currency: string
 }
 
 const MONTH_NAMES = [
@@ -58,8 +60,9 @@ const MONTH_NAMES = [
 
 const DAY_LABELS = ['Su','Mo','Tu','We','Th','Fr','Sa']
 
-export default function EditPaylawClient({ paylaw, employees }: Props) {
+export default function EditPaylawClient({ paylaw, employees, currency }: Props) {
   const router = useRouter()
+  const symbol = getCurrencySymbol(currency)
 
   // Pre-fill sheet info from existing paylaw
   const [site, setSite]               = useState(paylaw.site)
@@ -259,7 +262,7 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
         </span>
         <span className="text-gray-400">×</span>
         <span className="bg-green-100 text-green-800 font-medium px-2 py-0.5 rounded">
-          rate per day (K)
+          rate per day ({symbol})
         </span>
       </div>
 
@@ -379,7 +382,7 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
             <option value="">Add another worker...</option>
             {availableEmployees.map(e => (
               <option key={e.id} value={e.id}>
-                {e.name} — {e.jobTitle} (K {e.dayRate}/day)
+                {e.name} — {e.jobTitle} ({symbol} {e.dayRate}/day)
               </option>
             ))}
           </select>
@@ -432,7 +435,7 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
                                border-gray-200 text-center text-xs font-medium
                                text-gray-400 uppercase tracking-wide px-3 py-3
                                min-w-20">
-                  K / day
+                  {symbol} / day
                 </th>
 
                 {allDays.map(day => {
@@ -543,7 +546,7 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
 
                     <td className="px-3 py-2.5 text-right text-sm font-semibold
                                    text-green-700 whitespace-nowrap">
-                      {amount > 0 ? `K ${amount.toLocaleString()}` : '—'}
+                      {amount > 0 ? formatMoney(amount, currency) : '—'}
                     </td>
 
                     <td className="px-2 py-2.5">
@@ -609,7 +612,7 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
                 </td>
                 <td className="px-3 py-2 text-right text-xs font-bold
                                text-green-700 whitespace-nowrap">
-                  K {totalNormal.toLocaleString()}
+                  {formatMoney(totalNormal, currency)}
                 </td>
                 <td colSpan={2}/>
               </tr>
@@ -628,17 +631,17 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-              Salaries total (K)
+              Salaries total ({symbol})
             </label>
             <input readOnly
-              value={`K ${totalNormal.toLocaleString()}`}
+              value={formatMoney(totalNormal, currency)}
               className="border border-gray-200 rounded-lg px-3 py-2 text-sm
                          text-green-700 font-medium bg-green-50 outline-none"
             />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-              Food expense (K)
+              Food expense ({symbol})
             </label>
             <input type="number" value={foodExpense}
               onChange={e => setFoodExpense(e.target.value)}
@@ -648,7 +651,7 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-              Other deductions (K)
+              Other deductions ({symbol})
             </label>
             <input type="number" value={otherDeduct}
               onChange={e => setOtherDeduct(e.target.value)}
@@ -658,14 +661,15 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-              Total amount spent (K)
+              Total amount spent ({symbol})
             </label>
             <input readOnly
-              value={`K ${(
+              value={formatMoney(
                 totalNormal +
                 parseFloat(foodExpense || '0') +
-                parseFloat(otherDeduct || '0')
-              ).toLocaleString()}`}
+                parseFloat(otherDeduct || '0'),
+                currency
+              )}
               className="border border-gray-200 rounded-lg px-3 py-2 text-sm
                          font-semibold text-gray-900 bg-gray-50 outline-none"
             />
@@ -688,7 +692,7 @@ export default function EditPaylawClient({ paylaw, employees }: Props) {
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Total pay</p>
             <p className="text-xl font-semibold text-green-700">
-              K {totalNormal.toLocaleString()}
+              {formatMoney(totalNormal, currency)}
             </p>
           </div>
         </div>

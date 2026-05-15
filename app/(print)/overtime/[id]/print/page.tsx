@@ -9,6 +9,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { getCurrencySymbol, formatMoney } from '@/lib/currency'
 import type { Metadata } from 'next'
 import PrintButton from './PrintButton'
 
@@ -66,6 +67,9 @@ export default async function PrintOvertimePage({
 
   // Show a 404 page if the record doesn't exist or belongs to another user
   if (!overtime) notFound()
+
+  const currency = settings?.currency || 'ZMW'
+  const currencySymbol = getCurrencySymbol(currency)
 
   // ── Derived date values ─────────────────────────────────────────────────────
 
@@ -325,7 +329,7 @@ export default async function PrintOvertimePage({
                 {/* Fixed columns: employee info */}
                 <th className="l" style={{ minWidth: '100px' }}>Name</th>
                 <th className="l" style={{ minWidth: '75px' }}>Job Title</th>
-                <th style={{ minWidth: '38px' }}>K/hr</th>
+                <th style={{ minWidth: '38px' }}>{currencySymbol}/hr</th>
 
                 {/* Dynamic day columns — one per day in the month */}
                 {allDays.map(day => (
@@ -386,7 +390,7 @@ export default async function PrintOvertimePage({
 
                     {/* Summary columns at the end of each row */}
                     <td style={{ fontWeight: 700, color: '#92400e' }}>{row.totalHours}h</td>
-                    <td style={{ fontWeight: 700, color: '#92400e' }}>K {row.amount.toLocaleString()}</td>
+                    <td style={{ fontWeight: 700, color: '#92400e' }}>{formatMoney(row.amount, currency)}</td>
                     <td style={{ color: '#9ca3af', fontStyle: 'italic' }}>{row.signature || ''}</td>
                   </tr>
                 )
@@ -422,7 +426,7 @@ export default async function PrintOvertimePage({
                 })}
                 {/* Grand total hours and amount at the end of the total row */}
                 <td style={{ fontWeight: 700, color: '#92400e' }}>{grandHours}h</td>
-                <td style={{ fontWeight: 700, color: '#92400e' }}>K {grandAmount.toLocaleString()}</td>
+                <td style={{ fontWeight: 700, color: '#92400e' }}>{formatMoney(grandAmount, currency)}</td>
                 <td/> {/* empty signature cell */}
               </tr>
             </tbody>
@@ -446,7 +450,7 @@ export default async function PrintOvertimePage({
                   <td><strong>Total OT Payout</strong></td>
                   <td>
                     <strong style={{ color: '#92400e' }}>
-                      K {grandAmount.toLocaleString()}
+                      {formatMoney(grandAmount, currency)}
                     </strong>
                   </td>
                 </tr>

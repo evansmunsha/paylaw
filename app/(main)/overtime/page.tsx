@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { formatMoney } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
 import Link from 'next/link'
 import DeleteOvertime from './DeleteOvertime'
@@ -15,11 +16,18 @@ export default async function OvertimePage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
-  const overtimes = await prisma.overtime.findMany({
-    where: { userId: session.user.id },
-    include: { rows: true },
-    orderBy: { createdAt: 'desc' },
-  })
+  const [overtimes, settings] = await Promise.all([
+    prisma.overtime.findMany({
+      where: { userId: session.user.id },
+      include: { rows: true },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.settings.findUnique({
+      where: { userId: session.user.id },
+    }),
+  ])
+
+  const currency = settings?.currency || 'ZMW'
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -125,7 +133,7 @@ export default async function OvertimePage() {
                         <td className="px-4 md:px-5 py-3">
                           <div className="text-sm font-semibold text-amber-700
                                           whitespace-nowrap">
-                            K {totalPay.toLocaleString()}
+                            {formatMoney(totalPay, currency)}
                           </div>
                           <div className="text-xs text-gray-400 mt-0.5">
                             {totalHrs} hrs

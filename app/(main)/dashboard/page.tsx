@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { formatMoney, getCurrencySymbol } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
 import Link from 'next/link'
 
@@ -17,7 +18,7 @@ export default async function DashboardPage() {
   const greeting =
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
 
-  const [paylaws, overtimes, employees] = await Promise.all([
+  const [paylaws, overtimes, employees, settings] = await Promise.all([
     prisma.paylaw.findMany({
       where: { userId: session.user.id, month, year },
       include: { rows: true },
@@ -31,6 +32,9 @@ export default async function DashboardPage() {
     prisma.employee.findMany({
       where: { userId: session.user.id, active: true },
     }),
+    prisma.settings.findUnique({
+      where: { userId: session.user.id },
+    }),
   ])
 
   // ── Totals ──────────────────────────────────────────
@@ -41,6 +45,8 @@ export default async function DashboardPage() {
     (t, o) => t + o.rows.reduce((s, r) => s + r.amount, 0), 0
   )
   const totalPay = normalPay + otPay
+  const currency = settings?.currency || 'ZMW'
+  const currencySymbol = getCurrencySymbol(currency)
 
   // ── This week strip ──────────────────────────────────
   // Build Mon–Sun for the current week
@@ -140,7 +146,7 @@ export default async function DashboardPage() {
               Normal Pay — {monthName}
             </p>
             <p className="text-3xl font-semibold text-green-700">
-              K {normalPay.toLocaleString()}
+              {formatMoney(normalPay, settings?.currency || 'ZMW')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               {paylaws.length} paylaw{paylaws.length !== 1 ? 's' : ''} · per day rate
@@ -154,7 +160,7 @@ export default async function DashboardPage() {
               Overtime Pay — {monthName}
             </p>
             <p className="text-3xl font-semibold text-amber-700">
-              K {otPay.toLocaleString()}
+              {formatMoney(otPay, settings?.currency || 'ZMW')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               {overtimes.length} OT sheet{overtimes.length !== 1 ? 's' : ''} · per hour rate
@@ -168,7 +174,7 @@ export default async function DashboardPage() {
               Total Payout — {monthName}
             </p>
             <p className="text-3xl font-semibold text-gray-900">
-              K {totalPay.toLocaleString()}
+              {formatMoney(totalPay, settings?.currency || 'ZMW')}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               Normal + overtime combined
@@ -321,11 +327,11 @@ export default async function DashboardPage() {
                           <span className="text-xs font-medium bg-green-50
                                            text-green-700 border border-green-100
                                            px-2 py-0.5 rounded">
-                            K/day
+                            {currencySymbol}/day
                           </span>
                         </td>
                         <td className="px-5 py-3 text-sm font-semibold text-green-700">
-                          K {total.toLocaleString()}
+                          {formatMoney(total, currency)}
                         </td>
                         <td className="px-5 py-3">
                           <span className={`text-xs font-medium px-2 py-0.5 rounded-full
@@ -393,11 +399,11 @@ export default async function DashboardPage() {
                           <span className="text-xs font-medium bg-amber-50
                                            text-amber-700 border border-amber-100
                                            px-2 py-0.5 rounded">
-                            K/hr
+                            {currencySymbol}/hr
                           </span>
                         </td>
                         <td className="px-5 py-3 text-sm font-semibold text-amber-700">
-                          K {total.toLocaleString()}
+                          {formatMoney(total, currency)}
                         </td>
                         <td className="px-5 py-3">
                           <span className={`text-xs font-medium px-2 py-0.5 rounded-full
@@ -458,13 +464,13 @@ export default async function DashboardPage() {
                       {data.workers.size}
                     </td>
                     <td className="px-5 py-3 text-sm font-semibold text-green-700">
-                      K {data.normalPay.toLocaleString()}
+                      {formatMoney(data.normalPay, currency)}
                     </td>
                     <td className="px-5 py-3 text-sm font-semibold text-amber-700">
-                      K {data.otPay.toLocaleString()}
+                      {formatMoney(data.otPay, currency)}
                     </td>
                     <td className="px-5 py-3 text-sm font-bold text-gray-900">
-                      K {(data.normalPay + data.otPay).toLocaleString()}
+                      {formatMoney(data.normalPay + data.otPay, currency)}
                     </td>
                   </tr>
                 ))}
@@ -478,13 +484,13 @@ export default async function DashboardPage() {
                     {employees.length}
                   </td>
                   <td className="px-5 py-3 text-sm font-bold text-green-700">
-                    K {normalPay.toLocaleString()}
+                    {formatMoney(normalPay, currency)}
                   </td>
                   <td className="px-5 py-3 text-sm font-bold text-amber-700">
-                    K {otPay.toLocaleString()}
+                    {formatMoney(otPay, currency)}
                   </td>
                   <td className="px-5 py-3 text-base font-bold text-gray-900">
-                    K {totalPay.toLocaleString()}
+                    {formatMoney(totalPay, currency)}
                   </td>
                 </tr>
               </tbody>

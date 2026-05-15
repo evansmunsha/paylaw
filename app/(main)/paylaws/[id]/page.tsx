@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { formatMoney, getCurrencySymbol } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
 import Link from 'next/link'
 import DownloadPaylawPDF from './DownloadPaylawPDF'
@@ -27,20 +28,28 @@ export default async function ViewPaylawPage({
   const { id } = await params
 
   // Fetch the paylaw with all its rows and employee info
-  const paylaw = await prisma.paylaw.findFirst({
-    where: {
-      id,
-      userId: session.user.id, // security — only show if it belongs to this user
-    },
-    include: {
-      rows: {
-        include: { employee: true },
+  const [paylaw, settings] = await Promise.all([
+    prisma.paylaw.findFirst({
+      where: {
+        id,
+        userId: session.user.id, // security — only show if it belongs to this user
       },
-    },
-  })
+      include: {
+        rows: {
+          include: { employee: true },
+        },
+      },
+    }),
+    prisma.settings.findUnique({
+      where: { userId: session.user.id },
+    }),
+  ])
 
   // If not found or does not belong to this user — show 404
   if (!paylaw) notFound()
+
+  const currency = settings?.currency || 'ZMW'
+  const currencySymbol = getCurrencySymbol(currency)
 
   const monthName = MONTH_NAMES[paylaw.month - 1]
   const daysInMonth = new Date(paylaw.year, paylaw.month, 0).getDate()
@@ -135,6 +144,7 @@ export default async function ViewPaylawPage({
                 attendance: r.attendance as Record<string, boolean>,
                 signature: r.signature || '',
             }))}
+            currency={settings?.currency || 'ZMW'}
             />
 
             
@@ -227,7 +237,7 @@ export default async function ViewPaylawPage({
                                  border-gray-200 text-center text-xs font-medium
                                  text-gray-400 uppercase tracking-wide px-3 py-3
                                  min-w-20">
-                    K / day
+                    {currencySymbol} / day
                   </th>
 
                   {allDays.map(day => {
@@ -305,7 +315,7 @@ export default async function ViewPaylawPage({
                         <span className="text-xs font-semibold text-green-700
                                          bg-green-50 border border-green-200
                                          rounded px-2 py-0.5">
-                          K {row.dayRate}
+                          {currencySymbol} {row.dayRate}
                         </span>
                       </td>
 
@@ -341,7 +351,7 @@ export default async function ViewPaylawPage({
 
                       <td className="px-3 py-2.5 text-right text-sm font-semibold
                                      text-green-700 whitespace-nowrap">
-                        K {row.amount.toLocaleString()}
+                        {formatMoney(row.amount, currency)}
                       </td>
 
                       <td className="px-3 py-2.5 text-xs text-gray-500 italic">
@@ -386,7 +396,7 @@ export default async function ViewPaylawPage({
                   </td>
                   <td className="px-3 py-2 text-right text-xs font-bold
                                  text-green-700 whitespace-nowrap">
-                    K {totalNormal.toLocaleString()}
+                    {formatMoney(totalNormal, currency)}
                   </td>
                   <td/>
                 </tr>
@@ -408,7 +418,7 @@ export default async function ViewPaylawPage({
                 Salaries total
               </p>
               <p className="text-sm font-semibold text-green-700">
-                K {totalNormal.toLocaleString()}
+                {formatMoney(totalNormal, currency)}
               </p>
             </div>
             <div>
@@ -416,7 +426,7 @@ export default async function ViewPaylawPage({
                 Food expense
               </p>
               <p className="text-sm font-medium text-gray-900">
-                K {paylaw.foodExpense.toLocaleString()}
+                {formatMoney(paylaw.foodExpense, currency)}
               </p>
             </div>
             <div>
@@ -424,7 +434,7 @@ export default async function ViewPaylawPage({
                 Other deductions
               </p>
               <p className="text-sm font-medium text-gray-900">
-                K {paylaw.otherDeduct.toLocaleString()}
+                {formatMoney(paylaw.otherDeduct, currency)}
               </p>
             </div>
             <div>
@@ -432,7 +442,7 @@ export default async function ViewPaylawPage({
                 Total amount spent
               </p>
               <p className="text-base font-bold text-gray-900">
-                K {totalSpent.toLocaleString()}
+                {formatMoney(totalSpent, currency)}
               </p>
             </div>
           </div>

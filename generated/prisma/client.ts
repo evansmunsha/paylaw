@@ -76,3 +76,8 @@ export type OvertimeRow = Prisma.OvertimeRowModel
  * 
  */
 export type Settings = Prisma.SettingsModel
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel

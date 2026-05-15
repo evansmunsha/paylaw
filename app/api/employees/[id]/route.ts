@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { logAction } from '@/lib/audit'
 
 export async function PATCH(
   req: Request,
@@ -14,7 +15,6 @@ export async function PATCH(
 
   const { id } = await params
 
-  // Find the employee — check it belongs to this user or their admin
   const ownerId = session.user.role === 'foreman'
     ? session.user.adminId!
     : session.user.id
@@ -27,7 +27,6 @@ export async function PATCH(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  // Foremen can only edit employees at their site
   if (
     session.user.role === 'foreman' &&
     existing.site !== session.user.site
@@ -40,13 +39,24 @@ export async function PATCH(
   const employee = await prisma.employee.update({
     where: { id },
     data: {
-      name,
-      jobTitle,
-      site,
-      dayRate: parseFloat(dayRate) || 0,
-      otRate:  parseFloat(otRate)  || 0,
-      active:  active ?? true,
+      name:    name    ?? existing.name,
+      jobTitle: jobTitle ?? existing.jobTitle,
+      site:    site    ?? existing.site,
+      dayRate: parseFloat(dayRate) || existing.dayRate,
+      otRate:  parseFloat(otRate)  || existing.otRate,
+      active:  active  ?? existing.active,
     },
+  })
+
+  await logAction({
+    action:     'updated',
+    entityType: 'employee',
+    entityId:   id,
+    entityName: `${employee.name} — ${employee.site}`,
+    userId:     session.user.id,
+    userName:   session.user.name || session.user.email || 'Unknown',
+    userRole:   session.user.role || 'admin',
+    adminId:    ownerId,
   })
 
   return NextResponse.json(employee)
@@ -75,7 +85,6 @@ export async function DELETE(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  // Foremen can only delete employees at their site
   if (
     session.user.role === 'foreman' &&
     existing.site !== session.user.site
@@ -84,6 +93,17 @@ export async function DELETE(
   }
 
   await prisma.employee.delete({ where: { id } })
+
+  await logAction({
+    action:     'deleted',
+    entityType: 'employee',
+    entityId:   id,
+    entityName: `${existing.name} — ${existing.site}`,
+    userId:     session.user.id,
+    userName:   session.user.name || session.user.email || 'Unknown',
+    userRole:   session.user.role || 'admin',
+    adminId:    ownerId,
+  })
 
   return NextResponse.json({ message: 'Deleted' })
 }

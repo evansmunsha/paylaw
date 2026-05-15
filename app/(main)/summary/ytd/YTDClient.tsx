@@ -1,5 +1,7 @@
 'use client'
 
+import { formatMoney } from '@/lib/currency'
+
 interface MonthData {
   month: number
   name: string
@@ -14,9 +16,10 @@ interface MonthData {
 interface Props {
   monthlyData: MonthData[]
   year: number
+  currency: string
 }
 
-export default function YTDClient({ monthlyData, year }: Props) {
+export default function YTDClient({ monthlyData, year, currency }: Props) {
   const maxTotal = Math.max(...monthlyData.map(m => m.total), 1)
   const hasAnyData = monthlyData.some(m => m.total > 0)
 
@@ -74,21 +77,21 @@ export default function YTDClient({ monthlyData, year }: Props) {
                   <p className="font-semibold">{m.name}</p>
                   {m.normalPay > 0 && (
                     <p className="text-green-300">
-                      Normal: K {m.normalPay.toLocaleString()}
+                      Normal: {formatMoney(m.normalPay, currency)}
                     </p>
                   )}
                   {m.otPay > 0 && (
                     <p className="text-amber-300">
-                      OT: K {m.otPay.toLocaleString()}
+                      OT: {formatMoney(m.otPay, currency)}
                     </p>
                   )}
                   {m.food > 0 && (
                     <p className="text-red-300">
-                      Exp: K {m.food.toLocaleString()}
+                      Exp: {formatMoney(m.food, currency)}
                     </p>
                   )}
                   <p className="font-bold border-t border-white/20 mt-1 pt-1">
-                    Total: K {m.total.toLocaleString()}
+                    Total: {formatMoney(m.total, currency)}
                   </p>
                 </div>
               )}

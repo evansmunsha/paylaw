@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { logAction } from '@/lib/audit'
+
+const MONTH_NAMES = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December'
+]
 
 export async function PATCH(
   req: Request,
@@ -14,8 +20,12 @@ export async function PATCH(
 
   const { id } = await params
 
+  const ownerId = session.user.role === 'foreman'
+    ? session.user.adminId!
+    : session.user.id
+
   const existing = await prisma.overtime.findFirst({
-    where: { id, userId: session.user.id },
+    where: { id, userId: ownerId },
   })
 
   if (!existing) {
@@ -24,19 +34,17 @@ export async function PATCH(
 
   const { site, month, year, preparedBy, status, rows } = await req.json()
 
-  // Update header
   await prisma.overtime.update({
     where: { id },
     data: {
       site,
-      month: parseInt(month),
-      year: parseInt(year),
+      month:     parseInt(month),
+      year:      parseInt(year),
       preparedBy,
-      status: status || 'draft',
+      status:    status || 'draft',
     },
   })
 
-  // Delete old rows and recreate
   await prisma.overtimeRow.deleteMany({ where: { overtimeId: id } })
 
   if (rows && rows.length > 0) {
@@ -51,14 +59,28 @@ export async function PATCH(
       }) => ({
         overtimeId: id,
         employeeId: row.employeeId,
-        otRate: row.otRate,
+        otRate:     row.otRate,
         totalHours: row.totalHours,
-        amount: row.amount,
-        hours: row.hours,
-        signature: row.signature || '',
+        amount:     row.amount,
+        hours:      row.hours,
+        signature:  row.signature || '',
       })),
     })
   }
+
+  await logAction({
+    action:
+      status === 'submitted' ? 'submitted' :
+      status === 'approved'  ? 'approved'  :
+      'updated',
+    entityType: 'overtime',
+    entityId:   id,
+    entityName: `${existing.site} — ${MONTH_NAMES[existing.month - 1]} ${existing.year}`,
+    userId:     session.user.id,
+    userName:   session.user.name || session.user.email || 'Unknown',
+    userRole:   session.user.role || 'admin',
+    adminId:    ownerId,
+  })
 
   return NextResponse.json({ message: 'Updated' })
 }
@@ -84,6 +106,17 @@ export async function DELETE(
 
   await prisma.overtimeRow.deleteMany({ where: { overtimeId: id } })
   await prisma.overtime.delete({ where: { id } })
+
+  await logAction({
+    action:     'deleted',
+    entityType: 'overtime',
+    entityId:   id,
+    entityName: `${existing.site} — ${MONTH_NAMES[existing.month - 1]} ${existing.year}`,
+    userId:     session.user.id,
+    userName:   session.user.name || session.user.email || 'Unknown',
+    userRole:   session.user.role || 'admin',
+    adminId:    session.user.id,
+  })
 
   return NextResponse.json({ message: 'Deleted' })
 }

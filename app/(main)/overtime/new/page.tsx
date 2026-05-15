@@ -10,20 +10,26 @@ export default async function NewOvertimePage() {
   if (!session) redirect('/login')
 
   const isForeman = session.user.role === 'foreman'
+  const userId = isForeman ? session.user.adminId! : session.user.id
 
-  const employees = await prisma.employee.findMany({
-    where: isForeman
-      ? {
-          userId: session.user.adminId!,
-          site:   session.user.site!,
-          active: true,
-        }
-      : {
-          userId: session.user.id,
-          active: true,
-        },
-    orderBy: { name: 'asc' },
-  })
+  const [employees, settings] = await Promise.all([
+    prisma.employee.findMany({
+      where: isForeman
+        ? {
+            userId: session.user.adminId!,
+            site:   session.user.site!,
+            active: true,
+          }
+        : {
+            userId: session.user.id,
+            active: true,
+          },
+      orderBy: { name: 'asc' },
+    }),
+    prisma.settings.findUnique({
+      where: { userId },
+    }),
+  ])
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -31,7 +37,10 @@ export default async function NewOvertimePage() {
         title="New Overtime Sheet"
         subtitle="Extra hours · each worker paid per hour"
       />
-      <NewOvertimeClient employees={employees} />
+      <NewOvertimeClient 
+        employees={employees} 
+        currency={settings?.currency || 'ZMW'}
+      />
     </div>
   )
 }

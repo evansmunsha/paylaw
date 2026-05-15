@@ -9,6 +9,7 @@
 
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { getCurrencySymbol, formatMoney } from './currency'
 
 // ── Static lookup arrays ──────────────────────────────────────────────────────
 
@@ -55,7 +56,8 @@ interface OvertimeData {
 }
 
 // ── Main export function ──────────────────────────────────────────────────────
-export function generateOvertimePDF(data: OvertimeData) {
+export function generateOvertimePDF(data: OvertimeData, currency: string = 'ZMW') {
+  const symbol = getCurrencySymbol(currency)
 
   // Create an A4 landscape document — landscape fits all 31 day columns
   const doc = new jsPDF({
@@ -138,14 +140,14 @@ export function generateOvertimePDF(data: OvertimeData) {
 
   // Header row — static columns + one column per day in the month
   const head = [[
-    'Name', 'Job Title', 'K/hr',
+    'Name', 'Job Title', `${symbol}/hr`,
     // Day columns: number on top, abbreviated day name below (e.g. "1\nFr")
     ...Array.from({ length: daysInMonth }, (_, i) => {
       const d   = i + 1
       const dow = new Date(data.year, data.month - 1, d).getDay()
       return `${d}\n${DAY_LABELS[dow]}`
     }),
-    'Total Hrs', 'Amount (K)', 'Signature',
+    'Total Hrs', `Amount (${symbol})`, 'Signature',
   ]]
 
   // Body rows — one per employee
@@ -159,7 +161,7 @@ export function generateOvertimePDF(data: OvertimeData) {
       return h > 0 ? h : ''
     }),
     `${row.totalHours}h`,         // total hours with "h" suffix
-    row.amount.toLocaleString(),  // formatted amount
+    formatMoney(row.amount, currency).split(' ').slice(1).join(' '),  // formatted amount
     row.signature || '',
   ])
 
@@ -176,7 +178,7 @@ export function generateOvertimePDF(data: OvertimeData) {
       return t > 0 ? `${t}h` : '' // show blank instead of "0h" for cleaner look
     }),
     `${grandHours}h`,
-    grandAmount.toLocaleString(),
+    formatMoney(grandAmount, currency).split(' ').slice(1).join(' '),
     '',
   ])
 
@@ -326,7 +328,7 @@ export function generateOvertimePDF(data: OvertimeData) {
     body: [
       ['Total OT Hours',  `${grandHours} hrs`],
       // Total payout is the last row — styled with grey bg and amber text below
-      ['Total OT Payout', `K ${grandAmount.toLocaleString()}`],
+      ['Total OT Payout', formatMoney(grandAmount, currency)],
     ],
     startY: afterTable + 3,
     margin: { left: leftX, right: pageW - (leftX + colW) },

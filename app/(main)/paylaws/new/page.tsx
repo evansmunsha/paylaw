@@ -10,32 +10,25 @@ export default async function NewPaylawPage() {
   if (!session) redirect('/login')
 
   const isForeman = session.user.role === 'foreman'
+  const ownerId   = isForeman ? session.user.adminId! : session.user.id
 
-  // Foremen see only employees at their site
-  // owned by their admin — same fix as employees page
-  const employeeWhere = isForeman
-    ? {
-        userId: session.user.adminId!,
-        site:   session.user.site!,
-        active: true, // only show active workers
-      }
-    : {
-        userId: session.user.id,
-        active: true, // only show active workers
-      }
-
-  const [employees, previousPaylaws] = await Promise.all([
+  const [employees, previousPaylaws, settings] = await Promise.all([
     prisma.employee.findMany({
-      where: employeeWhere,
+      where: isForeman
+        ? { userId: ownerId, site: session.user.site!, active: true }
+        : { userId: ownerId, active: true },
       orderBy: { name: 'asc' },
     }),
     prisma.paylaw.findMany({
       where: isForeman
-        ? { userId: session.user.adminId!, site: session.user.site! }
-        : { userId: session.user.id },
+        ? { userId: ownerId, site: session.user.site! }
+        : { userId: ownerId },
       orderBy: { createdAt: 'desc' },
       select: { id: true, site: true, month: true, year: true },
       take: 10,
+    }),
+    prisma.settings.findUnique({
+      where: { userId: ownerId },
     }),
   ])
 
@@ -48,6 +41,10 @@ export default async function NewPaylawPage() {
       <NewPaylawClient
         employees={employees}
         previousPaylaws={previousPaylaws}
+        currency={settings?.currency || 'ZMW'}
+        foremanSite={isForeman ? session.user.site || '' : ''}
+        isForeman={isForeman}
+        preparedByDefault={session.user.name || ''}
       />
     </div>
   )

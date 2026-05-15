@@ -120,6 +120,7 @@ export async function GET(req: Request) {
     year,
     preparedBy,
     sites,
+    currency: settings?.currency || 'ZMW',
     company: settings ? {
       companyName: settings.companyName,
       phone:       settings.phone,

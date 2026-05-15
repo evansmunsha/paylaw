@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { formatMoney, getCurrencySymbol } from '@/lib/currency'
 
 interface Employee {
   active: boolean
@@ -35,6 +35,10 @@ interface WorkerRow {
 interface Props {
   employees: Employee[]
   previousPaylaws: PreviousPaylaw[]
+  currency: string
+  foremanSite: string
+  isForeman: boolean
+  preparedByDefault: string
 }
 
 const MONTH_NAMES = [
@@ -44,21 +48,24 @@ const MONTH_NAMES = [
 
 const DAY_LABELS = ['Su','Mo','Tu','We','Th','Fr','Sa']
 
-export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
+export default function NewPaylawClient({
+  employees,
+  previousPaylaws,
+  currency,
+  foremanSite,
+  isForeman,
+  preparedByDefault,
+}: Props) {
   const router = useRouter()
-  const { data: session } = useSession()
-  const isForeman   = session?.user?.role === 'foreman'
-  const foremanSite = session?.user?.site || ''
+
+  const symbol = getCurrencySymbol(currency)
+  const format = (amount: number) => formatMoney(amount, currency)
 
   const now = new Date()
-  const [site, setSite]               = useState(
-    isForeman ? foremanSite : ''
-  )
+  const [site, setSite]               = useState(isForeman ? foremanSite : '')
   const [month, setMonth]             = useState(now.getMonth() + 1)
   const [year, setYear]               = useState(now.getFullYear())
-  const [preparedBy, setPreparedBy]   = useState(
-    session?.user?.name || ''
-  )
+  const [preparedBy, setPreparedBy]   = useState(preparedByDefault)
   const [foodExpense, setFoodExpense] = useState('0')
   const [otherDeduct, setOtherDeduct] = useState('0')
   const [rows, setRows]               = useState<WorkerRow[]>([])
@@ -84,13 +91,11 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
     return d === 0 || d === 6
   }
 
-  // ── Copy workers from a previous paylaw ──────────────
   async function copyFromPaylaw(paylawId: string) {
     if (!paylawId) return
     setCopying(true)
     setCopySuccess('')
     setError('')
-
     try {
       const res = await fetch(`/api/paylaws/${paylawId}/workers`)
       if (!res.ok) {
@@ -125,7 +130,6 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
     }
   }
 
-  // ── Add individual worker ─────────────────────────────
   function addWorker() {
     if (!selectedEmpId) return
     if (rows.find(r => r.employeeId === selectedEmpId)) {
@@ -152,11 +156,10 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
     setRows(prev => prev.filter(r => r.employeeId !== employeeId))
   }
 
-  // ── Toggle day — blocked for inactive workers ─────────
   function toggleDay(employeeId: string, day: number) {
     setRows(prev => prev.map(row => {
       if (row.employeeId !== employeeId) return row
-      if (!row.active) return row // safety block
+      if (!row.active) return row
       const key = String(day)
       return {
         ...row,
@@ -198,8 +201,9 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
   const totalNet     = rows.reduce((t, r) => t + netAmount(r), 0)
   const totalDaysAll = rows.reduce((t, r) => t + daysWorked(r), 0)
 
-  // ── Save ─────────────────────────────────────────────
-  async function handleSave(status: 'draft' | 'done' | 'submitted' | 'approved') {
+  async function handleSave(
+    status: 'draft' | 'done' | 'submitted' | 'approved'
+  ) {
     if (!site || !preparedBy) {
       setError('Site name and Prepared by are required')
       return
@@ -209,27 +213,25 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
       return
     }
 
-    // Check same worker in different site same month
+    // Check duplicate workers in same month different site
     try {
       const checkRes = await fetch('/api/paylaws/check-duplicates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           employeeIds: rows.map(r => r.employeeId),
-          month,
-          year,
-          site,
+          month, year, site,
         }),
       })
       const checkData = await checkRes.json()
       if (checkData.duplicates && checkData.duplicates.length > 0) {
         setError(
-          `These workers already have a paylaw this month at a different site: ${checkData.duplicates.join(', ')}. Remove them or use the same site.`
+          `These workers already have a paylaw this month at a different site: ${checkData.duplicates.join(', ')}`
         )
         return
       }
     } catch {
-      // If check fails just continue
+      // Continue if check fails
     }
 
     setSaving(true)
@@ -292,6 +294,10 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
         <span className="bg-red-100 text-red-700 font-medium
                          px-2 py-0.5 rounded">
           deduction
+        </span>
+        <span className="text-gray-300">·</span>
+        <span className="text-xs text-gray-400">
+          Currency: <strong className="text-gray-600">{symbol} {currency}</strong>
         </span>
       </div>
 
@@ -374,7 +380,8 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
             </label>
             <select
               className="border border-gray-200 rounded-lg px-3 py-2
-                         text-sm outline-none focus:border-gray-400 bg-white"
+                         text-sm outline-none focus:border-gray-400
+                         bg-white"
               value={month}
               onChange={e => setMonth(parseInt(e.target.value))}
             >
@@ -440,7 +447,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
             <span className="flex items-center gap-1.5">
               <span className="w-5 h-5 rounded bg-gray-100 border
                                border-gray-200 inline-block"/>
-              Inactive worker
+              Inactive
             </span>
           </div>
         </div>
@@ -465,7 +472,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           </span>
         </div>
 
-        {/* Add worker dropdown */}
+        {/* Add worker */}
         <div className="flex gap-2 mb-4">
           <select
             className="flex-1 min-w-0 border border-gray-200 rounded-lg
@@ -477,8 +484,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
             <option value="">Add individual worker...</option>
             {availableEmployees.map(e => (
               <option key={e.id} value={e.id}>
-                {e.name} — {e.jobTitle} (K {e.dayRate}/day)
-                {!e.active ? ' — INACTIVE' : ''}
+                {e.name} — {e.jobTitle} ({symbol} {e.dayRate}/day)
               </option>
             ))}
           </select>
@@ -537,7 +543,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                                  border-r border-gray-200 text-center
                                  text-xs font-medium text-gray-400 uppercase
                                  tracking-wide px-3 py-3 min-w-20">
-                    K / day
+                    {symbol} / day
                   </th>
                   {allDays.map(day => {
                     const weekend = isWeekend(day)
@@ -546,21 +552,15 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                         key={day}
                         className={`border-b border-gray-200 text-center
                                     px-0 py-2 min-w-9
-                                    ${weekend
-                                      ? 'bg-amber-50'
-                                      : 'bg-gray-50'}`}
+                                    ${weekend ? 'bg-amber-50' : 'bg-gray-50'}`}
                       >
                         <div className="flex flex-col items-center gap-0.5">
                           <span className={`text-xs font-semibold
-                            ${weekend
-                              ? 'text-amber-600'
-                              : 'text-gray-600'}`}>
+                            ${weekend ? 'text-amber-600' : 'text-gray-600'}`}>
                             {day}
                           </span>
                           <span className={`text-xs
-                            ${weekend
-                              ? 'text-amber-400'
-                              : 'text-gray-300'}`}>
+                            ${weekend ? 'text-amber-400' : 'text-gray-300'}`}>
                             {DAY_LABELS[getDayOfWeek(day)]}
                           </span>
                         </div>
@@ -574,17 +574,17 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                   </th>
                   <th className="border-b border-gray-200 bg-gray-50
                                  text-right text-xs font-medium text-gray-400
-                                 uppercase tracking-wide px-3 py-3 min-w-20">
+                                 uppercase tracking-wide px-3 py-3 min-w-24">
                     Gross
                   </th>
                   <th className="border-b border-gray-200 bg-red-50
                                  text-center text-xs font-medium text-red-400
-                                 uppercase tracking-wide px-3 py-3 min-w-20">
-                    Deduct (K)
+                                 uppercase tracking-wide px-3 py-3 min-w-24">
+                    Deduct ({symbol})
                   </th>
                   <th className="border-b border-gray-200 bg-green-50
                                  text-right text-xs font-medium text-green-600
-                                 uppercase tracking-wide px-3 py-3 min-w-20">
+                                 uppercase tracking-wide px-3 py-3 min-w-24">
                     Net pay
                   </th>
                   <th className="border-b border-gray-200 bg-gray-50
@@ -611,7 +611,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                           ? 'hover:bg-gray-50/50'
                           : 'bg-gray-50/50 opacity-70'}`}
                     >
-                      {/* Name — with inactive badge */}
+                      {/* Name */}
                       <td className="sticky left-0 z-10 bg-white border-r
                                      border-gray-100 px-4 py-2.5 min-w-40">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -675,15 +675,13 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                               disabled={!row.active}
                               title={
                                 !row.active
-                                  ? 'Worker is inactive — cannot mark days'
-                                  : present
-                                  ? 'Mark absent'
-                                  : 'Mark present'
+                                  ? 'Worker is inactive'
+                                  : present ? 'Mark absent' : 'Mark present'
                               }
                               className={`w-7 h-7 rounded text-xs font-bold
                                           transition-all mx-auto block
                                 ${!row.active
-                                  ? 'bg-gray-50 border border-gray-100 text-gray-200 cursor-not-allowed'
+                                  ? 'bg-gray-50 border border-gray-100 cursor-not-allowed'
                                   : present
                                   ? 'bg-green-100 border border-green-300 text-green-700 hover:bg-green-200'
                                   : weekend
@@ -697,7 +695,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                         )
                       })}
 
-                      {/* Days worked */}
+                      {/* Days */}
                       <td className="border-l border-gray-100 px-3 py-2.5
                                      text-center text-sm font-semibold
                                      text-gray-800">
@@ -708,7 +706,9 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                       <td className="px-3 py-2.5 text-right text-sm
                                      font-medium text-gray-600
                                      whitespace-nowrap">
-                        {gross > 0 ? `K ${gross.toLocaleString()}` : '—'}
+                        {gross > 0
+                          ? format(gross)
+                          : '—'}
                       </td>
 
                       {/* Deduction */}
@@ -736,7 +736,9 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                       <td className="px-3 py-2.5 text-right text-sm
                                      font-semibold text-green-700
                                      whitespace-nowrap bg-green-50/20">
-                        {net > 0 ? `K ${net.toLocaleString()}` : '—'}
+                        {net > 0
+                          ? format(net)
+                          : '—'}
                       </td>
 
                       {/* Signature */}
@@ -761,7 +763,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                         />
                       </td>
 
-                      {/* Remove button */}
+                      {/* Remove */}
                       <td className="px-2 py-2.5">
                         <button
                           onClick={() => removeWorker(row.employeeId)}
@@ -794,9 +796,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                     return (
                       <td key={day} className="text-center px-0.5 py-2">
                         <span className={`text-xs font-semibold
-                          ${count > 0
-                            ? 'text-green-700'
-                            : 'text-gray-300'}`}>
+                          ${count > 0 ? 'text-green-700' : 'text-gray-300'}`}>
                           {count > 0 ? count : '—'}
                         </span>
                       </td>
@@ -808,19 +808,19 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
                   </td>
                   <td className="px-3 py-2 text-right text-xs font-bold
                                  text-gray-600 whitespace-nowrap">
-                    K {totalGross.toLocaleString()}
+                    {format(totalGross)}
                   </td>
                   <td className="px-3 py-2 text-center text-xs font-bold
                                  text-red-600 whitespace-nowrap
                                  bg-red-50/30">
                     {totalDeduct > 0
-                      ? `− K ${totalDeduct.toLocaleString()}`
+                      ? `− ${format(totalDeduct)}`
                       : '—'}
                   </td>
                   <td className="px-3 py-2 text-right text-xs font-bold
                                  text-green-700 whitespace-nowrap
                                  bg-green-50/20">
-                    K {totalNet.toLocaleString()}
+                    {format(totalNet)}
                   </td>
                   <td colSpan={2}/>
                 </tr>
@@ -844,11 +844,11 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500
                                uppercase tracking-wide">
-              Gross salaries (K)
+              Gross salaries ({symbol})
             </label>
             <input
               readOnly
-              value={`K ${totalGross.toLocaleString()}`}
+              value={format(totalGross)}
               className="border border-gray-200 rounded-lg px-3 py-2
                          text-sm text-gray-600 bg-gray-50 outline-none"
             />
@@ -856,13 +856,13 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500
                                uppercase tracking-wide">
-              Total deductions (K)
+              Total deductions ({symbol})
             </label>
             <input
               readOnly
               value={totalDeduct > 0
-                ? `− K ${totalDeduct.toLocaleString()}`
-                : 'K 0'}
+                ? `− ${format(totalDeduct)}`
+                : format(0)}
               className="border border-red-100 rounded-lg px-3 py-2
                          text-sm text-red-600 bg-red-50 outline-none"
             />
@@ -870,11 +870,11 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500
                                uppercase tracking-wide">
-              Net salaries (K)
+              Net salaries ({symbol})
             </label>
             <input
               readOnly
-              value={`K ${totalNet.toLocaleString()}`}
+              value={format(totalNet)}
               className="border border-green-100 rounded-lg px-3 py-2
                          text-sm text-green-700 font-semibold
                          bg-green-50 outline-none"
@@ -883,7 +883,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-500
                                uppercase tracking-wide">
-              Food expense (K)
+              Food expense ({symbol})
             </label>
             <input
               type="number"
@@ -897,7 +897,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
         </div>
       </div>
 
-      {/* Summary + save buttons */}
+      {/* Summary + Save buttons */}
       <div className="bg-white border border-gray-100 rounded-xl
                       p-4 md:p-5 flex items-center justify-between
                       gap-4 flex-wrap">
@@ -915,7 +915,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
               Gross pay
             </p>
             <p className="text-xl font-semibold text-gray-600">
-              K {totalGross.toLocaleString()}
+              {format(totalGross)}
             </p>
           </div>
           <div>
@@ -923,7 +923,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
               Deductions
             </p>
             <p className="text-xl font-semibold text-red-600">
-              − K {totalDeduct.toLocaleString()}
+              − {format(totalDeduct)}
             </p>
           </div>
           <div>
@@ -931,7 +931,7 @@ export default function NewPaylawClient({ employees, previousPaylaws }: Props) {
               Net pay
             </p>
             <p className="text-xl font-semibold text-green-700">
-              K {totalNet.toLocaleString()}
+              {format(totalNet)}
             </p>
           </div>
         </div>

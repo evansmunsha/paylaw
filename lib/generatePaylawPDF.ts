@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { getCurrencySymbol, formatMoney } from './currency'
 
 const MONTH_NAMES = [
   'January','February','March','April','May','June',
@@ -37,7 +38,7 @@ interface PaylawData {
   company?: CompanySettings
 }
 
-export function generatePaylawPDF(data: PaylawData) {
+export function generatePaylawPDF(data: PaylawData, currency: string = 'ZMW') {
   const doc = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',
@@ -48,6 +49,7 @@ export function generatePaylawPDF(data: PaylawData) {
   const monthName   = MONTH_NAMES[data.month - 1]
   const daysInMonth = new Date(data.year, data.month, 0).getDate()
   const company     = data.company
+  const symbol      = getCurrencySymbol(currency)
 
   // ── Colours ───────────────────────────────────────────
   const BLACK       = [17,  24,  39]  as [number,number,number]
@@ -111,13 +113,13 @@ export function generatePaylawPDF(data: PaylawData) {
   const PRESENT_MARK = 'v'
 
   const head = [[
-    'Name', 'Job Title', 'K/day',
+    'Name', 'Job Title', `${symbol}/day`,
     ...Array.from({ length: daysInMonth }, (_, i) => {
       const d   = i + 1
       const dow = new Date(data.year, data.month - 1, d).getDay()
       return `${d}\n${DAY_LABELS[dow]}`
     }),
-    'Days', 'Amount (K)', 'Signature',
+    'Days', `Amount (${symbol})`, 'Signature',
   ]]
 
   const body: (string | number)[][] = data.rows.map(row => [
@@ -128,7 +130,7 @@ export function generatePaylawPDF(data: PaylawData) {
       row.attendance[String(i + 1)] ? PRESENT_MARK : ''
     ),
     row.daysWorked,
-    row.amount.toLocaleString(),
+    formatMoney(row.amount, currency).split(' ').slice(1).join(' '),
     row.signature || '',
   ])
 
@@ -143,7 +145,7 @@ export function generatePaylawPDF(data: PaylawData) {
       return c > 0 ? c : ''
     }),
     totalDays,
-    totalAmount.toLocaleString(),
+    formatMoney(totalAmount, currency).split(' ').slice(1).join(' '),
     '',
   ])
 
@@ -183,7 +185,7 @@ export function generatePaylawPDF(data: PaylawData) {
       0: { halign: 'left', cellWidth: 26, fontStyle: 'bold' },
       // Job title
       1: { halign: 'left', cellWidth: 20, textColor: GRAY_MID },
-      // K/day
+      // {symbol}/day
       2: { cellWidth: 12, textColor: GREEN_DARK, fontStyle: 'bold' },
       // Days column
       [3 + daysInMonth]: {
@@ -282,12 +284,12 @@ export function generatePaylawPDF(data: PaylawData) {
 
   const descRows = [
     ['Absents',           '0'],
-    ['Salaries',          `K ${totalAmount.toLocaleString()}`],
+    ['Salaries',          formatMoney(totalAmount, currency)],
     ['Overtime',          'See OT sheet'],
-    ['Food Expense',      `K ${data.foodExpense.toLocaleString()}`],
-    ['Other Deductions',  `K ${data.otherDeduct.toLocaleString()}`],
+    ['Food Expense',      formatMoney(data.foodExpense, currency)],
+    ['Other Deductions',  formatMoney(data.otherDeduct, currency)],
     ['Total Amount Spent',
-     `K ${(totalAmount + data.foodExpense + data.otherDeduct).toLocaleString()}`],
+     formatMoney(totalAmount + data.foodExpense + data.otherDeduct, currency)],
   ]
 
   autoTable(doc, {

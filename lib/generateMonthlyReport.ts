@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { formatMoney } from './currency'
 
 const MONTH_NAMES = [
   'January','February','March','April','May','June',
@@ -39,7 +40,7 @@ interface MonthlyReportData {
   company?: CompanySettings
 }
 
-export function generateMonthlyReport(data: MonthlyReportData) {
+export function generateMonthlyReport(data: MonthlyReportData, currency: string = 'ZMW') {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -125,28 +126,28 @@ export function generateMonthlyReport(data: MonthlyReportData) {
   const boxes = [
     {
       label: 'NORMAL PAY',
-      value: `K ${grandNormal.toLocaleString()}`,
+      value: formatMoney(grandNormal, currency),
       sub: `${allWorkers.length} workers`,
       color: GREEN_DARK,
       bg: GREEN_LIGHT,
     },
     {
       label: 'OVERTIME PAY',
-      value: `K ${grandOT.toLocaleString()}`,
+      value: formatMoney(grandOT, currency),
       sub: `${allWorkers.filter(w => w.otHours > 0).length} workers`,
       color: AMBER_DARK,
       bg: AMBER_LIGHT,
     },
     {
       label: 'DEDUCTIONS',
-      value: `K ${grandDeduct.toLocaleString()}`,
+      value: formatMoney(grandDeduct, currency),
       sub: 'Loans & advances',
       color: RED_DARK,
       bg: RED_LIGHT,
     },
     {
       label: 'TOTAL SPENT',
-      value: `K ${grandTotal.toLocaleString()}`,
+      value: formatMoney(grandTotal, currency),
       sub: 'All inclusive',
       color: BLACK,
       bg: GRAY_LIGHT,
@@ -201,10 +202,10 @@ export function generateMonthlyReport(data: MonthlyReportData) {
     return [
       s.site,
       String(s.workers.length),
-      `K ${normal.toLocaleString()}`,
-      `K ${ot.toLocaleString()}`,
-      `K ${food.toLocaleString()}`,
-      `K ${(normal + ot + food).toLocaleString()}`,
+      formatMoney(normal, currency).split(' ').slice(1).join(' '),
+      formatMoney(ot, currency).split(' ').slice(1).join(' '),
+      formatMoney(food, currency).split(' ').slice(1).join(' '),
+      formatMoney(normal + ot + food, currency).split(' ').slice(1).join(' '),
     ]
   })
 
@@ -249,24 +250,24 @@ export function generateMonthlyReport(data: MonthlyReportData) {
     w.name,
     w.jobTitle,
     String(w.daysWorked),
-    `K ${w.grossPay.toLocaleString()}`,
-    w.deduction > 0 ? `− K ${w.deduction.toLocaleString()}` : '—',
-    `K ${w.netPay.toLocaleString()}`,
+    formatMoney(w.grossPay, currency).split(' ').slice(1).join(' '),
+    w.deduction > 0 ? `− ${formatMoney(w.deduction, currency).split(' ').slice(1).join(' ')}` : '—',
+    formatMoney(w.netPay, currency).split(' ').slice(1).join(' '),
     w.otHours > 0 ? `${w.otHours}h` : '—',
-    w.otPay > 0 ? `K ${w.otPay.toLocaleString()}` : '—',
-    `K ${(w.netPay + w.otPay).toLocaleString()}`,
+    w.otPay > 0 ? formatMoney(w.otPay, currency).split(' ').slice(1).join(' ') : '—',
+    formatMoney(w.netPay + w.otPay, currency).split(' ').slice(1).join(' '),
   ])
 
   // Grand total row
   workerTableRows.push([
     'TOTAL', '',
     String(allWorkers.reduce((t, w) => t + w.daysWorked, 0)),
-    `K ${allWorkers.reduce((t, w) => t + w.grossPay, 0).toLocaleString()}`,
-    grandDeduct > 0 ? `− K ${grandDeduct.toLocaleString()}` : '—',
-    `K ${grandNormal.toLocaleString()}`,
+    formatMoney(allWorkers.reduce((t, w) => t + w.grossPay, 0), currency).split(' ').slice(1).join(' '),
+    grandDeduct > 0 ? `− ${formatMoney(grandDeduct, currency).split(' ').slice(1).join(' ')}` : '—',
+    formatMoney(grandNormal, currency).split(' ').slice(1).join(' '),
     `${allWorkers.reduce((t, w) => t + w.otHours, 0)}h`,
-    `K ${grandOT.toLocaleString()}`,
-    `K ${(grandNormal + grandOT).toLocaleString()}`,
+    formatMoney(grandOT, currency).split(' ').slice(1).join(' '),
+    formatMoney(grandNormal + grandOT, currency).split(' ').slice(1).join(' '),
   ])
 
   autoTable(doc, {
@@ -345,14 +346,14 @@ export function generateMonthlyReport(data: MonthlyReportData) {
 
     // Site mini summary boxes
     const sMiniBoxes = [
-      { label: 'Normal Pay', value: `K ${siteNormal.toLocaleString()}`,
+      { label: 'Normal Pay', value: formatMoney(siteNormal, currency),
         color: GREEN_DARK },
-      { label: 'Overtime',   value: `K ${siteOT.toLocaleString()}`,
+      { label: 'Overtime',   value: formatMoney(siteOT, currency),
         color: AMBER_DARK },
       { label: 'Expenses',
-        value: `K ${(site.foodExpense + site.otherDeduct).toLocaleString()}`,
+        value: formatMoney(site.foodExpense + site.otherDeduct, currency),
         color: GRAY_MID },
-      { label: 'TOTAL',      value: `K ${siteTotal.toLocaleString()}`,
+      { label: 'TOTAL',      value: formatMoney(siteTotal, currency),
         color: BLACK },
     ]
 
@@ -388,25 +389,25 @@ export function generateMonthlyReport(data: MonthlyReportData) {
       w.name,
       w.jobTitle,
       String(w.daysWorked),
-      `K ${w.grossPay.toLocaleString()}`,
-      w.deduction > 0 ? `− K ${w.deduction.toLocaleString()}` : '—',
-      `K ${w.netPay.toLocaleString()}`,
+      formatMoney(w.grossPay, currency),
+      w.deduction > 0 ? `− ${formatMoney(w.deduction, currency)}` : '—',
+      formatMoney(w.netPay, currency),
       w.otHours > 0 ? `${w.otHours}h` : '—',
-      w.otPay > 0 ? `K ${w.otPay.toLocaleString()}` : '—',
-      `K ${(w.netPay + w.otPay).toLocaleString()}`,
+      w.otPay > 0 ? formatMoney(w.otPay, currency) : '—',
+      formatMoney(w.netPay + w.otPay, currency),
     ])
 
     siteRows.push([
       'TOTAL', '',
       String(site.workers.reduce((t, w) => t + w.daysWorked, 0)),
-      `K ${site.workers.reduce((t, w) => t + w.grossPay, 0).toLocaleString()}`,
+      formatMoney(site.workers.reduce((t, w) => t + w.grossPay, 0), currency),
       site.workers.reduce((t, w) => t + w.deduction, 0) > 0
-        ? `− K ${site.workers.reduce((t, w) => t + w.deduction, 0).toLocaleString()}`
+        ? `− ${formatMoney(site.workers.reduce((t, w) => t + w.deduction, 0), currency)}`
         : '—',
-      `K ${siteNormal.toLocaleString()}`,
+      formatMoney(siteNormal, currency),
       `${site.workers.reduce((t, w) => t + w.otHours, 0)}h`,
-      `K ${siteOT.toLocaleString()}`,
-      `K ${(siteNormal + siteOT).toLocaleString()}`,
+      formatMoney(siteOT, currency),
+      formatMoney(siteNormal + siteOT, currency),
     ])
 
     autoTable(doc, {
@@ -455,11 +456,11 @@ export function generateMonthlyReport(data: MonthlyReportData) {
 
     autoTable(doc, {
       body: [
-        ['Salaries (net)',    `K ${siteNormal.toLocaleString()}`],
-        ['Overtime pay',     `K ${siteOT.toLocaleString()}`],
-        ['Food expense',     `K ${site.foodExpense.toLocaleString()}`],
-        ['Other deductions', `K ${site.otherDeduct.toLocaleString()}`],
-        ['TOTAL',            `K ${siteTotal.toLocaleString()}`],
+        ['Salaries (net)',    formatMoney(siteNormal, currency)],
+        ['Overtime pay',     formatMoney(siteOT, currency)],
+        ['Food expense',     formatMoney(site.foodExpense, currency)],
+        ['Other deductions', formatMoney(site.otherDeduct, currency)],
+        ['TOTAL',            formatMoney(siteTotal, currency)],
       ],
       startY: descY + 4,
       margin: { left: 15, right: pageW / 2 },

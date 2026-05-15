@@ -17,26 +17,30 @@ export default async function EditOvertimePage({
   const isForeman = session.user.role === 'foreman'
   const ownerId   = isForeman ? session.user.adminId! : session.user.id
 
-  const overtime = await prisma.overtime.findFirst({
-    where: { id, userId: ownerId },
-    include: { rows: { include: { employee: true } } },
-  })
+  const [overtime, employees, settings] = await Promise.all([
+    prisma.overtime.findFirst({
+      where: { id, userId: ownerId },
+      include: { rows: { include: { employee: true } } },
+    }),
+    prisma.employee.findMany({
+      where: isForeman
+        ? {
+            userId: session.user.adminId!,
+            site:   session.user.site!,
+            active: true,
+          }
+        : {
+            userId: session.user.id,
+            active: true,
+          },
+      orderBy: { name: 'asc' },
+    }),
+    prisma.settings.findUnique({
+      where: { userId: ownerId },
+    }),
+  ])
 
   if (!overtime) notFound()
-
-  const employees = await prisma.employee.findMany({
-    where: isForeman
-      ? {
-          userId: session.user.adminId!,
-          site:   session.user.site!,
-          active: true,
-        }
-      : {
-          userId: session.user.id,
-          active: true,
-        },
-    orderBy: { name: 'asc' },
-  })
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -44,7 +48,11 @@ export default async function EditOvertimePage({
         title={`Edit Overtime — ${overtime.site}`}
         subtitle="Continue entering hours"
       />
-      <EditOvertimeClient overtime={overtime} employees={employees} />
+      <EditOvertimeClient 
+        overtime={overtime} 
+        employees={employees} 
+        currency={settings?.currency || 'ZMW'}
+      />
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { getCurrencySymbol } from '@/lib/currency'
 
 interface Employee {
   id: string
@@ -23,6 +24,7 @@ interface Props {
   employees: Employee[]
   allSites: string[]
   foremanSites: ForemanSite[]
+  currency: string
 }
 
 const avColours = [
@@ -37,6 +39,7 @@ export default function EmployeeClient({
   employees,
   allSites,
   foremanSites,
+  currency,
 }: Props) {
   const router = useRouter()
   const { data: session } = useSession()
@@ -44,13 +47,13 @@ export default function EmployeeClient({
   const isForeman   = session?.user?.role === 'foreman'
   const foremanSite = session?.user?.site || ''
 
-  const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all')
-  const [siteFilter, setSiteFilter] = useState('all')
+  const symbol = getCurrencySymbol(currency)
+
+  const [search, setSearch]         = useState('')
+  const [filter, setFilter]         = useState<'all' | 'active' | 'inactive'>('all')
   const [showModal, setShowModal]   = useState(false)
   const [editing, setEditing]       = useState<Employee | null>(null)
 
-  // Form fields
   const [name, setName]         = useState('')
   const [jobTitle, setJobTitle] = useState('')
   const [site, setSite]         = useState('')
@@ -59,7 +62,6 @@ export default function EmployeeClient({
   const [saving, setSaving]     = useState(false)
   const [error, setError]       = useState('')
 
-  // ── Filter employees ─────────────────────────────────
   const filtered = employees.filter(e => {
     const matchSearch =
       e.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -68,22 +70,12 @@ export default function EmployeeClient({
       filter === 'all' ||
       (filter === 'active'   && e.active) ||
       (filter === 'inactive' && !e.active)
-    const matchSite =
-      siteFilter === 'all' || e.site === siteFilter
-    return matchSearch && matchFilter && matchSite
+    return matchSearch && matchFilter
   })
 
   const activeCount   = employees.filter(e => e.active).length
   const inactiveCount = employees.filter(e => !e.active).length
 
-  // Group employees by site for admin view
-  const siteGroups = allSites.map(s => ({
-    site: s,
-    count: employees.filter(e => e.site === s).length,
-    foreman: foremanSites.find(f => f.site === s)?.name || null,
-  }))
-
-  // ── Open modals ──────────────────────────────────────
   function openAdd() {
     setEditing(null)
     setName('')
@@ -106,7 +98,6 @@ export default function EmployeeClient({
     setShowModal(true)
   }
 
-  // ── Save ─────────────────────────────────────────────
   async function handleSave() {
     if (!name || !jobTitle || !site || !dayRate || !otRate) {
       setError('All fields are required')
@@ -121,8 +112,7 @@ export default function EmployeeClient({
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            name, jobTitle, site,
-            dayRate, otRate,
+            name, jobTitle, site, dayRate, otRate,
             active: editing.active,
           }),
         })
@@ -152,7 +142,6 @@ export default function EmployeeClient({
     }
   }
 
-  // ── Quick reassign site ───────────────────────────────
   async function handleReassign(empId: string, newSite: string) {
     await fetch(`/api/employees/${empId}`, {
       method: 'PATCH',
@@ -162,7 +151,6 @@ export default function EmployeeClient({
     router.refresh()
   }
 
-  // ── Delete ───────────────────────────────────────────
   async function handleDelete(id: string) {
     if (!confirm('Remove this employee? This cannot be undone.')) return
     await fetch(`/api/employees/${id}`, { method: 'DELETE' })
@@ -194,60 +182,8 @@ export default function EmployeeClient({
         </div>
       )}
 
-      {/* Admin — site overview cards */}
-      {!isForeman && siteGroups.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
-          {/* All sites card */}
-          <button
-            onClick={() => setSiteFilter('all')}
-            className={`border rounded-xl p-4 text-left transition-colors
-              ${siteFilter === 'all'
-                ? 'bg-black text-white border-black'
-                : 'bg-white border-gray-100 hover:border-gray-200'}`}
-          >
-            <p className={`text-lg font-bold
-              ${siteFilter === 'all' ? 'text-white' : 'text-gray-900'}`}>
-              {employees.length}
-            </p>
-            <p className={`text-xs font-medium mt-0.5
-              ${siteFilter === 'all' ? 'text-white/70' : 'text-gray-400'}`}>
-              All workers
-            </p>
-          </button>
-
-          {siteGroups.map(sg => (
-            <button
-              key={sg.site}
-              onClick={() => setSiteFilter(sg.site)}
-              className={`border rounded-xl p-4 text-left transition-colors
-                ${siteFilter === sg.site
-                  ? 'bg-black text-white border-black'
-                  : 'bg-white border-gray-100 hover:border-gray-200'}`}
-            >
-              <p className={`text-lg font-bold
-                ${siteFilter === sg.site ? 'text-white' : 'text-gray-900'}`}>
-                {sg.count}
-              </p>
-              <p className={`text-xs font-medium truncate mt-0.5
-                ${siteFilter === sg.site ? 'text-white/80' : 'text-gray-700'}`}>
-                {sg.site}
-              </p>
-              {sg.foreman && (
-                <p className={`text-xs mt-0.5 truncate
-                  ${siteFilter === sg.site
-                    ? 'text-white/60'
-                    : 'text-gray-400'}`}>
-                  Foreman: {sg.foreman}
-                </p>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* ── Toolbar ── */}
+      {/* Toolbar */}
       <div className="flex items-center gap-3 flex-wrap">
-        {/* Search */}
         <div className="relative flex-1 min-w-0 max-w-xs">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2
                           text-gray-400"
@@ -268,7 +204,6 @@ export default function EmployeeClient({
           />
         </div>
 
-        {/* Status filter tabs */}
         <div className="flex gap-1 bg-white border border-gray-200
                         rounded-lg p-1">
           {(['all', 'active', 'inactive'] as const).map(f => (
@@ -288,7 +223,6 @@ export default function EmployeeClient({
           ))}
         </div>
 
-        {/* Add button */}
         <button
           onClick={openAdd}
           className="ml-auto flex items-center gap-2 bg-black text-white
@@ -305,7 +239,7 @@ export default function EmployeeClient({
         </button>
       </div>
 
-      {/* ── Employee grid ── */}
+      {/* Employee grid */}
       {filtered.length === 0 ? (
         <div className="bg-white border border-gray-100 rounded-xl
                         py-16 text-center">
@@ -313,7 +247,7 @@ export default function EmployeeClient({
             {search
               ? `No employees match "${search}"`
               : isForeman
-              ? `No workers at ${foremanSite} yet — add your first worker`
+              ? `No workers at ${foremanSite} yet`
               : 'No employees yet'}
           </p>
           <button
@@ -325,7 +259,8 @@ export default function EmployeeClient({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3
+                        gap-4">
           {filtered.map((emp, i) => (
             <div
               key={emp.id}
@@ -333,7 +268,6 @@ export default function EmployeeClient({
                           transition-colors hover:border-gray-200
                           ${!emp.active ? 'opacity-60' : ''}`}
             >
-              {/* Avatar + name */}
               <div className={`w-10 h-10 rounded-full flex items-center
                                justify-center text-sm font-semibold mb-3
                                flex-shrink-0
@@ -345,7 +279,7 @@ export default function EmployeeClient({
               </p>
               <p className="text-xs text-gray-500 mb-1">{emp.jobTitle}</p>
 
-              {/* Site — admin can reassign via dropdown */}
+              {/* Site */}
               {isForeman ? (
                 <div className="flex items-center gap-1.5 mb-4">
                   <svg width="10" height="10" viewBox="0 0 10 10"
@@ -360,7 +294,6 @@ export default function EmployeeClient({
                   <span className="text-xs text-gray-400">{emp.site}</span>
                 </div>
               ) : (
-                // Admin — site is a dropdown to reassign
                 <div className="flex items-center gap-1.5 mb-4">
                   <svg width="10" height="10" viewBox="0 0 10 10"
                        fill="none">
@@ -375,14 +308,12 @@ export default function EmployeeClient({
                     value={emp.site}
                     onChange={e => handleReassign(emp.id, e.target.value)}
                     className="text-xs text-gray-600 border-0 bg-transparent
-                               outline-none cursor-pointer hover:text-gray-900
-                               pr-1"
+                               outline-none cursor-pointer hover:text-gray-900"
                     title="Click to change site"
                   >
                     {allSites.map(s => (
                       <option key={s} value={s}>{s}</option>
                     ))}
-                    {/* Allow custom site entry */}
                     {!allSites.includes(emp.site) && (
                       <option value={emp.site}>{emp.site}</option>
                     )}
@@ -396,17 +327,17 @@ export default function EmployeeClient({
                 </div>
               )}
 
-              {/* Rates */}
+              {/* Rates — using currency symbol */}
               <div className="flex gap-2 mb-4 flex-wrap">
                 <span className="text-xs font-medium bg-green-50
                                  text-green-700 border border-green-100
                                  px-2 py-0.5 rounded">
-                  K {emp.dayRate} / day
+                  {symbol} {emp.dayRate} / day
                 </span>
                 <span className="text-xs font-medium bg-amber-50
                                  text-amber-700 border border-amber-100
                                  px-2 py-0.5 rounded">
-                  K {emp.otRate} / hr OT
+                  {symbol} {emp.otRate} / hr OT
                 </span>
               </div>
 
@@ -467,7 +398,7 @@ export default function EmployeeClient({
         </div>
       )}
 
-      {/* ── Add / Edit Modal ── */}
+      {/* Modal */}
       {showModal && (
         <div
           className="fixed inset-0 bg-black/30 z-50 flex items-center
@@ -521,9 +452,7 @@ export default function EmployeeClient({
                                    uppercase tracking-wide">
                   Assign to site
                 </label>
-
                 {isForeman ? (
-                  // Foremen — site locked to their site
                   <div className="border border-gray-200 rounded-lg px-3
                                   py-2 text-sm bg-gray-50 text-gray-500
                                   flex items-center justify-between">
@@ -534,7 +463,6 @@ export default function EmployeeClient({
                     </span>
                   </div>
                 ) : allSites.length > 0 ? (
-                  // Admin with existing sites — show dropdown + custom option
                   <div className="flex flex-col gap-2">
                     <select
                       value={allSites.includes(site) ? site : '__custom__'}
@@ -554,7 +482,6 @@ export default function EmployeeClient({
                         + Type a different site...
                       </option>
                     </select>
-                    {/* Show text input if site is not in the list */}
                     {!allSites.includes(site) && (
                       <input
                         className="border border-gray-200 rounded-lg px-3
@@ -566,7 +493,6 @@ export default function EmployeeClient({
                         autoFocus
                       />
                     )}
-                    {/* Show foreman info for the selected site */}
                     {foremanSites.find(f => f.site === site) && (
                       <p className="text-xs text-blue-600 bg-blue-50
                                     border border-blue-100 rounded-lg
@@ -580,7 +506,6 @@ export default function EmployeeClient({
                     )}
                   </div>
                 ) : (
-                  // No existing sites yet — plain text input
                   <input
                     className="border border-gray-200 rounded-lg px-3
                                py-2 text-sm outline-none
@@ -597,7 +522,7 @@ export default function EmployeeClient({
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-gray-600
                                      uppercase tracking-wide">
-                    Day rate (K)
+                    Day rate ({symbol})
                   </label>
                   <input
                     type="number"
@@ -615,7 +540,7 @@ export default function EmployeeClient({
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-medium text-gray-600
                                      uppercase tracking-wide">
-                    OT rate (K)
+                    OT rate ({symbol})
                   </label>
                   <input
                     type="number"

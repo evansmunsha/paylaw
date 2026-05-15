@@ -31,6 +31,7 @@ export type SettingsMinAggregateOutputType = {
   phone: string | null
   email: string | null
   address: string | null
+  currency: string | null
   userId: string | null
 }
 
@@ -41,6 +42,7 @@ export type SettingsMaxAggregateOutputType = {
   phone: string | null
   email: string | null
   address: string | null
+  currency: string | null
   userId: string | null
 }
 
@@ -51,6 +53,7 @@ export type SettingsCountAggregateOutputType = {
   phone: number
   email: number
   address: number
+  currency: number
   userId: number
   _all: number
 }
@@ -63,6 +66,7 @@ export type SettingsMinAggregateInputType = {
   phone?: true
   email?: true
   address?: true
+  currency?: true
   userId?: true
 }
 
@@ -73,6 +77,7 @@ export type SettingsMaxAggregateInputType = {
   phone?: true
   email?: true
   address?: true
+  currency?: true
   userId?: true
 }
 
@@ -83,6 +88,7 @@ export type SettingsCountAggregateInputType = {
   phone?: true
   email?: true
   address?: true
+  currency?: true
   userId?: true
   _all?: true
 }
@@ -166,6 +172,7 @@ export type SettingsGroupByOutputType = {
   phone: string
   email: string
   address: string
+  currency: string
   userId: string
   _count: SettingsCountAggregateOutputType | null
   _min: SettingsMinAggregateOutputType | null
@@ -197,6 +204,7 @@ export type SettingsWhereInput = {
   phone?: Prisma.StringFilter<"Settings"> | string
   email?: Prisma.StringFilter<"Settings"> | string
   address?: Prisma.StringFilter<"Settings"> | string
+  currency?: Prisma.StringFilter<"Settings"> | string
   userId?: Prisma.StringFilter<"Settings"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
@@ -208,6 +216,7 @@ export type SettingsOrderByWithRelationInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  currency?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
@@ -223,6 +232,7 @@ export type SettingsWhereUniqueInput = Prisma.AtLeast<{
   phone?: Prisma.StringFilter<"Settings"> | string
   email?: Prisma.StringFilter<"Settings"> | string
   address?: Prisma.StringFilter<"Settings"> | string
+  currency?: Prisma.StringFilter<"Settings"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId">
 
@@ -233,6 +243,7 @@ export type SettingsOrderByWithAggregationInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  currency?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   _count?: Prisma.SettingsCountOrderByAggregateInput
   _max?: Prisma.SettingsMaxOrderByAggregateInput
@@ -249,6 +260,7 @@ export type SettingsScalarWhereWithAggregatesInput = {
   phone?: Prisma.StringWithAggregatesFilter<"Settings"> | string
   email?: Prisma.StringWithAggregatesFilter<"Settings"> | string
   address?: Prisma.StringWithAggregatesFilter<"Settings"> | string
+  currency?: Prisma.StringWithAggregatesFilter<"Settings"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Settings"> | string
 }
 
@@ -259,6 +271,7 @@ export type SettingsCreateInput = {
   phone?: string
   email?: string
   address?: string
+  currency?: string
   user: Prisma.UserCreateNestedOneWithoutSettingsInput
 }
 
@@ -269,6 +282,7 @@ export type SettingsUncheckedCreateInput = {
   phone?: string
   email?: string
   address?: string
+  currency?: string
   userId: string
 }
 
@@ -279,6 +293,7 @@ export type SettingsUpdateInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
   user?: Prisma.UserUpdateOneRequiredWithoutSettingsNestedInput
 }
 
@@ -289,6 +304,7 @@ export type SettingsUncheckedUpdateInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -299,6 +315,7 @@ export type SettingsCreateManyInput = {
   phone?: string
   email?: string
   address?: string
+  currency?: string
   userId: string
 }
 
@@ -309,6 +326,7 @@ export type SettingsUpdateManyMutationInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type SettingsUncheckedUpdateManyInput = {
@@ -318,6 +336,7 @@ export type SettingsUncheckedUpdateManyInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -333,6 +352,7 @@ export type SettingsCountOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  currency?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
@@ -343,6 +363,7 @@ export type SettingsMaxOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  currency?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
@@ -353,6 +374,7 @@ export type SettingsMinOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  currency?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
@@ -395,6 +417,7 @@ export type SettingsCreateWithoutUserInput = {
   phone?: string
   email?: string
   address?: string
+  currency?: string
 }
 
 export type SettingsUncheckedCreateWithoutUserInput = {
@@ -404,6 +427,7 @@ export type SettingsUncheckedCreateWithoutUserInput = {
   phone?: string
   email?: string
   address?: string
+  currency?: string
 }
 
 export type SettingsCreateOrConnectWithoutUserInput = {
@@ -429,6 +453,7 @@ export type SettingsUpdateWithoutUserInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type SettingsUncheckedUpdateWithoutUserInput = {
@@ -438,6 +463,7 @@ export type SettingsUncheckedUpdateWithoutUserInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.StringFieldUpdateOperationsInput | string
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -449,6 +475,7 @@ export type SettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   phone?: boolean
   email?: boolean
   address?: boolean
+  currency?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
@@ -460,6 +487,7 @@ export type SettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   phone?: boolean
   email?: boolean
   address?: boolean
+  currency?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
@@ -471,6 +499,7 @@ export type SettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   phone?: boolean
   email?: boolean
   address?: boolean
+  currency?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
@@ -482,10 +511,11 @@ export type SettingsSelectScalar = {
   phone?: boolean
   email?: boolean
   address?: boolean
+  currency?: boolean
   userId?: boolean
 }
 
-export type SettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyName" | "siteName" | "phone" | "email" | "address" | "userId", ExtArgs["result"]["settings"]>
+export type SettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyName" | "siteName" | "phone" | "email" | "address" | "currency" | "userId", ExtArgs["result"]["settings"]>
 export type SettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -508,6 +538,7 @@ export type $SettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     phone: string
     email: string
     address: string
+    currency: string
     userId: string
   }, ExtArgs["result"]["settings"]>
   composites: {}
@@ -939,6 +970,7 @@ export interface SettingsFieldRefs {
   readonly phone: Prisma.FieldRef<"Settings", 'String'>
   readonly email: Prisma.FieldRef<"Settings", 'String'>
   readonly address: Prisma.FieldRef<"Settings", 'String'>
+  readonly currency: Prisma.FieldRef<"Settings", 'String'>
   readonly userId: Prisma.FieldRef<"Settings", 'String'>
 }
     
