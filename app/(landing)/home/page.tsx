@@ -5,19 +5,19 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white flex flex-col">
 
       {/* ── NAV ── */}
-      <nav className="flex items-center justify-between px-6 md:px-16
-                      py-5 border-b border-gray-100 sticky top-0
+      <nav className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 md:px-16
+                      py-4 sm:py-5 border-b border-gray-100 sticky top-0
                       bg-white z-50">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-black rounded-lg flex items-center
-                          justify-center flex-shrink-0">
+                          justify-center shrink-0">
             <span className="text-white text-xs font-bold">PL</span>
           </div>
           <span className="text-lg font-bold tracking-widest text-gray-900">
             PAYLAW
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-end">
           <Link
             href="/login"
             className="text-sm text-gray-500 hover:text-gray-800
@@ -27,7 +27,7 @@ export default function LandingPage() {
           </Link>
           <Link
             href="/register"
-            className="bg-black text-white text-sm font-medium px-5 py-2.5
+            className="bg-black text-white text-sm font-medium px-4 py-2
                        rounded-lg hover:bg-gray-800 transition-colors"
           >
             Get started free
@@ -132,9 +132,7 @@ export default function LandingPage() {
                 </svg>
               </div>
               <p className="text-white/60 text-sm">Demo video coming soon</p>
-              <p className="text-white/30 text-xs mt-1">
-                Replace with your screen recording
-              </p>
+              
             </div>
           </div>
         </div>
