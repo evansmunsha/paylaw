@@ -72,18 +72,18 @@ export default async function ViewPaylawPage({
   return (
     <div className="flex flex-col min-h-screen">
       <Topbar
-        title={`Paylaw — ${paylaw.site}`}
-        subtitle={`${monthName} ${paylaw.year}`}
+        title={'Paylaw — ' + paylaw.site}
+        subtitle={monthName + ' ' + paylaw.year}
       />
 
-      <div className="p-6 flex flex-col gap-5">
+      <div className="p-4 sm:p-6 flex flex-col gap-4">
 
         {/* Action buttons */}
-        <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <Link
             href="/paylaws"
             className="flex items-center gap-2 text-sm text-gray-500
-                    hover:text-gray-800 transition-colors"
+              hover:text-gray-800 transition-colors"
         >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M10 3L6 8L10 13" stroke="currentColor" strokeWidth="1.4"
@@ -92,21 +92,20 @@ export default async function ViewPaylawPage({
             Back to paylaws
         </Link>
 
-        <div className="flex gap-3 items-center">
-            <span className={`text-xs font-medium px-3 py-1.5 rounded-full
-            ${paylaw.status === 'done'
-                ? 'bg-green-50 text-green-700 border border-green-100'
-                : 'bg-amber-50 text-amber-700 border border-amber-100'}`}>
+        <div className="flex gap-2 sm:gap-3 items-center flex-wrap overflow-x-auto">
+          <span className={paylaw.status === 'done'
+                ? 'text-xs font-medium px-2 py-1 rounded-full bg-green-50 text-green-700 border border-green-100'
+                : 'text-xs font-medium px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100'}>
             {paylaw.status === 'done' ? '✓ Done' : '● Draft'}
             </span>
 
             {/* Continue marking button — shows for drafts */}
             {paylaw.status === 'draft' && (
             <Link
-                href={`/paylaws/${paylaw.id}/edit`}
-                className="flex items-center gap-2 bg-amber-50 border border-amber-200
-                        text-amber-800 text-sm font-medium px-4 py-2 rounded-lg
-                        hover:bg-amber-100 transition-colors"
+              href={`/paylaws/${paylaw.id}/edit`}
+              className="flex items-center gap-2 bg-amber-50 border border-amber-200
+                  text-amber-800 text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg
+                  hover:bg-amber-100 transition-colors shrink-0"
             >
                 <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
                 <path d="M9 1.5L11.5 4L5 10.5H2.5V8L9 1.5Z" stroke="currentColor"
@@ -124,15 +123,16 @@ export default async function ViewPaylawPage({
             <Link
             href={`/paylaws/${paylaw.id}/edit`}
             className="flex items-center gap-2 border border-gray-200 text-gray-700
-                        text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-50
-                        transition-colors"
+                        text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-50
+                        transition-colors shrink-0"
             >
             Edit
             </Link>
 
             
 
-         <DownloadPaylawPDF
+        <div className="shrink-0">
+        <DownloadPaylawPDF
             site={paylaw.site}
             month={paylaw.month}
             year={paylaw.year}
@@ -151,15 +151,12 @@ export default async function ViewPaylawPage({
             }))}
             currency={settings?.currency || 'ZMW'}
             />
-
-            
-
           <Link
             href={`/paylaws/${paylaw.id}/print`}
             target="_blank"
             className="flex items-center gap-2 border border-gray-200 text-gray-700
-                      text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-50
-                      transition-colors"
+                      text-sm font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-50
+                      transition-colors shrink-0"
           >
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
               <rect x="2" y="4" width="9" height="6" rx="1.5"
@@ -174,6 +171,7 @@ export default async function ViewPaylawPage({
 
 
 
+        </div>
         </div>
         </div>
 

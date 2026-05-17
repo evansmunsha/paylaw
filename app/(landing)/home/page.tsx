@@ -36,8 +36,8 @@ export default function LandingPage() {
       </nav>
 
       {/* ── HERO ── */}
-      <section className="flex flex-col items-center text-center px-6
-                          pt-16 md:pt-24 pb-12 md:pb-20">
+      <section className="flex flex-col items-center text-center px-4 sm:px-6
+              pt-12 sm:pt-16 md:pt-24 pb-10 sm:pb-12 md:pb-20">
         <div className="inline-flex items-center gap-2 bg-green-50 border
                         border-green-100 rounded-full px-4 py-1.5 text-xs
                         font-medium text-green-700 mb-6">
@@ -46,8 +46,8 @@ export default function LandingPage() {
           Simple payroll for construction companies worldwide
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-bold text-gray-900
-                       leading-tight max-w-3xl mb-6">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900
+                 leading-tight max-w-3xl mb-6">
           Payroll made simple for{' '}
           <span className="text-green-600">site managers</span>
         </h1>
@@ -62,7 +62,7 @@ export default function LandingPage() {
         <div className="flex gap-3 flex-wrap justify-center">
           <Link
             href="/register"
-            className="bg-black text-white text-sm font-medium px-6 py-3
+            className="bg-black text-white text-sm font-medium px-4 sm:px-6 py-2.5 sm:py-3
                        rounded-lg hover:bg-gray-800 transition-colors"
           >
             Create free account →
@@ -70,7 +70,7 @@ export default function LandingPage() {
           <Link
             href="#how-it-works"
             className="border border-gray-200 text-gray-700 text-sm
-                       font-medium px-6 py-3 rounded-lg hover:bg-gray-50
+                       font-medium px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-gray-50
                        transition-colors"
           >
             See how it works
@@ -104,7 +104,7 @@ export default function LandingPage() {
       {/* ── VIDEO SECTION ── */}
       <section
         id="how-it-works"
-        className="px-6 md:px-16 py-12 md:py-16 bg-gray-50
+        className="px-4 sm:px-6 md:px-16 py-12 md:py-16 bg-gray-50
                    border-y border-gray-100"
       >
         <div className="max-w-4xl mx-auto">
@@ -139,7 +139,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="px-6 md:px-16 py-12 md:py-16">
+      <section className="px-4 sm:px-6 md:px-16 py-12 md:py-16">
         <div className="max-w-4xl mx-auto">
           <p className="text-xs font-semibold text-gray-400 uppercase
                         tracking-widest text-center mb-3">
@@ -267,8 +267,8 @@ export default function LandingPage() {
 
 
 
-      <section className="px-6 md:px-16 py-12 md:py-16 bg-gray-50
-                          border-y border-gray-100">
+      <section className="px-4 sm:px-6 md:px-16 py-12 md:py-16 bg-gray-50
+              border-y border-gray-100">
         <div className="max-w-4xl mx-auto">
           <p className="text-xs font-semibold text-gray-400 uppercase
                         tracking-widest text-center mb-3">
@@ -600,7 +600,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="px-6 md:px-16 py-12 md:py-16 bg-gray-900">
+      <section className="px-4 sm:px-6 md:px-16 py-12 md:py-16 bg-gray-900">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             Ready to stop using paper?
@@ -623,8 +623,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="px-6 md:px-16 py-6 border-t border-gray-100
-                         flex items-center justify-between flex-wrap gap-4">
+      <footer className="px-4 sm:px-6 md:px-16 py-6 border-t border-gray-100
+             flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-black rounded-md flex items-center
                           justify-center">

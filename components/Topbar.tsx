@@ -58,12 +58,12 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
 
   return (
     <>
-      <header className="h-14 bg-white border-b border-gray-100
-                         flex items-center justify-between px-4 md:px-6
-                         sticky top-0 z-40">
+      <header className="h-12 sm:h-14 bg-white border-b border-gray-100
+             flex flex-wrap items-center justify-between px-3 sm:px-4 md:px-6
+             sticky top-0 z-40">
 
         <div className="min-w-0 flex-1">
-          <h1 className="text-sm md:text-base font-semibold
+          <h1 className="text-xs sm:text-sm md:text-base font-semibold
                          text-gray-900 leading-none truncate">
             {title}
           </h1>
@@ -75,7 +75,7 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
           )}
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 ml-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-3 flex-wrap">
 
           {/* Install button — only show if not installed */}
           {!isInstalled && (
@@ -83,9 +83,9 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
               onClick={handleInstall}
               title="Install PayLaw app"
               className="flex items-center gap-1.5 text-xs border
-                         border-gray-200 px-3 py-1.5 rounded-lg
-                         text-gray-600 hover:bg-gray-50 transition-colors
-                         hidden sm:flex"
+                           border-gray-200 px-2.5 py-1 rounded-lg
+                           text-gray-600 hover:bg-gray-50 transition-colors
+                           hidden sm:flex"
             >
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M2 9h8M6 1v6M3.5 4.5L6 7L8.5 4.5"
