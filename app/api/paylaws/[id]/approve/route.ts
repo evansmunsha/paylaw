@@ -26,6 +26,10 @@ export async function POST(
   const { id }          = await params
   const { action, note } = await req.json()
 
+  if (action === 'reject' && (!note || !note.trim())) {
+    return NextResponse.json({ error: 'Rejection note is required' }, { status: 400 })
+  }
+
   const paylaw = await prisma.paylaw.findFirst({
     where: { id, userId: session.user.id },
   })

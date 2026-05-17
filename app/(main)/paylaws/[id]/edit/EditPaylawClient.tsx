@@ -233,10 +233,10 @@ export default function EditPaylawClient({ paylaw, employees, currency }: Props)
   )
 
   return (
-    <div className="p-6 flex flex-col gap-5">
+    <div className="p-4 sm:p-6 flex flex-col gap-4">
 
       {/* Info banner */}
-      <div className="flex items-center gap-3 bg-blue-50 border border-blue-100
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-blue-50 border border-blue-100
                       rounded-lg px-4 py-3 text-sm text-blue-700">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.3"/>
@@ -273,8 +273,8 @@ export default function EditPaylawClient({ paylaw, employees, currency }: Props)
                       after:bg-gray-100 after:content-['']">
           Sheet info
         </p>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          <div className="flex flex-col gap-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
               Site name
             </label>
@@ -334,11 +334,11 @@ export default function EditPaylawClient({ paylaw, employees, currency }: Props)
           Monthly attendance &amp; rates
         </p>
 
-        <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
-          <span className="text-sm font-medium text-gray-700">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 text-sm">
+          <span className="font-medium text-gray-700">
             {MONTH_NAMES[month - 1]} {year}
           </span>
-          <div className="flex items-center gap-4 text-xs text-gray-500">
+          <div className="flex flex-wrap items-center gap-3 text-[11px] text-gray-500">
             <span className="flex items-center gap-1.5">
               <span className="w-5 h-5 rounded bg-green-100 border border-green-300
                                flex items-center justify-center text-green-700
@@ -372,9 +372,9 @@ export default function EditPaylawClient({ paylaw, employees, currency }: Props)
         </div>
 
         {/* Add worker */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
           <select
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2
+            className="flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2
                        text-sm outline-none focus:border-gray-400 bg-white"
             value={selectedEmpId}
             onChange={e => setSelectedEmpId(e.target.value)}
@@ -524,13 +524,13 @@ export default function EditPaylawClient({ paylaw, employees, currency }: Props)
                           <button
                             onClick={() => toggleDay(row.employeeId, day)}
                             title={present ? 'Mark absent' : 'Mark present'}
-                            className={`w-7 h-7 rounded text-xs font-bold
+                            className={`w-8 h-8 rounded text-xs font-bold
                                         transition-all mx-auto block
                               ${present
-                                ? 'bg-green-100 border border-green-300 text-green-700'
+                                ? 'bg-green-100 border border-green-300 text-green-700 hover:bg-green-200'
                                 : weekend
-                                ? 'bg-amber-50 border border-amber-100 text-amber-200'
-                                : 'bg-gray-100 border border-gray-200 text-gray-200'
+                                ? 'bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100'
+                                : 'bg-gray-50 border border-gray-200 text-gray-500 hover:bg-gray-100'
                               }`}
                           >
                             {present ? '✓' : ''}
@@ -628,8 +628,8 @@ export default function EditPaylawClient({ paylaw, employees, currency }: Props)
                       after:bg-gray-100 after:content-['']">
           Description &amp; expenses
         </p>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          <div className="flex flex-col gap-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
               Salaries total ({symbol})
             </label>
@@ -679,7 +679,8 @@ export default function EditPaylawClient({ paylaw, employees, currency }: Props)
 
       {/* Summary bar */}
       <div className="bg-white border border-gray-100 rounded-xl p-5
-                      flex items-center justify-between gap-4 flex-wrap">
+                      flex flex-col sm:flex-row items-start sm:items-center
+                      justify-between gap-4">
         <div className="flex gap-8">
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Workers</p>

@@ -94,7 +94,7 @@ const allNavItems = [
     href: '/settings',
     roles: ['admin'],
     icon: (active: boolean) => (
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
         <circle cx="10" cy="10" r="3"
                 fill={active ? 'currentColor' : 'none'}
                 stroke="currentColor" strokeWidth="1.4"/>
@@ -103,6 +103,66 @@ const allNavItems = [
                  M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4"
               stroke="currentColor" strokeWidth="1.4"
               strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'Team',
+    href: '/settings/team',
+    roles: ['admin'],
+    icon: (active: boolean) => (
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <circle cx="6" cy="6" r="2.5" stroke="currentColor"
+                strokeWidth="1.4" fill={active ? 'currentColor' : 'none'} />
+        <circle cx="14" cy="5" r="2" stroke="currentColor"
+                strokeWidth="1.4" fill={active ? 'currentColor' : 'none'} />
+        <path d="M2 17c0-2.5 2.015-4 4.5-4s4.5 1.5 4.5 4"
+              stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        <path d="M11 13c1.8 0 3.5 1 3.5 3.5"
+              stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Audit',
+    href: '/audit',
+    roles: ['admin', 'foreman'],
+    icon: (active: boolean) => (
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <rect x="3" y="2" width="14" height="16" rx="2"
+              stroke="currentColor" strokeWidth="1.4"/>
+        <line x1="6" y1="6" x2="14" y2="6" stroke="currentColor"
+              strokeWidth="1.2" strokeLinecap="round"/>
+        <line x1="6" y1="10" x2="14" y2="10" stroke="currentColor"
+              strokeWidth="1.2" strokeLinecap="round"/>
+        <line x1="6" y1="14" x2="10" y2="14" stroke="currentColor"
+              strokeWidth="1.2" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'Sites',
+    href: '/sites',
+    roles: ['admin'],
+    icon: (active: boolean) => (
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <path d="M10 3L15 6.5V13.5L10 17L5 13.5V6.5L10 3Z"
+              stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
+        <circle cx="10" cy="10" r="2.5" stroke="currentColor"
+                strokeWidth="1.4" fill={active ? 'currentColor' : 'none'} />
+      </svg>
+    ),
+  },
+  {
+    label: 'Notifications',
+    href: '/notifications',
+    roles: ['admin', 'foreman'],
+    icon: (active: boolean) => (
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <path d="M10 3a4.5 4.5 0 00-4.5 4.5v2.5l-1 1.5h11l-1-1.5V7.5A4.5 4.5 0 0010 3z"
+              stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
+        <path d="M7.5 14.5a1.5 1.5 0 003 0"
+              stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
       </svg>
     ),
   },
@@ -125,19 +185,20 @@ export default function MobileNav() {
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white
                     border-t border-gray-200"
          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div className="flex items-center justify-around px-2 py-2">
+      <div className="flex items-center gap-1 overflow-x-auto px-2 py-2">
         {visibleItems.map(item => {
           const active = isActive(item.href)
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5
-                          rounded-xl transition-colors min-w-0
-                          ${active ? 'text-gray-900' : 'text-gray-400'}`}
+              className={`flex flex-col items-center gap-0.5 px-2 py-1
+                          rounded-2xl transition-colors text-center
+                          min-w-12 shrink-0
+                          ${active ? 'text-gray-900 bg-gray-100' : 'text-gray-400 hover:bg-gray-50'}`}
             >
               {item.icon(active)}
-              <span className={`text-xs font-medium leading-none
+              <span className={`text-[10px] font-medium leading-none
                 ${active ? 'text-gray-900' : 'text-gray-400'}`}>
                 {item.label}
               </span>

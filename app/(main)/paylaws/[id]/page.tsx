@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { formatMoney, getCurrencySymbol } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
+import ApproveReject from '@/components/ApproveReject'
 import Link from 'next/link'
 import DownloadPaylawPDF from './DownloadPaylawPDF'
 import PayslipButton from './PayslipButton'
@@ -114,6 +115,10 @@ export default async function ViewPaylawPage({
                 Continue marking
             </Link>
             )}
+
+            {/* Admin approve/reject controls (shows when submitted) */}
+            {/* Rendered via a client component to call approve API */}
+            <ApproveReject id={paylaw.id} status={paylaw.status} isAdmin={session.user.role === 'admin'} />
 
             {/* Edit even if done */}
             <Link

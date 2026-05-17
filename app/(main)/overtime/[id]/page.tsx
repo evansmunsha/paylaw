@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { formatMoney, getCurrencySymbol } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
+import ApproveReject from '@/components/ApproveReject'
 import Link from 'next/link'
 import DownloadOvertimePDF from './DownloadOvertimePDF'
 
@@ -106,6 +107,8 @@ export default async function ViewOvertimePage({
                 Continue marking
               </Link>
             )}
+
+            <ApproveReject id={overtime.id} status={overtime.status} isAdmin={session.user.role === 'admin'} />
 
             <Link
               href={`/overtime/${overtime.id}/edit`}

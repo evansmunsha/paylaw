@@ -339,7 +339,7 @@ export default function NewPaylawClient({
 
       {/* Sheet Info */}
       <div className="bg-white border border-gray-100 rounded-xl
-                      p-4 md:p-5">
+                      p-4 sm:p-5">
         <p className="text-xs font-semibold text-gray-400 uppercase
                       tracking-wider mb-4 flex items-center gap-3
                       after:flex-1 after:h-px after:bg-gray-100
@@ -473,7 +473,7 @@ export default function NewPaylawClient({
         </div>
 
         {/* Add worker */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
           <select
             className="flex-1 min-w-0 border border-gray-200 rounded-lg
                        px-3 py-2 text-sm outline-none
@@ -495,7 +495,7 @@ export default function NewPaylawClient({
                        text-sm font-medium px-4 py-2 rounded-lg
                        hover:bg-gray-800 disabled:opacity-40
                        disabled:cursor-not-allowed transition-colors
-                       flex-shrink-0"
+                       shrink-0"
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <line x1="6" y1="1" x2="6" y2="11" stroke="currentColor"
@@ -625,7 +625,7 @@ export default function NewPaylawClient({
                             <span className="text-xs bg-gray-100
                                              text-gray-400 px-1.5 py-0.5
                                              rounded-full leading-none
-                                             flex-shrink-0">
+                                             shrink-0">
                               inactive
                             </span>
                           )}
@@ -685,8 +685,8 @@ export default function NewPaylawClient({
                                   : present
                                   ? 'bg-green-100 border border-green-300 text-green-700 hover:bg-green-200'
                                   : weekend
-                                  ? 'bg-amber-50 border border-amber-100 text-amber-200 hover:bg-amber-100'
-                                  : 'bg-gray-100 border border-gray-200 text-gray-300 hover:bg-gray-200'
+                                  ? 'bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100'
+                                  : 'bg-gray-50 border border-gray-200 text-gray-500 hover:bg-gray-100'
                                 }`}
                             >
                               {present && row.active ? '✓' : ''}
@@ -899,8 +899,8 @@ export default function NewPaylawClient({
 
       {/* Summary + Save buttons */}
       <div className="bg-white border border-gray-100 rounded-xl
-                      p-4 md:p-5 flex items-center justify-between
-                      gap-4 flex-wrap">
+                      p-4 sm:p-5 flex flex-col sm:flex-row items-start
+                      sm:items-center justify-between gap-4">
         <div className="flex gap-4 md:gap-8 flex-wrap">
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">

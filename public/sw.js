@@ -1,4 +1,4 @@
-const CACHE_NAME = 'paylaw-v1'
+const CACHE_NAME = 'paylaw-v2'
 
 // Files to cache for offline use
 const STATIC_ASSETS = [
