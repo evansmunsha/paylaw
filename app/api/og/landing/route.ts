@@ -1,12 +1,7 @@
 import sharp from 'sharp'
 
-const siteTitle = 'PayLaw — Construction Payroll'
-const siteSubtitle = 'Sample PDF payroll preview for share cards'
-const sampleLines = [
-  'Attendance, overtime, salaries, deductions',
-  'Clean PDF payslip ready to download',
-  'Shared from PayLaw — simple construction payroll',
-]
+const siteTitle = 'PAYLAW'
+const siteSubtitle = 'Construction payroll PDF preview'
 
 function escapeXml(value: string) {
   return value
@@ -21,39 +16,62 @@ function renderSvg() {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .title { font-family: Inter, sans-serif; font-weight: 800; font-size: 54px; fill: #0f172a }
-    .subtitle { font-family: Inter, sans-serif; font-weight: 600; font-size: 24px; fill: #111827; opacity: .85 }
-    .label { font-family: Inter, sans-serif; font-weight: 600; font-size: 16px; fill: #ffffff; opacity: .88 }
-    .text { font-family: Inter, sans-serif; font-weight: 500; font-size: 18px; fill: #111827; opacity: .9 }
-    .accent { fill: #16a34a }
+    .bg { fill: #0f172a }
+    .card { fill: #ffffff; stroke: #e5e7eb; stroke-width: 1.5 }
+    .title { font-family: Inter, sans-serif; font-size: 52px; font-weight: 800; fill: #111827 }
+    .label { font-family: Inter, sans-serif; font-size: 16px; font-weight: 700; fill: #6b7280 }
+    .subtitle { font-family: Inter, sans-serif; font-size: 20px; font-weight: 600; fill: #111827; opacity: .85 }
+    .note { font-family: Inter, sans-serif; font-size: 16px; fill: #111827 }
+    .small { font-family: Inter, sans-serif; font-size: 14px; fill: #374151 }
+    .table-head { font-family: Inter, sans-serif; font-size: 13px; font-weight: 700; fill: #ffffff }
+    .table-cell { font-family: Inter, sans-serif; font-size: 12px; fill: #111827 }
+    .table-amount { font-family: Inter, sans-serif; font-size: 13px; font-weight: 700; fill: #15803d }
+    .badge { fill: #16a34a }
+    .badge-text { font-family: Inter, sans-serif; font-size: 13px; font-weight: 700; fill: #ffffff }
+    .divider { stroke: #e5e7eb; stroke-width: 1 }
   </style>
-  <rect width="1200" height="630" fill="#0f172a" />
-  <rect x="56" y="56" width="1088" height="518" rx="32" fill="#ffffff" />
-  <rect x="88" y="88" width="512" height="444" rx="22" fill="#f8fafc" stroke="#e5e7eb" stroke-width="2" />
-  <rect x="660" y="88" width="424" height="130" rx="20" fill="#111827" />
-  <text x="690" y="134" class="title">${escapeXml(siteTitle)}</text>
-  <text x="690" y="182" class="subtitle">${escapeXml(siteSubtitle)}</text>
-  <rect x="690" y="210" width="352" height="60" rx="14" fill="#16a34a" />
-  <text x="720" y="250" class="label">Sample PDF preview</text>
-  <text x="100" y="162" class="text">Example payslip</text>
-  <rect x="100" y="190" width="432" height="52" rx="10" fill="#e5e7eb" />
-  <text x="120" y="228" class="text">Worker: J. Banda</text>
-  <text x="100" y="268" class="text">Site: Kafue Road</text>
-  <text x="100" y="306" class="text">Month: May 2026</text>
-  <rect x="100" y="340" width="432" height="180" rx="14" fill="#e5e7eb" />
-  <text x="120" y="378" class="text">Net pay: ZMW 16,240.00</text>
-  <text x="120" y="408" class="text">Overtime: ZMW 2,160.00</text>
-  <text x="120" y="438" class="text">Deductions: ZMW 240.00</text>
-  <text x="120" y="468" class="text">Total PDF ready to download</text>
-  <g transform="translate(660, 320)">
-    <rect x="0" y="0" width="424" height="210" rx="24" fill="#f8fafc" stroke="#e5e7eb" />
-    <text x="30" y="50" class="text">Shareable payroll snapshot</text>
-    ${sampleLines
-      .map((line, index) =>
-        `<text x="30" y="110" class="text">• ${escapeXml(line)}</text>`)
-      .join('')}
-  </g>
-  <text x="100" y="560" class="subtitle">PayLaw — payroll for site managers</text>
+  <rect width="1200" height="630" class="bg" />
+  <rect x="60" y="50" width="1080" height="530" rx="32" class="card" />
+
+  <text x="100" y="120" class="label">Evans AI Labs</text>
+  <text x="100" y="160" class="title">${escapeXml(siteTitle)}</text>
+  <text x="100" y="198" class="small">lusaka · May 2026</text>
+  <text x="100" y="228" class="note">Sample payroll PDF preview for construction site payslips.</text>
+
+  <rect x="100" y="250" width="980" height="38" rx="10" fill="#111827" />
+  <text x="120" y="278" class="table-head">Name</text>
+  <text x="330" y="278" class="table-head">Job Title</text>
+  <text x="560" y="278" class="table-head">K/day</text>
+  <text x="700" y="278" class="table-head">Days</text>
+  <text x="820" y="278" class="table-head">Amount</text>
+  <text x="980" y="278" class="table-head">Signature</text>
+
+  <rect x="100" y="292" width="980" height="44" rx="10" fill="#f8fafc" />
+  <text x="120" y="322" class="table-cell">Adson Phiri</text>
+  <text x="330" y="322" class="table-cell">Site manager</text>
+  <text x="560" y="322" class="table-cell">K 4,000</text>
+  <text x="700" y="322" class="table-cell">9</text>
+  <text x="820" y="322" class="table-amount">K 36,000</text>
+  <text x="980" y="322" class="small">✓</text>
+
+  <line x1="100" y1="350" x2="1080" y2="350" class="divider" />
+  <text x="100" y="384" class="label">DESCRIPTION</text>
+  <text x="100" y="412" class="small">Salaries</text>
+  <text x="980" y="412" class="table-amount">K 36,000</text>
+  <text x="100" y="436" class="small">Overtime</text>
+  <text x="980" y="436" class="table-cell">See OT sheet</text>
+  <text x="100" y="460" class="small">Food Expense</text>
+  <text x="980" y="460" class="table-cell">K 0</text>
+  <text x="100" y="484" class="small">Other Deductions</text>
+  <text x="980" y="484" class="table-cell">K 0</text>
+
+  <rect x="100" y="510" width="980" height="74" rx="18" fill="#f3f4f6" />
+  <text x="120" y="544" class="label">Total Amount Spent</text>
+  <text x="980" y="544" class="table-amount">K 36,000</text>
+  <text x="100" y="572" class="small">PDF-ready export • clean construction payroll summary</text>
+
+  <rect x="920" y="120" width="160" height="34" rx="12" class="badge" />
+  <text x="940" y="143" class="badge-text">PDF sample</text>
 </svg>`
 }
 
