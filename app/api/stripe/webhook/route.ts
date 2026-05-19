@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { stripe, getPlanFromPriceId } from '@/lib/stripe'
+import { getStripe, getPlanFromPriceId } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
 import type Stripe from 'stripe'
 
 export async function POST(req: Request) {
+  const stripe = getStripe()
   const body      = await req.text()
   const signature = req.headers.get('stripe-signature')!
 

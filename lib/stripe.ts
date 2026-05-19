@@ -1,8 +1,23 @@
 import Stripe from 'stripe'
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-04-22.dahlia',
-})
+let stripeClient: Stripe | undefined
+
+function getStripeKey() {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) {
+    throw new Error('Missing STRIPE_SECRET_KEY environment variable')
+  }
+  return key
+}
+
+export function getStripe() {
+  if (!stripeClient) {
+    stripeClient = new Stripe(getStripeKey(), {
+      apiVersion: '2026-04-22.dahlia',
+    })
+  }
+  return stripeClient
+}
 
 export function getPriceId(
   plan: 'starter' | 'pro',
