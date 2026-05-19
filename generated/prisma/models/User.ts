@@ -32,6 +32,13 @@ export type UserMinAggregateOutputType = {
   role: string | null
   site: string | null
   adminId: string | null
+  plan: string | null
+  stripeCustomerId: string | null
+  stripeSubId: string | null
+  stripePriceId: string | null
+  subStatus: string | null
+  subCurrentPeriodEnd: Date | null
+  trialEndsAt: Date | null
   createdAt: Date | null
 }
 
@@ -43,6 +50,13 @@ export type UserMaxAggregateOutputType = {
   role: string | null
   site: string | null
   adminId: string | null
+  plan: string | null
+  stripeCustomerId: string | null
+  stripeSubId: string | null
+  stripePriceId: string | null
+  subStatus: string | null
+  subCurrentPeriodEnd: Date | null
+  trialEndsAt: Date | null
   createdAt: Date | null
 }
 
@@ -54,6 +68,13 @@ export type UserCountAggregateOutputType = {
   role: number
   site: number
   adminId: number
+  plan: number
+  stripeCustomerId: number
+  stripeSubId: number
+  stripePriceId: number
+  subStatus: number
+  subCurrentPeriodEnd: number
+  trialEndsAt: number
   createdAt: number
   _all: number
 }
@@ -67,6 +88,13 @@ export type UserMinAggregateInputType = {
   role?: true
   site?: true
   adminId?: true
+  plan?: true
+  stripeCustomerId?: true
+  stripeSubId?: true
+  stripePriceId?: true
+  subStatus?: true
+  subCurrentPeriodEnd?: true
+  trialEndsAt?: true
   createdAt?: true
 }
 
@@ -78,6 +106,13 @@ export type UserMaxAggregateInputType = {
   role?: true
   site?: true
   adminId?: true
+  plan?: true
+  stripeCustomerId?: true
+  stripeSubId?: true
+  stripePriceId?: true
+  subStatus?: true
+  subCurrentPeriodEnd?: true
+  trialEndsAt?: true
   createdAt?: true
 }
 
@@ -89,6 +124,13 @@ export type UserCountAggregateInputType = {
   role?: true
   site?: true
   adminId?: true
+  plan?: true
+  stripeCustomerId?: true
+  stripeSubId?: true
+  stripePriceId?: true
+  subStatus?: true
+  subCurrentPeriodEnd?: true
+  trialEndsAt?: true
   createdAt?: true
   _all?: true
 }
@@ -173,6 +215,13 @@ export type UserGroupByOutputType = {
   role: string
   site: string | null
   adminId: string | null
+  plan: string
+  stripeCustomerId: string | null
+  stripeSubId: string | null
+  stripePriceId: string | null
+  subStatus: string
+  subCurrentPeriodEnd: Date | null
+  trialEndsAt: Date | null
   createdAt: Date
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
@@ -205,6 +254,13 @@ export type UserWhereInput = {
   role?: Prisma.StringFilter<"User"> | string
   site?: Prisma.StringNullableFilter<"User"> | string | null
   adminId?: Prisma.StringNullableFilter<"User"> | string | null
+  plan?: Prisma.StringFilter<"User"> | string
+  stripeCustomerId?: Prisma.StringNullableFilter<"User"> | string | null
+  stripeSubId?: Prisma.StringNullableFilter<"User"> | string | null
+  stripePriceId?: Prisma.StringNullableFilter<"User"> | string | null
+  subStatus?: Prisma.StringFilter<"User"> | string
+  subCurrentPeriodEnd?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  trialEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   admin?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   foremen?: Prisma.UserListRelationFilter
@@ -222,6 +278,13 @@ export type UserOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   site?: Prisma.SortOrderInput | Prisma.SortOrder
   adminId?: Prisma.SortOrderInput | Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  subStatus?: Prisma.SortOrder
+  subCurrentPeriodEnd?: Prisma.SortOrderInput | Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   admin?: Prisma.UserOrderByWithRelationInput
   foremen?: Prisma.UserOrderByRelationAggregateInput
@@ -234,6 +297,8 @@ export type UserOrderByWithRelationInput = {
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   email?: string
+  stripeCustomerId?: string
+  stripeSubId?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -242,6 +307,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.StringFilter<"User"> | string
   site?: Prisma.StringNullableFilter<"User"> | string | null
   adminId?: Prisma.StringNullableFilter<"User"> | string | null
+  plan?: Prisma.StringFilter<"User"> | string
+  stripePriceId?: Prisma.StringNullableFilter<"User"> | string | null
+  subStatus?: Prisma.StringFilter<"User"> | string
+  subCurrentPeriodEnd?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  trialEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   admin?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   foremen?: Prisma.UserListRelationFilter
@@ -249,7 +319,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   overtimes?: Prisma.OvertimeListRelationFilter
   employees?: Prisma.EmployeeListRelationFilter
   settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null
-}, "id" | "email">
+}, "id" | "email" | "stripeCustomerId" | "stripeSubId">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -259,6 +329,13 @@ export type UserOrderByWithAggregationInput = {
   role?: Prisma.SortOrder
   site?: Prisma.SortOrderInput | Prisma.SortOrder
   adminId?: Prisma.SortOrderInput | Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeSubId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  subStatus?: Prisma.SortOrder
+  subCurrentPeriodEnd?: Prisma.SortOrderInput | Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -276,6 +353,13 @@ export type UserScalarWhereWithAggregatesInput = {
   role?: Prisma.StringWithAggregatesFilter<"User"> | string
   site?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   adminId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  plan?: Prisma.StringWithAggregatesFilter<"User"> | string
+  stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  stripeSubId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  stripePriceId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  subStatus?: Prisma.StringWithAggregatesFilter<"User"> | string
+  subCurrentPeriodEnd?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  trialEndsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
 
@@ -286,6 +370,13 @@ export type UserCreateInput = {
   name?: string | null
   role?: string
   site?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   admin?: Prisma.UserCreateNestedOneWithoutForemenInput
   foremen?: Prisma.UserCreateNestedManyWithoutAdminInput
@@ -303,6 +394,13 @@ export type UserUncheckedCreateInput = {
   role?: string
   site?: string | null
   adminId?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   foremen?: Prisma.UserUncheckedCreateNestedManyWithoutAdminInput
   paylaws?: Prisma.PaylawUncheckedCreateNestedManyWithoutUserInput
@@ -318,6 +416,13 @@ export type UserUpdateInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   admin?: Prisma.UserUpdateOneWithoutForemenNestedInput
   foremen?: Prisma.UserUpdateManyWithoutAdminNestedInput
@@ -335,6 +440,13 @@ export type UserUncheckedUpdateInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foremen?: Prisma.UserUncheckedUpdateManyWithoutAdminNestedInput
   paylaws?: Prisma.PaylawUncheckedUpdateManyWithoutUserNestedInput
@@ -351,6 +463,13 @@ export type UserCreateManyInput = {
   role?: string
   site?: string | null
   adminId?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -361,6 +480,13 @@ export type UserUpdateManyMutationInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -372,6 +498,13 @@ export type UserUncheckedUpdateManyInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -398,6 +531,13 @@ export type UserCountOrderByAggregateInput = {
   role?: Prisma.SortOrder
   site?: Prisma.SortOrder
   adminId?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubId?: Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrder
+  subStatus?: Prisma.SortOrder
+  subCurrentPeriodEnd?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -409,6 +549,13 @@ export type UserMaxOrderByAggregateInput = {
   role?: Prisma.SortOrder
   site?: Prisma.SortOrder
   adminId?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubId?: Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrder
+  subStatus?: Prisma.SortOrder
+  subCurrentPeriodEnd?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -420,6 +567,13 @@ export type UserMinOrderByAggregateInput = {
   role?: Prisma.SortOrder
   site?: Prisma.SortOrder
   adminId?: Prisma.SortOrder
+  plan?: Prisma.SortOrder
+  stripeCustomerId?: Prisma.SortOrder
+  stripeSubId?: Prisma.SortOrder
+  stripePriceId?: Prisma.SortOrder
+  subStatus?: Prisma.SortOrder
+  subCurrentPeriodEnd?: Prisma.SortOrder
+  trialEndsAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -454,6 +608,10 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -561,6 +719,13 @@ export type UserCreateWithoutForemenInput = {
   name?: string | null
   role?: string
   site?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   admin?: Prisma.UserCreateNestedOneWithoutForemenInput
   paylaws?: Prisma.PaylawCreateNestedManyWithoutUserInput
@@ -577,6 +742,13 @@ export type UserUncheckedCreateWithoutForemenInput = {
   role?: string
   site?: string | null
   adminId?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   paylaws?: Prisma.PaylawUncheckedCreateNestedManyWithoutUserInput
   overtimes?: Prisma.OvertimeUncheckedCreateNestedManyWithoutUserInput
@@ -596,6 +768,13 @@ export type UserCreateWithoutAdminInput = {
   name?: string | null
   role?: string
   site?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   foremen?: Prisma.UserCreateNestedManyWithoutAdminInput
   paylaws?: Prisma.PaylawCreateNestedManyWithoutUserInput
@@ -611,6 +790,13 @@ export type UserUncheckedCreateWithoutAdminInput = {
   name?: string | null
   role?: string
   site?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   foremen?: Prisma.UserUncheckedCreateNestedManyWithoutAdminInput
   paylaws?: Prisma.PaylawUncheckedCreateNestedManyWithoutUserInput
@@ -647,6 +833,13 @@ export type UserUpdateWithoutForemenInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   admin?: Prisma.UserUpdateOneWithoutForemenNestedInput
   paylaws?: Prisma.PaylawUpdateManyWithoutUserNestedInput
@@ -663,6 +856,13 @@ export type UserUncheckedUpdateWithoutForemenInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paylaws?: Prisma.PaylawUncheckedUpdateManyWithoutUserNestedInput
   overtimes?: Prisma.OvertimeUncheckedUpdateManyWithoutUserNestedInput
@@ -697,6 +897,13 @@ export type UserScalarWhereInput = {
   role?: Prisma.StringFilter<"User"> | string
   site?: Prisma.StringNullableFilter<"User"> | string | null
   adminId?: Prisma.StringNullableFilter<"User"> | string | null
+  plan?: Prisma.StringFilter<"User"> | string
+  stripeCustomerId?: Prisma.StringNullableFilter<"User"> | string | null
+  stripeSubId?: Prisma.StringNullableFilter<"User"> | string | null
+  stripePriceId?: Prisma.StringNullableFilter<"User"> | string | null
+  subStatus?: Prisma.StringFilter<"User"> | string
+  subCurrentPeriodEnd?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  trialEndsAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
 }
 
@@ -707,6 +914,13 @@ export type UserCreateWithoutEmployeesInput = {
   name?: string | null
   role?: string
   site?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   admin?: Prisma.UserCreateNestedOneWithoutForemenInput
   foremen?: Prisma.UserCreateNestedManyWithoutAdminInput
@@ -723,6 +937,13 @@ export type UserUncheckedCreateWithoutEmployeesInput = {
   role?: string
   site?: string | null
   adminId?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   foremen?: Prisma.UserUncheckedCreateNestedManyWithoutAdminInput
   paylaws?: Prisma.PaylawUncheckedCreateNestedManyWithoutUserInput
@@ -753,6 +974,13 @@ export type UserUpdateWithoutEmployeesInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   admin?: Prisma.UserUpdateOneWithoutForemenNestedInput
   foremen?: Prisma.UserUpdateManyWithoutAdminNestedInput
@@ -769,6 +997,13 @@ export type UserUncheckedUpdateWithoutEmployeesInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foremen?: Prisma.UserUncheckedUpdateManyWithoutAdminNestedInput
   paylaws?: Prisma.PaylawUncheckedUpdateManyWithoutUserNestedInput
@@ -783,6 +1018,13 @@ export type UserCreateWithoutPaylawsInput = {
   name?: string | null
   role?: string
   site?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   admin?: Prisma.UserCreateNestedOneWithoutForemenInput
   foremen?: Prisma.UserCreateNestedManyWithoutAdminInput
@@ -799,6 +1041,13 @@ export type UserUncheckedCreateWithoutPaylawsInput = {
   role?: string
   site?: string | null
   adminId?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   foremen?: Prisma.UserUncheckedCreateNestedManyWithoutAdminInput
   overtimes?: Prisma.OvertimeUncheckedCreateNestedManyWithoutUserInput
@@ -829,6 +1078,13 @@ export type UserUpdateWithoutPaylawsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   admin?: Prisma.UserUpdateOneWithoutForemenNestedInput
   foremen?: Prisma.UserUpdateManyWithoutAdminNestedInput
@@ -845,6 +1101,13 @@ export type UserUncheckedUpdateWithoutPaylawsInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foremen?: Prisma.UserUncheckedUpdateManyWithoutAdminNestedInput
   overtimes?: Prisma.OvertimeUncheckedUpdateManyWithoutUserNestedInput
@@ -859,6 +1122,13 @@ export type UserCreateWithoutOvertimesInput = {
   name?: string | null
   role?: string
   site?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   admin?: Prisma.UserCreateNestedOneWithoutForemenInput
   foremen?: Prisma.UserCreateNestedManyWithoutAdminInput
@@ -875,6 +1145,13 @@ export type UserUncheckedCreateWithoutOvertimesInput = {
   role?: string
   site?: string | null
   adminId?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   foremen?: Prisma.UserUncheckedCreateNestedManyWithoutAdminInput
   paylaws?: Prisma.PaylawUncheckedCreateNestedManyWithoutUserInput
@@ -905,6 +1182,13 @@ export type UserUpdateWithoutOvertimesInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   admin?: Prisma.UserUpdateOneWithoutForemenNestedInput
   foremen?: Prisma.UserUpdateManyWithoutAdminNestedInput
@@ -921,6 +1205,13 @@ export type UserUncheckedUpdateWithoutOvertimesInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foremen?: Prisma.UserUncheckedUpdateManyWithoutAdminNestedInput
   paylaws?: Prisma.PaylawUncheckedUpdateManyWithoutUserNestedInput
@@ -935,6 +1226,13 @@ export type UserCreateWithoutSettingsInput = {
   name?: string | null
   role?: string
   site?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   admin?: Prisma.UserCreateNestedOneWithoutForemenInput
   foremen?: Prisma.UserCreateNestedManyWithoutAdminInput
@@ -951,6 +1249,13 @@ export type UserUncheckedCreateWithoutSettingsInput = {
   role?: string
   site?: string | null
   adminId?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
   foremen?: Prisma.UserUncheckedCreateNestedManyWithoutAdminInput
   paylaws?: Prisma.PaylawUncheckedCreateNestedManyWithoutUserInput
@@ -981,6 +1286,13 @@ export type UserUpdateWithoutSettingsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   admin?: Prisma.UserUpdateOneWithoutForemenNestedInput
   foremen?: Prisma.UserUpdateManyWithoutAdminNestedInput
@@ -997,6 +1309,13 @@ export type UserUncheckedUpdateWithoutSettingsInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foremen?: Prisma.UserUncheckedUpdateManyWithoutAdminNestedInput
   paylaws?: Prisma.PaylawUncheckedUpdateManyWithoutUserNestedInput
@@ -1011,6 +1330,13 @@ export type UserCreateManyAdminInput = {
   name?: string | null
   role?: string
   site?: string | null
+  plan?: string
+  stripeCustomerId?: string | null
+  stripeSubId?: string | null
+  stripePriceId?: string | null
+  subStatus?: string
+  subCurrentPeriodEnd?: Date | string | null
+  trialEndsAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -1021,6 +1347,13 @@ export type UserUpdateWithoutAdminInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foremen?: Prisma.UserUpdateManyWithoutAdminNestedInput
   paylaws?: Prisma.PaylawUpdateManyWithoutUserNestedInput
@@ -1036,6 +1369,13 @@ export type UserUncheckedUpdateWithoutAdminInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   foremen?: Prisma.UserUncheckedUpdateManyWithoutAdminNestedInput
   paylaws?: Prisma.PaylawUncheckedUpdateManyWithoutUserNestedInput
@@ -1051,6 +1391,13 @@ export type UserUncheckedUpdateManyWithoutAdminInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
   site?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePriceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1120,6 +1467,13 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   site?: boolean
   adminId?: boolean
+  plan?: boolean
+  stripeCustomerId?: boolean
+  stripeSubId?: boolean
+  stripePriceId?: boolean
+  subStatus?: boolean
+  subCurrentPeriodEnd?: boolean
+  trialEndsAt?: boolean
   createdAt?: boolean
   admin?: boolean | Prisma.User$adminArgs<ExtArgs>
   foremen?: boolean | Prisma.User$foremenArgs<ExtArgs>
@@ -1138,6 +1492,13 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   site?: boolean
   adminId?: boolean
+  plan?: boolean
+  stripeCustomerId?: boolean
+  stripeSubId?: boolean
+  stripePriceId?: boolean
+  subStatus?: boolean
+  subCurrentPeriodEnd?: boolean
+  trialEndsAt?: boolean
   createdAt?: boolean
   admin?: boolean | Prisma.User$adminArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1150,6 +1511,13 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   site?: boolean
   adminId?: boolean
+  plan?: boolean
+  stripeCustomerId?: boolean
+  stripeSubId?: boolean
+  stripePriceId?: boolean
+  subStatus?: boolean
+  subCurrentPeriodEnd?: boolean
+  trialEndsAt?: boolean
   createdAt?: boolean
   admin?: boolean | Prisma.User$adminArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1162,10 +1530,17 @@ export type UserSelectScalar = {
   role?: boolean
   site?: boolean
   adminId?: boolean
+  plan?: boolean
+  stripeCustomerId?: boolean
+  stripeSubId?: boolean
+  stripePriceId?: boolean
+  subStatus?: boolean
+  subCurrentPeriodEnd?: boolean
+  trialEndsAt?: boolean
   createdAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "name" | "role" | "site" | "adminId" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "name" | "role" | "site" | "adminId" | "plan" | "stripeCustomerId" | "stripeSubId" | "stripePriceId" | "subStatus" | "subCurrentPeriodEnd" | "trialEndsAt" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   admin?: boolean | Prisma.User$adminArgs<ExtArgs>
   foremen?: boolean | Prisma.User$foremenArgs<ExtArgs>
@@ -1200,6 +1575,13 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     role: string
     site: string | null
     adminId: string | null
+    plan: string
+    stripeCustomerId: string | null
+    stripeSubId: string | null
+    stripePriceId: string | null
+    subStatus: string
+    subCurrentPeriodEnd: Date | null
+    trialEndsAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -1637,6 +2019,13 @@ export interface UserFieldRefs {
   readonly role: Prisma.FieldRef<"User", 'String'>
   readonly site: Prisma.FieldRef<"User", 'String'>
   readonly adminId: Prisma.FieldRef<"User", 'String'>
+  readonly plan: Prisma.FieldRef<"User", 'String'>
+  readonly stripeCustomerId: Prisma.FieldRef<"User", 'String'>
+  readonly stripeSubId: Prisma.FieldRef<"User", 'String'>
+  readonly stripePriceId: Prisma.FieldRef<"User", 'String'>
+  readonly subStatus: Prisma.FieldRef<"User", 'String'>
+  readonly subCurrentPeriodEnd: Prisma.FieldRef<"User", 'DateTime'>
+  readonly trialEndsAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     

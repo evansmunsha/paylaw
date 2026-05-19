@@ -86,6 +86,13 @@ export const UserScalarFieldEnum = {
   role: 'role',
   site: 'site',
   adminId: 'adminId',
+  plan: 'plan',
+  stripeCustomerId: 'stripeCustomerId',
+  stripeSubId: 'stripeSubId',
+  stripePriceId: 'stripePriceId',
+  subStatus: 'subStatus',
+  subCurrentPeriodEnd: 'subCurrentPeriodEnd',
+  trialEndsAt: 'trialEndsAt',
   createdAt: 'createdAt'
 } as const
 

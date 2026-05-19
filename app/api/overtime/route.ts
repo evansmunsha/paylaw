@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { checkPlan } from '@/lib/checkPlan'
 import { logAction } from '@/lib/audit'
 import { notify } from '@/lib/notify'
 
@@ -47,6 +48,18 @@ export async function POST(req: Request) {
   const ownerId = session.user.role === 'foreman'
     ? session.user.adminId!
     : session.user.id
+
+  const planCheck = await checkPlan(ownerId, 'create_overtime')
+  if (!planCheck.allowed) {
+    return NextResponse.json(
+      {
+        error:   planCheck.reason,
+        upgrade: planCheck.upgrade,
+        code:    'PLAN_LIMIT',
+      },
+      { status: 403 }
+    )
+  }
 
   if (
     session.user.role === 'foreman' &&

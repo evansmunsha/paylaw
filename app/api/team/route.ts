@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { checkPlan } from '@/lib/checkPlan'
 import bcrypt from 'bcryptjs'
 
 export async function GET() {
@@ -34,6 +35,18 @@ export async function POST(req: Request) {
 
   if (session.user.role !== 'admin') {
     return NextResponse.json({ error: 'Not allowed' }, { status: 403 })
+  }
+
+  const planCheck = await checkPlan(session.user.id, 'create_foreman')
+  if (!planCheck.allowed) {
+    return NextResponse.json(
+      {
+        error:   planCheck.reason,
+        upgrade: planCheck.upgrade,
+        code:    'PLAN_LIMIT',
+      },
+      { status: 403 }
+    )
   }
 
   const { name, email, password, site } = await req.json()

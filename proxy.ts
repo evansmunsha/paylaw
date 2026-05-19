@@ -18,10 +18,8 @@ export async function proxy(req: NextRequest) {
 
   const protectedPaths = [
     '/dashboard', '/paylaws', '/overtime',
-    '/employees', '/summary', '/settings',
+    '/employees', '/summary', '/settings', '/billing',
   ]
-
-  
 
   const isProtected = protectedPaths.some(p => pathname.startsWith(p))
 
@@ -60,12 +58,13 @@ export const config = {
     '/employees/:path*',
     '/summary/:path*',
     '/settings/:path*',
+    '/billing',
     '/audit/:path*',
     '/sites/:path*',
     '/notifications/:path*',
     '/login',
     '/home',
     '/register',
-    
+    '/pricing',
   ],
 }

@@ -23,6 +23,16 @@ model User {
   role      String   @default("admin")  // "admin" or "foreman"
   site      String?  // foremen only — which site they manage
   adminId   String?  // foremen are linked to the admin who created them
+
+  // Subscription fields
+  plan               String   @default("free")
+  stripeCustomerId   String?  @unique
+  stripeSubId        String?  @unique
+  stripePriceId      String?
+  subStatus          String   @default("active")
+  subCurrentPeriodEnd DateTime?
+  trialEndsAt        DateTime?
+
   createdAt DateTime @default(now())
 
   // Self relation — admin has many foremen

@@ -20,6 +20,13 @@ export default function LandingPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-end">
           <Link
+            href="/pricing"
+            className="text-sm text-gray-500 hover:text-gray-800
+                       transition-colors"
+          >
+            Pricing
+          </Link>
+          <Link
             href="/login"
             className="text-sm text-gray-500 hover:text-gray-800
                        transition-colors"
@@ -545,9 +552,7 @@ export default function LandingPage() {
               },
             ].map((item, i) => (
               <div key={i} className="flex gap-5 items-start">
-                <div className={`w-12 h-12 rounded-xl border flex
-                                 items-center justify-center flex-shrink-0
-                                 font-bold text-sm ${item.color}`}>
+                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 font-bold text-sm ${item.color}`}>
                   {item.step}
                 </div>
                 <div className="pt-1">
@@ -642,6 +647,12 @@ export default function LandingPage() {
             className="text-xs text-gray-400 hover:text-gray-700"
           >
             Privacy Policy
+          </Link>
+          <Link
+            href="/pricing"
+            className="text-xs text-gray-400 hover:text-gray-700"
+          >
+            Pricing
           </Link>
           <Link
             href="/login"

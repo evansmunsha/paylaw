@@ -106,6 +106,21 @@ const navItems: NavItem[] = [
     ),
   },
   {
+    label: 'Billing',
+    href: '/billing',
+    roles: ['admin'],
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="3.5" width="14" height="9" rx="2"
+              stroke="currentColor" strokeWidth="1.3"/>
+        <line x1="1" y1="7" x2="15" y2="7" stroke="currentColor"
+              strokeWidth="1.3"/>
+        <line x1="4" y1="10" x2="6" y2="10" stroke="currentColor"
+              strokeWidth="1.3" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
     label: 'Team',
     href: '/settings/team',
     roles: ['admin'],
@@ -194,14 +209,13 @@ export default function Sidebar() {
 
   return (
     <div className="fixed left-0 top-0 h-full w-56 bg-white
-                    border-r border-gray-100 flex flex-col z-40
-                    hidden md:flex">
+                    border-r border-gray-100 hidden md:flex md:flex-col z-40">
 
       {/* Logo */}
       <div className="px-5 py-5 border-b border-gray-100">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 bg-black rounded-lg flex items-center
-                          justify-center flex-shrink-0">
+                          justify-center shrink-0">
             <span className="text-white text-xs font-bold">PL</span>
           </div>
           <span className="text-base font-bold tracking-widest text-gray-900">
@@ -265,7 +279,7 @@ export default function Sidebar() {
         {/* User info */}
         <div className="flex items-center gap-2.5 px-3 py-2 mb-2">
           <div className="w-7 h-7 bg-gray-900 rounded-full flex items-center
-                          justify-center flex-shrink-0">
+                          justify-center shrink-0">
             <span className="text-white text-xs font-semibold">
               {session?.user?.name?.[0]?.toUpperCase() ||
                session?.user?.email?.[0]?.toUpperCase() || '?'}
