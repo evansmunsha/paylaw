@@ -364,7 +364,7 @@ export default async function YTDPage({
                   >
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full flex-shrink-0
+                        <span className={`w-2 h-2 rounded-full shrink-0
                           ${m.total > 0 ? 'bg-green-500' : 'bg-gray-200'}`}
                         />
                         <span className="text-sm font-medium text-gray-900">

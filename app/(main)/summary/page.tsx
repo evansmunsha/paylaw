@@ -329,7 +329,7 @@ export default async function SummaryPage({
 
                 return (
                   <div key={w.id} className="flex items-center gap-3">
-                    <div className="w-28 flex-shrink-0">
+                    <div className="w-28 shrink-0">
                       <p className="text-xs font-medium text-gray-800 truncate">
                         {w.name}
                       </p>
@@ -340,19 +340,19 @@ export default async function SummaryPage({
                       {w.normalPay > 0 && (
                         <div
                           className="h-full bg-green-400 rounded-l-md
-                                     transition-all flex-shrink-0"
+                                     transition-all shrink-0"
                           style={{ width: `${normalPct}%` }}
                         />
                       )}
                       {w.otPay > 0 && (
                         <div
                           className="h-full bg-amber-400 transition-all
-                                     flex-shrink-0"
+                                     shrink-0"
                           style={{ width: `${otPct}%` }}
                         />
                       )}
                     </div>
-                    <div className="w-24 text-right flex-shrink-0">
+                    <div className="w-24 text-right shrink-0">
                       <p className="text-xs font-semibold text-gray-900">
                         {formatMoney(w.total, settings?.currency || 'ZMW')}
                       </p>

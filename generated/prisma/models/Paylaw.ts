@@ -55,6 +55,7 @@ export type PaylawMinAggregateOutputType = {
   foodExpense: number | null
   otherDeduct: number | null
   status: string | null
+  public: boolean | null
   createdAt: Date | null
   userId: string | null
 }
@@ -70,6 +71,7 @@ export type PaylawMaxAggregateOutputType = {
   foodExpense: number | null
   otherDeduct: number | null
   status: string | null
+  public: boolean | null
   createdAt: Date | null
   userId: string | null
 }
@@ -85,6 +87,7 @@ export type PaylawCountAggregateOutputType = {
   foodExpense: number
   otherDeduct: number
   status: number
+  public: number
   createdAt: number
   userId: number
   _all: number
@@ -120,6 +123,7 @@ export type PaylawMinAggregateInputType = {
   foodExpense?: true
   otherDeduct?: true
   status?: true
+  public?: true
   createdAt?: true
   userId?: true
 }
@@ -135,6 +139,7 @@ export type PaylawMaxAggregateInputType = {
   foodExpense?: true
   otherDeduct?: true
   status?: true
+  public?: true
   createdAt?: true
   userId?: true
 }
@@ -150,6 +155,7 @@ export type PaylawCountAggregateInputType = {
   foodExpense?: true
   otherDeduct?: true
   status?: true
+  public?: true
   createdAt?: true
   userId?: true
   _all?: true
@@ -252,6 +258,7 @@ export type PaylawGroupByOutputType = {
   foodExpense: number
   otherDeduct: number
   status: string
+  public: boolean
   createdAt: Date
   userId: string
   _count: PaylawCountAggregateOutputType | null
@@ -290,6 +297,7 @@ export type PaylawWhereInput = {
   foodExpense?: Prisma.FloatFilter<"Paylaw"> | number
   otherDeduct?: Prisma.FloatFilter<"Paylaw"> | number
   status?: Prisma.StringFilter<"Paylaw"> | string
+  public?: Prisma.BoolFilter<"Paylaw"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Paylaw"> | Date | string
   userId?: Prisma.StringFilter<"Paylaw"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -307,6 +315,7 @@ export type PaylawOrderByWithRelationInput = {
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  public?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -327,6 +336,7 @@ export type PaylawWhereUniqueInput = Prisma.AtLeast<{
   foodExpense?: Prisma.FloatFilter<"Paylaw"> | number
   otherDeduct?: Prisma.FloatFilter<"Paylaw"> | number
   status?: Prisma.StringFilter<"Paylaw"> | string
+  public?: Prisma.BoolFilter<"Paylaw"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Paylaw"> | Date | string
   userId?: Prisma.StringFilter<"Paylaw"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -344,6 +354,7 @@ export type PaylawOrderByWithAggregationInput = {
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  public?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   _count?: Prisma.PaylawCountOrderByAggregateInput
@@ -367,6 +378,7 @@ export type PaylawScalarWhereWithAggregatesInput = {
   foodExpense?: Prisma.FloatWithAggregatesFilter<"Paylaw"> | number
   otherDeduct?: Prisma.FloatWithAggregatesFilter<"Paylaw"> | number
   status?: Prisma.StringWithAggregatesFilter<"Paylaw"> | string
+  public?: Prisma.BoolWithAggregatesFilter<"Paylaw"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Paylaw"> | Date | string
   userId?: Prisma.StringWithAggregatesFilter<"Paylaw"> | string
 }
@@ -382,6 +394,7 @@ export type PaylawCreateInput = {
   foodExpense?: number
   otherDeduct?: number
   status?: string
+  public?: boolean
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPaylawsInput
   rows?: Prisma.PaylawRowCreateNestedManyWithoutPaylawInput
@@ -398,6 +411,7 @@ export type PaylawUncheckedCreateInput = {
   foodExpense?: number
   otherDeduct?: number
   status?: string
+  public?: boolean
   createdAt?: Date | string
   userId: string
   rows?: Prisma.PaylawRowUncheckedCreateNestedManyWithoutPaylawInput
@@ -414,6 +428,7 @@ export type PaylawUpdateInput = {
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  public?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPaylawsNestedInput
   rows?: Prisma.PaylawRowUpdateManyWithoutPaylawNestedInput
@@ -430,6 +445,7 @@ export type PaylawUncheckedUpdateInput = {
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  public?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   rows?: Prisma.PaylawRowUncheckedUpdateManyWithoutPaylawNestedInput
@@ -446,6 +462,7 @@ export type PaylawCreateManyInput = {
   foodExpense?: number
   otherDeduct?: number
   status?: string
+  public?: boolean
   createdAt?: Date | string
   userId: string
 }
@@ -461,6 +478,7 @@ export type PaylawUpdateManyMutationInput = {
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  public?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -475,6 +493,7 @@ export type PaylawUncheckedUpdateManyInput = {
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  public?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -500,6 +519,7 @@ export type PaylawCountOrderByAggregateInput = {
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  public?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
@@ -524,6 +544,7 @@ export type PaylawMaxOrderByAggregateInput = {
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  public?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
@@ -539,6 +560,7 @@ export type PaylawMinOrderByAggregateInput = {
   foodExpense?: Prisma.SortOrder
   otherDeduct?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  public?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
@@ -632,6 +654,7 @@ export type PaylawCreateWithoutUserInput = {
   foodExpense?: number
   otherDeduct?: number
   status?: string
+  public?: boolean
   createdAt?: Date | string
   rows?: Prisma.PaylawRowCreateNestedManyWithoutPaylawInput
 }
@@ -647,6 +670,7 @@ export type PaylawUncheckedCreateWithoutUserInput = {
   foodExpense?: number
   otherDeduct?: number
   status?: string
+  public?: boolean
   createdAt?: Date | string
   rows?: Prisma.PaylawRowUncheckedCreateNestedManyWithoutPaylawInput
 }
@@ -691,6 +715,7 @@ export type PaylawScalarWhereInput = {
   foodExpense?: Prisma.FloatFilter<"Paylaw"> | number
   otherDeduct?: Prisma.FloatFilter<"Paylaw"> | number
   status?: Prisma.StringFilter<"Paylaw"> | string
+  public?: Prisma.BoolFilter<"Paylaw"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Paylaw"> | Date | string
   userId?: Prisma.StringFilter<"Paylaw"> | string
 }
@@ -706,6 +731,7 @@ export type PaylawCreateWithoutRowsInput = {
   foodExpense?: number
   otherDeduct?: number
   status?: string
+  public?: boolean
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPaylawsInput
 }
@@ -721,6 +747,7 @@ export type PaylawUncheckedCreateWithoutRowsInput = {
   foodExpense?: number
   otherDeduct?: number
   status?: string
+  public?: boolean
   createdAt?: Date | string
   userId: string
 }
@@ -752,6 +779,7 @@ export type PaylawUpdateWithoutRowsInput = {
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  public?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPaylawsNestedInput
 }
@@ -767,6 +795,7 @@ export type PaylawUncheckedUpdateWithoutRowsInput = {
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  public?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -782,6 +811,7 @@ export type PaylawCreateManyUserInput = {
   foodExpense?: number
   otherDeduct?: number
   status?: string
+  public?: boolean
   createdAt?: Date | string
 }
 
@@ -796,6 +826,7 @@ export type PaylawUpdateWithoutUserInput = {
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  public?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rows?: Prisma.PaylawRowUpdateManyWithoutPaylawNestedInput
 }
@@ -811,6 +842,7 @@ export type PaylawUncheckedUpdateWithoutUserInput = {
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  public?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rows?: Prisma.PaylawRowUncheckedUpdateManyWithoutPaylawNestedInput
 }
@@ -826,6 +858,7 @@ export type PaylawUncheckedUpdateManyWithoutUserInput = {
   foodExpense?: Prisma.FloatFieldUpdateOperationsInput | number
   otherDeduct?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  public?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -871,6 +904,7 @@ export type PaylawSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   foodExpense?: boolean
   otherDeduct?: boolean
   status?: boolean
+  public?: boolean
   createdAt?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -889,6 +923,7 @@ export type PaylawSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   foodExpense?: boolean
   otherDeduct?: boolean
   status?: boolean
+  public?: boolean
   createdAt?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -905,6 +940,7 @@ export type PaylawSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   foodExpense?: boolean
   otherDeduct?: boolean
   status?: boolean
+  public?: boolean
   createdAt?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -921,11 +957,12 @@ export type PaylawSelectScalar = {
   foodExpense?: boolean
   otherDeduct?: boolean
   status?: boolean
+  public?: boolean
   createdAt?: boolean
   userId?: boolean
 }
 
-export type PaylawOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "site" | "month" | "year" | "preparedBy" | "deduction" | "netAmount" | "foodExpense" | "otherDeduct" | "status" | "createdAt" | "userId", ExtArgs["result"]["paylaw"]>
+export type PaylawOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "site" | "month" | "year" | "preparedBy" | "deduction" | "netAmount" | "foodExpense" | "otherDeduct" | "status" | "public" | "createdAt" | "userId", ExtArgs["result"]["paylaw"]>
 export type PaylawInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   rows?: boolean | Prisma.Paylaw$rowsArgs<ExtArgs>
@@ -955,6 +992,7 @@ export type $PaylawPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     foodExpense: number
     otherDeduct: number
     status: string
+    public: boolean
     createdAt: Date
     userId: string
   }, ExtArgs["result"]["paylaw"]>
@@ -1392,6 +1430,7 @@ export interface PaylawFieldRefs {
   readonly foodExpense: Prisma.FieldRef<"Paylaw", 'Float'>
   readonly otherDeduct: Prisma.FieldRef<"Paylaw", 'Float'>
   readonly status: Prisma.FieldRef<"Paylaw", 'String'>
+  readonly public: Prisma.FieldRef<"Paylaw", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Paylaw", 'DateTime'>
   readonly userId: Prisma.FieldRef<"Paylaw", 'String'>
 }

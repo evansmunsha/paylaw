@@ -1157,6 +1157,7 @@ export const PaylawScalarFieldEnum = {
   foodExpense: 'foodExpense',
   otherDeduct: 'otherDeduct',
   status: 'status',
+  public: 'public',
   createdAt: 'createdAt',
   userId: 'userId'
 } as const

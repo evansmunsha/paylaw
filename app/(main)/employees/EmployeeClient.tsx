@@ -227,7 +227,7 @@ export default function EmployeeClient({
           onClick={openAdd}
           className="ml-auto flex items-center gap-2 bg-black text-white
                      text-sm font-medium px-4 py-2 rounded-lg
-                     hover:bg-gray-800 transition-colors flex-shrink-0"
+                     hover:bg-gray-800 transition-colors shrink-0"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <line x1="6" y1="1" x2="6" y2="11" stroke="currentColor"
@@ -270,7 +270,7 @@ export default function EmployeeClient({
             >
               <div className={`w-10 h-10 rounded-full flex items-center
                                justify-center text-sm font-semibold mb-3
-                               flex-shrink-0
+                               shrink-0
                                ${avColours[i % avColours.length]}`}>
                 {initials(emp.name)}
               </div>

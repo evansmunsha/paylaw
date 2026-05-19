@@ -65,6 +65,7 @@ model Paylaw {
   foodExpense Float    @default(0)
   otherDeduct Float    @default(0)
   status      String   @default("draft") // "draft" or "done"
+  public      Boolean  @default(false)
   createdAt   DateTime @default(now())
 
   userId      String
