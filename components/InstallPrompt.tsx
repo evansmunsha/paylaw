@@ -70,13 +70,14 @@ export default function InstallPrompt() {
   return (
     <>
       {/* Install banner */}
-      <div className="fixed bottom-20 md:bottom-4 left-1/2 -translate-x-1/2
-                      z-50 w-full max-w-sm px-4">
-        <div className="bg-white border border-gray-200 rounded-2xl
-                        shadow-xl p-4 flex items-center gap-3">
+      <div className="fixed z-50 inset-x-0 md:left-1/2 md:-translate-x-1/2
+              bottom-0 md:bottom-4 px-4 md:px-0">
+        <div className="bg-white border border-gray-200 rounded-t-2xl md:rounded-2xl
+            shadow-xl p-4 md:p-4 flex flex-col sm:flex-row items-stretch
+            sm:items-center gap-3 max-w-full md:max-w-sm mx-auto">
           {/* App icon */}
           <div className="w-12 h-12 bg-black rounded-xl flex items-center
-                          justify-center flex-shrink-0">
+                          justify-center shrink-0">
             <span className="text-white text-sm font-bold">PL</span>
           </div>
 
@@ -91,19 +92,20 @@ export default function InstallPrompt() {
             </p>
           </div>
 
-          <div className="flex gap-2 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => setShow(false)}
               className="text-xs text-gray-400 hover:text-gray-600
-                         px-2 py-1"
+                         px-2 py-2 rounded-lg border border-gray-100
+                         w-full sm:w-auto"
             >
               Later
             </button>
             <button
               onClick={handleInstall}
               className="bg-black text-white text-xs font-semibold
-                         px-3 py-1.5 rounded-lg hover:bg-gray-800
-                         transition-colors"
+                         px-3 py-2 rounded-lg hover:bg-gray-800
+                         transition-colors w-full sm:w-auto"
             >
               {isIOS ? 'How?' : 'Install'}
             </button>
@@ -131,7 +133,7 @@ export default function InstallPrompt() {
               <div className="flex items-start gap-3">
                 <span className="w-7 h-7 bg-gray-100 rounded-full flex
                                  items-center justify-center text-sm
-                                 font-bold text-gray-700 flex-shrink-0">
+                                 font-bold text-gray-700 shrink-0">
                   1
                 </span>
                 <div>
@@ -148,7 +150,7 @@ export default function InstallPrompt() {
               <div className="flex items-start gap-3">
                 <span className="w-7 h-7 bg-gray-100 rounded-full flex
                                  items-center justify-center text-sm
-                                 font-bold text-gray-700 flex-shrink-0">
+                                 font-bold text-gray-700 shrink-0">
                   2
                 </span>
                 <div>
@@ -165,7 +167,7 @@ export default function InstallPrompt() {
               <div className="flex items-start gap-3">
                 <span className="w-7 h-7 bg-black rounded-full flex
                                  items-center justify-center text-sm
-                                 font-bold text-white flex-shrink-0">
+                                 font-bold text-white shrink-0">
                   3
                 </span>
                 <div>

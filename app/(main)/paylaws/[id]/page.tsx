@@ -481,3 +481,35 @@ export default async function ViewPaylawPage({
     </div>
   )
 }
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const { id } = params
+  const paylaw = await prisma.paylaw.findUnique({ where: { id }, include: { rows: true } })
+  if (!paylaw) return {}
+
+  const title = `Paylaw — ${paylaw.site} (${MONTH_NAMES[paylaw.month - 1]} ${paylaw.year})`
+  const description = `Paylaw for ${paylaw.site} prepared by ${paylaw.preparedBy}. ${paylaw.rows.length} workers, total ${formatMoney(paylaw.rows.reduce((t, r) => t + r.amount, 0), 'ZMW')}.`
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://paylaw.vercel.app'
+  const url = `${base.replace(/\/$/, '')}/paylaws/${id}`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      images: [
+        {
+          url: `${base.replace(/\/$/, '')}/api/og/paylaw/${id}`,
+          alt: 'PayLaw preview image',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  }
+}

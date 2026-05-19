@@ -38,6 +38,15 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="PayLaw" />
         <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
         <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
+        {/* Structured data for SEO */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "PayLaw",
+          "url": "https://paylaw.vercel.app",
+          "logo": "https://paylaw.vercel.app/icons/icon-512x512.png",
+          "sameAs": []
+        }) }} />
       </head>
       <body>
         <Providers>

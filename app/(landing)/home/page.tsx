@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import ShareButton from '@/components/ShareButton'
 
 export default function LandingPage() {
   return (
@@ -75,6 +76,7 @@ export default function LandingPage() {
           >
             See how it works
           </Link>
+          <ShareButton />
         </div>
 
         {/* Supported currencies */}
