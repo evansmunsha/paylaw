@@ -3,10 +3,6 @@ import { stripe, getPlanFromPriceId } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
 import type Stripe from 'stripe'
 
-// Tell Next.js not to parse the body
-// Stripe needs the raw body to verify the webhook
-export const config = { api: { bodyParser: false } }
-
 export async function POST(req: Request) {
   const body      = await req.text()
   const signature = req.headers.get('stripe-signature')!

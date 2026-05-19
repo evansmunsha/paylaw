@@ -78,10 +78,12 @@ function renderSvg(paylaw: any, currency: string) {
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
+
   const paylaw = await prisma.paylaw.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { rows: true },
   })
 
@@ -93,7 +95,7 @@ export async function GET(
   const svg = renderSvg(paylaw, currency)
   const image = await sharp(Buffer.from(svg)).png().toBuffer()
 
-  return new Response(image, {
+  return new Response(new Uint8Array(image), {
     status: 200,
     headers: {
       'Content-Type': 'image/png',
