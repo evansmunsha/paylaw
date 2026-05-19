@@ -3,14 +3,48 @@ import './globals.css'
 import { Providers } from './providers'
 import InstallPrompt from '@/components/InstallPrompt'
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://paylaw.vercel.app'
+const siteTitle = 'PayLaw — Construction Payroll'
+const siteDescription = 'Run construction payroll, attendance, overtime and PDF payslips from your phone.'
+const siteImage = `${siteUrl}/api/og/landing`
+
 export const metadata: Metadata = {
-  title: 'PayLaw — Construction Payroll',
-  description: 'Manage your site workers, paylaws and overtime',
+  title: siteTitle,
+  description: siteDescription,
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'PayLaw',
+  },
+  openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+    url: siteUrl,
+    siteName: 'PayLaw',
+    type: 'website',
+    images: [
+      {
+        url: siteImage,
+        width: 1200,
+        height: 630,
+        alt: 'PayLaw sample PDF preview',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteTitle,
+    description: siteDescription,
+    images: [siteImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
 }
 
@@ -39,14 +73,19 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
         <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
         {/* Structured data for SEO */}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": "PayLaw",
-          "url": "https://paylaw.vercel.app",
-          "logo": "https://paylaw.vercel.app/icons/icon-512x512.png",
-          "sameAs": []
-        }) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'PayLaw',
+              url: siteUrl,
+              logo: `${siteUrl}/icons/icon-512x512.png`,
+              sameAs: [],
+            }),
+          }}
+        />
       </head>
       <body>
         <Providers>
