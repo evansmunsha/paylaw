@@ -15,11 +15,22 @@ export const metadata: Metadata = {
   description: siteDescription,
   metadataBase: new URL(siteUrl),
   manifest: '/manifest.json',
+  icons: {
+    icon: '/icons/icon-192x192.png',
+    apple: '/icons/icon-512x512.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'PayLaw',
   },
+  keywords: [
+    'construction payroll',
+    'attendance tracking',
+    'overtime tracking',
+    'PDF payslips',
+    'payroll software'
+  ],
   openGraph: {
     title: siteTitle,
     description: siteDescription,
@@ -78,10 +89,6 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="PayLaw" />
         <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
         <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
-        <meta
-          name="google-site-verification"
-          content="XoXKKpxJAqwZshDFMDfiTdq3NOjfVkZcCtbvUNQ0nVo"
-        />
         {/* Structured data for SEO */}
         <script
           type="application/ld+json"

@@ -12,6 +12,15 @@ export default function StructuredData() {
       'Simple payroll software for construction site managers. Mark attendance, track overtime, download PDF payslips.',
     url: siteUrl,
     screenshot: screenshotUrl,
+    publisher: {
+      '@type': 'Organization',
+      name: 'PayLaw',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/icons/icon-512x512.png`,
+      },
+    },
+    sameAs: [siteUrl],
     offers: {
       '@type':    'AggregateOffer',
       priceCurrency: 'USD',
