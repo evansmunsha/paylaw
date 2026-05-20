@@ -78,6 +78,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="PayLaw" />
         <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
         <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
+        <meta
+          name="google-site-verification"
+          content="XoXKKpxJAqwZshDFMDfiTdq3NOjfVkZcCtbvUNQ0nVo"
+        />
         {/* Structured data for SEO */}
         <script
           type="application/ld+json"
