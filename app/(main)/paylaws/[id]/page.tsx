@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect, notFound } from 'next/navigation'
@@ -482,8 +483,8 @@ export default async function ViewPaylawPage({
   )
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const { id } = params
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
   const paylaw = await prisma.paylaw.findUnique({ where: { id }, include: { rows: true } })
   if (!paylaw) return {}
 

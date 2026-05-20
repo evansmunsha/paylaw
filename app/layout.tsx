@@ -2,15 +2,18 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { Providers } from './providers'
 import InstallPrompt from '@/components/InstallPrompt'
+import { Inter } from 'next/font/google'
 
+const inter = Inter({ subsets: ['latin'] })
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://paylaw.vercel.app'
 const siteTitle = 'PayLaw — Construction Payroll'
 const siteDescription = 'Run construction payroll, attendance, overtime and PDF payslips from your phone.'
-const siteImage = `${siteUrl}/api/og/landing`
+const siteImage = `${siteUrl}/opengraph-image`
 
 export const metadata: Metadata = {
   title: siteTitle,
   description: siteDescription,
+  metadataBase: new URL(siteUrl),
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -37,6 +40,9 @@ export const metadata: Metadata = {
     title: siteTitle,
     description: siteDescription,
     images: [siteImage],
+  },
+  alternates: {
+    canonical: siteUrl,
   },
   robots: {
     index: true,
@@ -87,7 +93,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>
+      <body className={inter.className}>
         <Providers>
           {children}
           <InstallPrompt />

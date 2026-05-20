@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /main/
+Disallow: /auth/
 
 Sitemap: https://paylaw.vercel.app/sitemap.xml

@@ -1,3 +1,5 @@
+import StructuredData from '@/components/StructuredData'
+
 export default function LandingLayout({
   children,
 }: {
@@ -5,6 +7,7 @@ export default function LandingLayout({
 }) {
   return (
     <div className="min-h-screen bg-white">
+      <StructuredData />
       {children}
     </div>
   )

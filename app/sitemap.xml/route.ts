@@ -6,6 +6,8 @@ export async function GET() {
   // Static pages
   const pages = [
     { loc: `${base}/`, priority: '1.00' },
+    { loc: `${base}/pricing`, priority: '0.80' },
+    { loc: `${base}/privacy`, priority: '0.64' },
     { loc: `${base}/register`, priority: '0.80' },
     { loc: `${base}/login`, priority: '0.64' },
     { loc: `${base}/paylaws`, priority: '0.80' },

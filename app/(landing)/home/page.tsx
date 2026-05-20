@@ -83,7 +83,10 @@ export default function LandingPage() {
           >
             See how it works
           </Link>
-          <ShareButton />
+          <ShareButton
+            title="PayLaw — Construction Payroll for Site Managers"
+            text="Mark attendance, track overtime, and download PDF payslips with PayLaw. Free to start."
+          />
         </div>
 
         {/* Supported currencies */}
