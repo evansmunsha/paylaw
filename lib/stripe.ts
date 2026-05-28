@@ -1,12 +1,15 @@
 import Stripe from 'stripe'
 
-// Server-side Stripe client
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-04-22.dahlia",
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY is not set')
+}
+
+// Server-side Stripe instance
+export const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2026-04-22.dahlia',
 })
 
-// Client-side helper (for loading Stripe.js)
-export function getStripe() {
+export function getStripePublishableKey(): string {
   return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 }
 

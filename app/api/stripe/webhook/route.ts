@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
-import { stripe, getPlanFromPriceId } from '@/lib/stripe'
+import { stripeClient, getPlanFromPriceId } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
 import type Stripe from 'stripe'
 
-// This is critical — tell Next.js not to parse the body
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
@@ -21,16 +20,13 @@ export async function POST(req: Request) {
   const signature = req.headers.get('stripe-signature')
 
   if (!signature) {
-    return NextResponse.json(
-      { error: 'No signature' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'No signature' }, { status: 400 })
   }
 
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = stripeClient.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
@@ -49,24 +45,20 @@ export async function POST(req: Request) {
     switch (event.type) {
 
       case 'checkout.session.completed': {
-        const checkoutSession = event.data.object as Stripe.CheckoutSession
+        const checkoutSession = event.data.object as Stripe.Checkout.Session
         const userId = checkoutSession.metadata?.userId
-
-        console.log('checkout.session.completed — userId:', userId)
 
         if (!userId) {
           console.error('No userId in checkout session metadata')
           break
         }
 
-        const sub = await stripe.subscriptions.retrieve(
+        const sub = await stripeClient.subscriptions.retrieve(
           checkoutSession.subscription as string
         )
 
         const priceId = sub.items.data[0]?.price.id
         const plan    = getPlanFromPriceId(priceId)
-
-        console.log('Updating user plan to:', plan)
 
         await prisma.user.update({
           where: { id: userId },
@@ -75,20 +67,19 @@ export async function POST(req: Request) {
             stripeSubId:         sub.id,
             stripePriceId:       priceId,
             subStatus:           'active',
-            subCurrentPeriodEnd: new Date(sub.current_period_end * 1000),
-          },
+            subCurrentPeriodEnd: new Date((sub.items.data[0]?.current_period_end ?? 0) * 1000),          },
         })
 
-        console.log('Plan updated successfully for user:', userId)
+        console.log('Plan updated to', plan, 'for user', userId)
         break
       }
 
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice
-        const subId   = invoice.subscription as string
+        const subId   = invoice.parent?.subscription_details?.subscription as string
         if (!subId) break
 
-        const sub    = await stripe.subscriptions.retrieve(subId)
+        const sub    = await stripeClient.subscriptions.retrieve(subId)
         const userId = sub.metadata?.userId
         if (!userId) break
 
@@ -100,7 +91,7 @@ export async function POST(req: Request) {
           data: {
             plan,
             subStatus:           'active',
-            subCurrentPeriodEnd: new Date(sub.current_period_end * 1000),
+            subCurrentPeriodEnd: new Date((sub.items.data[0]?.current_period_end ?? 0) * 1000),
           },
         })
         break
@@ -108,10 +99,11 @@ export async function POST(req: Request) {
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
-        const subId   = invoice.subscription as string
+        // ✅ New - subscription is nested under parent
+        const subId = invoice.parent?.subscription_details?.subscription as string
         if (!subId) break
 
-        const sub    = await stripe.subscriptions.retrieve(subId)
+        const sub    = await stripeClient.subscriptions.retrieve(subId)
         const userId = sub.metadata?.userId
         if (!userId) break
 
@@ -154,7 +146,7 @@ export async function POST(req: Request) {
             plan,
             stripePriceId:       priceId,
             subStatus:           sub.status === 'active' ? 'active' : 'past_due',
-            subCurrentPeriodEnd: new Date(sub.current_period_end * 1000),
+            subCurrentPeriodEnd: new Date((sub.items.data[0]?.current_period_end ?? 0) * 1000),
           },
         })
         break
@@ -162,8 +154,7 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error('Error processing webhook:', err)
-    // Still return 200 so Stripe does not retry
-    return NextResponse.json({ received: true, error: 'Processing failed' })
+    return NextResponse.json({ received: true })
   }
 
   return NextResponse.json({ received: true })

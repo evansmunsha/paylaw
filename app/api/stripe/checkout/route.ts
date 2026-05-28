@@ -2,10 +2,9 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getStripe, getPriceId } from '@/lib/stripe'
+import { stripeClient, getPriceId } from '@/lib/stripe'
 
 export async function POST(req: Request) {
-  const stripe = getStripe()
   const session = await getServerSession(authOptions)
   if (!session) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
@@ -28,13 +27,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 })
   }
 
-  // Create or reuse Stripe customer
   let customerId = user.stripeCustomerId
 
   if (!customerId) {
-    const customer = await stripe.customers.create({
-      email: user.email,
-      name:  user.name || undefined,
+    const customer = await stripeClient.customers.create({
+      email:    user.email,
+      name:     user.name || undefined,
       metadata: { userId: user.id },
     })
     customerId = customer.id
@@ -45,25 +43,21 @@ export async function POST(req: Request) {
     })
   }
 
-  const priceId   = getPriceId(plan as 'starter' | 'pro', period)
-  const appUrl    = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const priceId = getPriceId(
+    plan as 'starter' | 'pro',
+    period as 'monthly' | 'yearly'
+  )
 
-  // Create Stripe checkout session
-  const checkout = await stripe.checkout.sessions.create({
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+  const checkout = await stripeClient.checkout.sessions.create({
     customer:             customerId,
     mode:                 'subscription',
     payment_method_types: ['card'],
-    line_items: [{
-      price:    priceId,
-      quantity: 1,
-    }],
+    line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${appUrl}/billing?success=true`,
     cancel_url:  `${appUrl}/billing?canceled=true`,
-    metadata: {
-      userId: user.id,
-      plan,
-      period,
-    },
+    metadata: { userId: user.id, plan, period },
     subscription_data: {
       metadata: { userId: user.id, plan },
     },

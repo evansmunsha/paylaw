@@ -2,10 +2,9 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getStripe } from '@/lib/stripe'
+import { stripeClient } from '@/lib/stripe'
 
 export async function POST() {
-  const stripe = getStripe()
   const session = await getServerSession(authOptions)
   if (!session) {
     return NextResponse.json({ error: 'Not logged in' }, { status: 401 })
@@ -24,12 +23,7 @@ export async function POST() {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-  // Stripe customer portal lets users:
-  // - upgrade/downgrade their plan
-  // - update payment method
-  // - cancel subscription
-  // - download invoices
-  const portal = await stripe.billingPortal.sessions.create({
+  const portal = await stripeClient.billingPortal.sessions.create({
     customer:   user.stripeCustomerId,
     return_url: `${appUrl}/billing`,
   })
