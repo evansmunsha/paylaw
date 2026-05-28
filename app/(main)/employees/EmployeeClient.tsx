@@ -129,6 +129,10 @@ export default function EmployeeClient({
         })
         if (!res.ok) {
           const d = await res.json()
+          if (d.code === 'PLAN_LIMIT') {
+            setError(`${d.error} ${d.upgrade || ''}`.trim())
+            return
+          }
           setError(d.error || 'Failed to create')
           return
         }

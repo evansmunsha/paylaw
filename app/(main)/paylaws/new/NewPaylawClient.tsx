@@ -259,6 +259,10 @@ export default function NewPaylawClient({
 
       if (!res.ok) {
         const data = await res.json()
+        if (data.code === 'PLAN_LIMIT') {
+          setError(`${data.error} ${data.upgrade || ''}`.trim())
+          return
+        }
         setError(data.error || 'Something went wrong')
         return
       }
