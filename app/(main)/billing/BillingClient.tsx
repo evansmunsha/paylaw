@@ -36,6 +36,8 @@ export default function BillingClient({
     typeof window !== 'undefined' &&
     new URLSearchParams(window.location.search).get('success') === 'true'
   )
+  const [syncing, setSyncing] = useState(false)
+  const [syncMsg, setSyncMsg] = useState('')
 
   async function handleCheckout(
     planName: 'starter' | 'pro',
@@ -70,6 +72,27 @@ export default function BillingClient({
     }
   }
 
+  
+
+  async function handleSync() {
+    setSyncing(true)
+    setSyncMsg('')
+    try {
+      const res  = await fetch('/api/stripe/sync', { method: 'POST' })
+      const data = await res.json()
+      if (data.synced) {
+        setSyncMsg(`Plan synced — refreshing...`)
+        setTimeout(() => window.location.reload(), 1500)
+      } else {
+        setSyncMsg(data.error || 'Could not sync')
+      }
+    } catch {
+      setSyncMsg('Something went wrong')
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   return (
     <div className="p-4 md:p-6 flex flex-col gap-5 max-w-3xl">
 
@@ -98,6 +121,36 @@ export default function BillingClient({
                       after:content-['']">
           Current plan
         </p>
+
+        {/* Sync button */}
+        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center
+                        justify-between flex-wrap gap-3">
+          <p className="text-xs text-gray-400">
+            Paid but still showing free? Click sync.
+          </p>
+          <div className="flex items-center gap-3">
+            {syncMsg && (
+              <span className="text-xs text-green-600">{syncMsg}</span>
+            )}
+            <button
+              onClick={handleSync}
+              disabled={syncing}
+              className="flex items-center gap-2 text-xs border border-gray-200
+                        px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-50
+                        transition-colors disabled:opacity-50"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+                  className={syncing ? 'animate-spin' : ''}>
+                <path d="M10 6A4 4 0 112 6" stroke="currentColor"
+                      strokeWidth="1.4" strokeLinecap="round"/>
+                <path d="M10 6V3M10 6H7" stroke="currentColor"
+                      strokeWidth="1.4" strokeLinecap="round"
+                      strokeLinejoin="round"/>
+              </svg>
+              {syncing ? 'Syncing...' : 'Sync plan with Stripe'}
+            </button>
+          </div>
+        </div>
 
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
