@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { Providers } from './providers'
 import InstallPrompt from '@/components/InstallPrompt'
+import { Analytics } from '@vercel/analytics/next'
 import { Inter } from 'next/font/google'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -108,6 +109,7 @@ export default function RootLayout({
         <Providers>
           {children}
           <InstallPrompt />
+          <Analytics />
         </Providers>
       </body>
     </html>
