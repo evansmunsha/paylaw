@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { formatMoney } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
+import UpgradeBanner from '@/components/UpgradeBanner'
+import { getLimits } from '@/lib/plans'
 import Link from 'next/link'
 import DeletePaylaw from './DeletePaylaw'
 
@@ -20,6 +22,18 @@ export default async function PaylawsPage() {
     ? { userId: session.user.adminId!, site: session.user.site! }
     : { userId: session.user.id }
 
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session.user.role === 'foreman'
+        ? session.user.adminId!
+        : session.user.id,
+    },
+    select: { plan: true },
+  })
+
+  const plan = user?.plan || 'free'
+  const limits = getLimits(plan)
+
   const [paylaws, settings] = await Promise.all([
     prisma.paylaw.findMany({
       where: userWhere,
@@ -32,6 +46,14 @@ export default async function PaylawsPage() {
   ])
 
   const currency = settings?.currency || 'ZMW'
+  const currentMonthCount = paylaws.filter(
+    p => p.month === new Date().getMonth() + 1 &&
+         p.year === new Date().getFullYear()
+  ).length
+
+  const showPaylawLimitBanner =
+    limits.maxPaylaws !== -1 &&
+    currentMonthCount >= limits.maxPaylaws
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -41,6 +63,14 @@ export default async function PaylawsPage() {
       />
 
       <div className="p-4 md:p-6 flex flex-col gap-5">
+        {showPaylawLimitBanner && (
+          <UpgradeBanner
+            title="You've reached this month's paylaw limit"
+            message="The free plan allows up to 3 paylaws per month. Upgrade to Starter for unlimited paylaws and automated reporting."
+            feature="3 monthly paylaws on Free · Unlimited on Starter"
+            compact
+          />
+        )}
 
         <div className="flex items-center justify-between flex-wrap gap-3">
           <p className="text-sm text-gray-500">

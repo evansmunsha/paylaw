@@ -10,6 +10,7 @@ export default async function BillingPage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
+  // Foremen cannot access billing — redirect to dashboard
   if (session.user.role !== 'admin') redirect('/dashboard')
 
   const user = await prisma.user.findUnique({

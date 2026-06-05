@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { formatMoney } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
+import UpgradeBanner from '@/components/UpgradeBanner'
 import Link from 'next/link'
 import MonthSelector from './MonthSelector'
 import ExportExcelButton from '@/components/ExportExcelButton'
@@ -50,6 +51,31 @@ export default async function SummaryPage({
   // Clamp month to valid range just in case
   const safeMonth = Math.min(Math.max(month, 1), 12)
   const safeYear  = year > 2000 && year < 2100 ? year : now.getFullYear()
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { plan: true },
+  })
+
+  const plan = user?.plan || 'free'
+
+  if (plan === 'free') {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Topbar
+          title="Summary"
+          subtitle="Monthly pay summary across all sites"
+        />
+        <div className="p-4 md:p-6">
+          <UpgradeBanner
+            title="Pay summary reports are not available on the free plan"
+            message="Upgrade to Starter to see monthly summaries, year-to-date totals, bar charts and export to Excel."
+            feature="Monthly summary, YTD report, site breakdown, Excel export"
+          />
+        </div>
+      </div>
+    )
+  }
 
   const [paylaws, overtimes, settings] = await Promise.all([
     prisma.paylaw.findMany({

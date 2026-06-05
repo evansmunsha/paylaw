@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Topbar from '@/components/Topbar'
 import EmployeeClient from './EmployeeClient'
+import { getLimits } from '@/lib/plans'
 
 export default async function EmployeesPage() {
   const session = await getServerSession(authOptions)
@@ -17,6 +18,16 @@ export default async function EmployeesPage() {
         site:   session.user.site!,
       }
     : { userId: session.user.id }
+
+  const user = isForeman
+    ? null
+    : await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { plan: true },
+      })
+
+  const plan = user?.plan || 'free'
+  const limits = getLimits(plan)
 
   const [employees, foremanUsers, settings] = await Promise.all([
     prisma.employee.findMany({
@@ -64,6 +75,8 @@ export default async function EmployeesPage() {
         allSites={allSites}
         foremanSites={foremanUsers as { site: string; name: string | null }[]}
         currency={settings?.currency || 'ZMW'}
+        plan={plan}
+        workerLimit={limits.maxWorkers}
       />
     </div>
   )

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import UpgradeBanner from '@/components/UpgradeBanner'
 import { getCurrencySymbol } from '@/lib/currency'
 
 interface Employee {
@@ -25,6 +26,8 @@ interface Props {
   allSites: string[]
   foremanSites: ForemanSite[]
   currency: string
+  plan: string
+  workerLimit: number
 }
 
 const avColours = [
@@ -40,6 +43,8 @@ export default function EmployeeClient({
   allSites,
   foremanSites,
   currency,
+  plan,
+  workerLimit,
 }: Props) {
   const router = useRouter()
   const { data: session } = useSession()
@@ -62,6 +67,10 @@ export default function EmployeeClient({
   const [saving, setSaving]     = useState(false)
   const [error, setError]       = useState('')
 
+  const showWorkerLimitBanner =
+    workerLimit !== -1 && employees.length >= workerLimit
+  const canAddEmployee = !showWorkerLimitBanner
+
   const filtered = employees.filter(e => {
     const matchSearch =
       e.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -77,6 +86,11 @@ export default function EmployeeClient({
   const inactiveCount = employees.filter(e => !e.active).length
 
   function openAdd() {
+    if (!canAddEmployee) {
+      setError(`You have reached your ${plan} plan limit of ${workerLimit} workers. Upgrade to Pro for unlimited employees.`)
+      return
+    }
+
     setEditing(null)
     setName('')
     setJobTitle('')
@@ -187,6 +201,14 @@ export default function EmployeeClient({
       )}
 
       {/* Toolbar */}
+      {showWorkerLimitBanner && (
+        <UpgradeBanner
+          title="Employee limit reached"
+          message={`Your ${plan} plan supports up to ${workerLimit} workers. Upgrade to Pro to add unlimited employees.`}
+          feature="Unlimited workers on Pro"
+          compact
+        />
+      )}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-0 max-w-xs">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2
@@ -229,9 +251,11 @@ export default function EmployeeClient({
 
         <button
           onClick={openAdd}
-          className="ml-auto flex items-center gap-2 bg-black text-white
-                     text-sm font-medium px-4 py-2 rounded-lg
-                     hover:bg-gray-800 transition-colors shrink-0"
+          disabled={!canAddEmployee}
+          className={`ml-auto flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg shrink-0 transition-colors
+                     ${canAddEmployee
+                       ? 'bg-black text-white hover:bg-gray-800'
+                       : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <line x1="6" y1="1" x2="6" y2="11" stroke="currentColor"

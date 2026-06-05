@@ -108,7 +108,7 @@ const navItems: NavItem[] = [
   {
     label: 'Billing',
     href: '/billing',
-    roles: ['admin'],
+    roles: ['admin'],   // ← foremen cannot see this
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <rect x="1" y="3.5" width="14" height="9" rx="2"
@@ -200,7 +200,11 @@ export default function Sidebar() {
   const site              = session?.user?.site
 
   // Only show nav items the current role is allowed to see
-  const visibleItems = navItems.filter(item => item.roles.includes(role))
+  // and make billing explicitly admin-only.
+  const visibleItems = navItems.filter(item =>
+    item.roles.includes(role) &&
+    (item.href !== '/billing' || role === 'admin')
+  )
 
   function isActive(href: string) {
     if (href === '/dashboard') return pathname === '/dashboard'
