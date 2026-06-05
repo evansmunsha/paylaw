@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { formatMoney } from '@/lib/currency'
+import { getPlan } from '@/lib/plans'
 import Topbar from '@/components/Topbar'
 import UpgradeBanner from '@/components/UpgradeBanner'
 import Link from 'next/link'
@@ -57,7 +58,7 @@ export default async function SummaryPage({
     select: { plan: true },
   })
 
-  const plan = user?.plan || 'free'
+  const plan = getPlan(user?.plan || 'free')
 
   if (plan === 'free') {
     return (

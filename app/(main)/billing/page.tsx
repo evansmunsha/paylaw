@@ -3,7 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Topbar from '@/components/Topbar'
-import { getLimits } from '@/lib/plans'
+import { getLimits, getPlan, isFreeMode } from '@/lib/plans'
 import BillingClient from './BillingClient'
 
 export default async function BillingPage() {
@@ -12,6 +12,8 @@ export default async function BillingPage() {
 
   // Foremen cannot access billing — redirect to dashboard
   if (session.user.role !== 'admin') redirect('/dashboard')
+
+  if (isFreeMode()) redirect('/dashboard')
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -33,7 +35,7 @@ export default async function BillingPage() {
 
   if (!user) redirect('/login')
 
-  const plan   = user.plan || 'free'
+  const plan   = getPlan(user.plan || 'free')
   const limits = getLimits(plan)
 
   return (

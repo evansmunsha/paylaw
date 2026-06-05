@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { isFreeMode } from '@/lib/plans'
 
 export async function GET() {
   const base = (process.env.NEXT_PUBLIC_SITE_URL || 'https://paylaw.vercel.app').replace(/\/$/, '')
@@ -6,7 +7,7 @@ export async function GET() {
   // Static pages
   const pages = [
     { loc: `${base}/`, priority: '1.00' },
-    { loc: `${base}/pricing`, priority: '0.80' },
+    ...(!isFreeMode() ? [{ loc: `${base}/pricing`, priority: '0.80' }] : []),
     { loc: `${base}/privacy`, priority: '0.64' },
     { loc: `${base}/register`, priority: '0.80' },
     { loc: `${base}/login`, priority: '0.64' },

@@ -198,12 +198,14 @@ export default function Sidebar() {
   const { data: session } = useSession()
   const role              = session?.user?.role || 'admin'
   const site              = session?.user?.site
+  const FREE_MODE         = process.env.NEXT_PUBLIC_FREE_MODE === 'true'
 
   // Only show nav items the current role is allowed to see
   // and make billing explicitly admin-only.
   const visibleItems = navItems.filter(item =>
     item.roles.includes(role) &&
-    (item.href !== '/billing' || role === 'admin')
+    (item.href !== '/billing' || role === 'admin') &&
+    !(FREE_MODE && item.href === '/billing')
   )
 
   function isActive(href: string) {

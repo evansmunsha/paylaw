@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Topbar from '@/components/Topbar'
 import EmployeeClient from './EmployeeClient'
-import { getLimits } from '@/lib/plans'
+import { getLimits, getPlan } from '@/lib/plans'
 
 export default async function EmployeesPage() {
   const session = await getServerSession(authOptions)
@@ -26,7 +26,7 @@ export default async function EmployeesPage() {
         select: { plan: true },
       })
 
-  const plan = user?.plan || 'free'
+  const plan = getPlan(user?.plan || 'free')
   const limits = getLimits(plan)
 
   const [employees, foremanUsers, settings] = await Promise.all([

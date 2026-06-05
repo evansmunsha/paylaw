@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Topbar from '@/components/Topbar'
 import UpgradeBanner from '@/components/UpgradeBanner'
-import { getLimits } from '@/lib/plans'
+import { getLimits, getPlan } from '@/lib/plans'
 import TeamClient from './TeamClient'
 
 export default async function TeamPage() {
@@ -19,7 +19,7 @@ export default async function TeamPage() {
     select: { plan: true },
   })
 
-  const plan   = user?.plan || 'free'
+  const plan   = getPlan(user?.plan || 'free')
   const limits = getLimits(plan)
 
   const foremen = await prisma.user.findMany({

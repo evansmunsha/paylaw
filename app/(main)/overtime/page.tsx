@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { formatMoney } from '@/lib/currency'
+import { getLimits, getPlan } from '@/lib/plans'
 import Topbar from '@/components/Topbar'
 import UpgradeBanner from '@/components/UpgradeBanner'
 import Link from 'next/link'
@@ -26,7 +27,7 @@ export default async function OvertimePage() {
     select: { plan: true },
   })
 
-  const plan = owner?.plan || 'free'
+  const plan = getPlan(owner?.plan || 'free')
 
   const [overtimes, settings] = await Promise.all([
     plan !== 'free'

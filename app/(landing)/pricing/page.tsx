@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+import { isFreeMode } from '@/lib/plans'
 import Link from 'next/link'
 
 const plans = [
@@ -68,6 +70,8 @@ const plans = [
 ]
 
 export default function PricingPage() {
+  if (isFreeMode()) redirect('/home')
+
   return (
     <div className="min-h-screen bg-white">
       <nav className="flex items-center justify-between px-6 md:px-16 py-5 border-b border-gray-100">

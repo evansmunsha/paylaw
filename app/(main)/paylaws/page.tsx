@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { formatMoney } from '@/lib/currency'
 import Topbar from '@/components/Topbar'
 import UpgradeBanner from '@/components/UpgradeBanner'
-import { getLimits } from '@/lib/plans'
+import { getLimits, getPlan } from '@/lib/plans'
 import Link from 'next/link'
 import DeletePaylaw from './DeletePaylaw'
 
@@ -31,7 +31,7 @@ export default async function PaylawsPage() {
     select: { plan: true },
   })
 
-  const plan = user?.plan || 'free'
+  const plan = getPlan(user?.plan || 'free')
   const limits = getLimits(plan)
 
   const [paylaws, settings] = await Promise.all([

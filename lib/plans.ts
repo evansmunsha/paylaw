@@ -53,8 +53,19 @@ export const PLAN_PRICES = {
   },
 }
 
+export const FREE_MODE = process.env.NEXT_PUBLIC_FREE_MODE === 'true'
+
+export function isFreeMode(): boolean {
+  return FREE_MODE
+}
+
+export function getPlan(plan: string): Plan {
+  if (FREE_MODE) return 'pro'
+  return plan === 'starter' || plan === 'pro' ? plan : 'free'
+}
+
 export function getLimits(plan: string): PlanLimits {
-  return PLAN_LIMITS[plan as Plan] || PLAN_LIMITS.free
+  return PLAN_LIMITS[getPlan(plan)]
 }
 
 export function canDo(
